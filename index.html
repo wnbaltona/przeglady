@@ -149,19 +149,14 @@ function refreshLists(){
 
 function render(){
   refreshLists();
-  const q=$('#search').value.toLowerCase(),
-        city=$('#city').value,
-        st=$('#status').value,
-        pr=$('#protocol').value,
-        shown=data.filter(r=>(!q||Object.values(r).join(' ').toLowerCase().includes(q))&&(!city||r.city===city)&&(!st||state(r)===st)&&(!pr||protocol(r)===pr)).sort((a,b)=>(nextDate(a.done,a.months)||'9999').localeCompare(nextDate(b.done,b.months)||'9999'));
+  const q=$('#search').value.toLowerCase(),city=$('#city').value,st=$('#status').value,pr=$('#protocol').value;
+  const shown=data.filter(r=>(!q||Object.values(r).join(' ').toLowerCase().includes(q))&&(!city||r.city===city)&&(!st||state(r)===st)&&(!pr||protocol(r)===pr)).sort((a,b)=>(nextDate(a.done,a.months)||'9999').localeCompare(nextDate(b.done,b.months)||'9999'));
   
-  for(const [id,s] of [['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']]) $('#'+id).textContent=data.filter(r=>state(r)===s).length;
+  for(const [id,s] of [['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;
   $('#all').textContent=data.length;
-
+  
   $('#rows').innerHTML=shown.map(r=>{
-    const rowIndex=data.indexOf(r),
-          s=state(r),
-          p=protocol(r);
+    const s=state(r),p=protocol(r);
     return `<tr>
       <td>${esc(r.city)}</td>
       <td><b>${esc(r.local)}</b></td>
@@ -169,20 +164,10 @@ function render(){
       <td>${format(r.done)}</td>
       <td>${format(nextDate(r.done,r.months))}</td>
       <td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td>
-      <td>
-        <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
-          <span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>
-          ${r.protocolPath?`<button class="secondary" data-action="open" data-index="${rowIndex}">Otwórz</button>`:''}
-        </div>
-      </td>
+      <td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?` <button class="secondary" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td>
       <td>${esc(r.notes)}</td>
-      <td style="white-space: nowrap;">
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <button class="secondary" data-action="edit" data-index="${rowIndex}">Edytuj</button>
-          <button class="danger" data-action="delete" data-index="${rowIndex}">Usuń</button>
-        </div>
-      </td>
-    </tr>`
+      <td><button class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button> <button class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button></td>
+    </tr>`;
   }).join('');
 }
 
