@@ -181,20 +181,20 @@ function render(){
   for(const [id,s] of [['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;
   $('#all').textContent=data.length;
   
-  $('#rows').innerHTML=shown.map(r=>{
-    const s=state(r),p=protocol(r);
-    return `<tr>
-      <td>${esc(r.city)}</td>
-      <td><b>${esc(r.local)}</b></td>
-      <td>${esc(r.type)}</td>
-      <td>${format(r.done)}</td>
-      <td>${format(nextDate(r.done,r.months))}</td>
-      <td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td>
-      <td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?` <button class="secondary" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td>
-      <td>${esc(r.notes)}</td>
-      <td><button class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button> <button class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button></td>
-    </tr>`;
-  }).join('');
+  $('#rows').innerHTML = shown.map(r=>{
+  const s=state(r),p=protocol(r);
+  return `<tr>
+    <td>${esc(r.city)}</td>
+    <td><b>${esc(r.local)}</b></td>
+    <td>${esc(r.type)}</td>
+    <td>${format(r.done)}</td>
+    <td>${format(nextDate(r.done,r.months))}</td>
+    <td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td>
+    <td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?` <button class="secondary" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td>
+    <td>${esc(r.notes)}</td>
+    <td><button class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button> <button class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button></td>
+  </tr>`;
+}).join('');
 }
 
 async function load(){
