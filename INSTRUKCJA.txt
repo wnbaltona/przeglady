@@ -1,0 +1,32 @@
+PRZEGLĄDY — uruchomienie wspólnego rejestru
+
+1. Załóż projekt na https://supabase.com i w SQL Editor uruchom plik supabase-schema.sql.
+2. W Authentication > Providers włącz Email. W URL Configuration dodaj adres, pod którym
+   będzie opublikowana aplikacja. Konta pracowników utwórz w Authentication > Users albo
+   ustaw allowRegistration:true w supabase-config.js tylko na czas rejestracji.
+3. W Settings > API skopiuj Project URL oraz anon/public key do supabase-config.js.
+   Nie wpisuj tam klucza service_role.
+4. Opublikuj cały folder na firmowym hostingu statycznym (np. SharePoint, Azure Static Web Apps
+   lub Netlify). Nie otwieraj index.html bezpośrednio z dysku — wtedy logowanie może nie działać.
+5. Po pierwszym logowaniu aplikacja sama zapisze dane startowe z pliku dane-startowe.js,
+   który został wygenerowany z przekazanego pliku przeglądy.xlsx. Zmiany wprowadzone przez
+   jedną osobę są od razu zapisywane w Supabase i pojawiają się u pozostałych.
+
+AUTOMATYCZNE AKTUALIZOWANIE Z EXCELA
+
+Jeżeli Excel ma pozostać źródłem referencyjnym, uruchamiaj cyklicznie sync_excel_to_supabase.py
+na komputerze lub serwerze, który ma dostęp do zsynchronizowanego OneDrive. Skrypt aktualizuje
+wiersze pochodzące z Excela i nie usuwa wpisów dodanych tylko w aplikacji.
+
+Przykład jednorazowego uruchomienia w PowerShell:
+  $env:SUPABASE_URL='https://twoj-projekt.supabase.co'
+  $env:SUPABASE_SERVICE_ROLE_KEY='sekretny_klucz_service_role'
+  python .\sync_excel_to_supabase.py 'C:\Users\wniziolek\OneDrive - Baltona\Pulpit\przeglądy.xlsx'
+
+Dodaj powyższe polecenie w Harmonogramie zadań Windows, np. co godzinę. Service role jest
+kluczem administracyjnym: przechowuj go wyłącznie w zmiennej systemowej konta uruchamiającego
+zadanie, nigdy w pliku aplikacji, Excelu ani w Git.
+
+UWAGA: synchronizacja traktuje pola w Excelu jako nadrzędne dla wierszy importowanych z Excela.
+Jeśli dany wiersz ma być aktualizowany wyłącznie przez dział w aplikacji, usuń go z Excela albo
+nie obejmuj go harmonogramem synchronizacji.

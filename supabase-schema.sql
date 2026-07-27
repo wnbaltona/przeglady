@@ -1,0 +1,51 @@
+-- Uruchom ten skrypt w Supabase: SQL Editor > New query.
+-- Dostęp do danych ma wyłącznie osoba zalogowana w projekcie Supabase.
+create table if not exists public.inspections (
+  id text primary key,
+  city text not null default '',
+  local text not null default '',
+  type text not null default '',
+  done date,
+  months integer not null default 12,
+  protocol_date date,
+  protocol_file_name text,
+  protocol_path text,
+  notes text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.inspections add column if not exists protocol_path text;
+alter table public.inspections add column if not exists created_at timestamptz not null default now();
+
+create or replace function public.set_updated_at()
+returns trigger language plpgsql as $$
+begin new.updated_at = now(); return new; end $$;
+
+drop trigger if exists inspections_set_updated_at on public.inspections;
+create trigger inspections_set_updated_at before update on public.inspections
+for each row execute function public.set_updated_at();
+
+alter table public.inspections enable row level security;
+
+drop policy if exists "Zalogowani odczytują przeglądy" on public.inspections;
+drop policy if exists "Zalogowani dodają przeglądy" on public.inspections;
+drop policy if exists "Zalogowani edytują przeglądy" on public.inspections;
+drop policy if exists "Zalogowani usuwają przeglądy" on public.inspections;
+create policy "Zalogowani odczytują przeglądy" on public.inspections for select to authenticated using (true);
+create policy "Zalogowani dodają przeglądy" on public.inspections for insert to authenticated with check (true);
+create policy "Zalogowani edytują przeglądy" on public.inspections for update to authenticated using (true) with check (true);
+create policy "Zalogowani usuwają przeglądy" on public.inspections for delete to authenticated using (true);
+
+do $$ begin alter publication supabase_realtime add table public.inspections; exception when duplicate_object then null; end $$;
+
+-- Załączniki protokołów: prywatny bucket, dostępny tylko po zalogowaniu.
+insert into storage.buckets (id, name, public) values ('protocols', 'protocols', false) on conflict (id) do nothing;
+drop policy if exists "Zalogowani odczytują protokoły" on storage.objects;
+drop policy if exists "Zalogowani dodają protokoły" on storage.objects;
+drop policy if exists "Zalogowani aktualizują protokoły" on storage.objects;
+drop policy if exists "Zalogowani usuwają protokoły" on storage.objects;
+create policy "Zalogowani odczytują protokoły" on storage.objects for select to authenticated using (bucket_id = 'protocols');
+create policy "Zalogowani dodają protokoły" on storage.objects for insert to authenticated with check (bucket_id = 'protocols');
+create policy "Zalogowani aktualizują protokoły" on storage.objects for update to authenticated using (bucket_id = 'protocols');
+create policy "Zalogowani usuwają protokoły" on storage.objects for delete to authenticated using (bucket_id = 'protocols');
