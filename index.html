@@ -1,16 +1,231 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Przeglądy</title>
-  <!-- Biblioteka do obsługi plików Excel w przeglądarce -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rejestr Przeglądów</title>
+  
+  <!-- Supabase & SheetJS (Excel) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="supabase-config.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --success-bg: #dcfce7;
+      --success-text: #15803d;
+      --warning-bg: #fef9c3;
+      --warning-text: #a16207;
+      --danger-bg: #fee2e2;
+      --danger-text: #b91c1c;
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 20px; line-height: 1.5; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    h1 { font-size: 1.5rem; font-weight: 700; }
+    .user-panel { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    
+    .stats-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .stat-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 16px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.875rem; }
+    .stat-btn.active { border-color: var(--primary); background: #eff6ff; color: var(--primary); }
+
+    .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    input, select, button { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.875rem; outline: none; }
+    input:focus, select:focus { border-color: var(--primary); }
+    
+    button { cursor: pointer; background: var(--primary); color: white; border: none; font-weight: 500; transition: background 0.2s; }
+    button:hover { background: var(--primary-hover); }
+    button.secondary { background: #f1f5f9; color: var(--text); border: 1px solid var(--border); }
+    button.secondary:hover { background: #e2e8f0; }
+    button.danger { background: var(--danger); }
+    button.danger:hover { background: var(--danger-hover); }
+
+    .badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+    .badge.OK { background: var(--success-bg); color: var(--success-text); }
+    .badge.DO { background: var(--warning-bg); color: var(--warning-text); }
+    .badge.PO { background: var(--danger-bg); color: var(--danger-text); }
+    .badge.BRAK { background: #f3f4f6; color: #4b5563; }
+
+    details.city-group { margin-bottom: 12px; }
+    summary.city-summary { cursor: pointer; padding: 12px 16px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); display: flex; justify-content: space-between; align-items: center; font-weight: 600; list-style: none; }
+    summary.city-summary::-webkit-details-marker { display: none; }
+    .city-summary-main { display: flex; align-items: center; gap: 8px; }
+    .city-summary-count { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; }
+    .city-summary-stats { display: flex; gap: 6px; }
+
+    .tablebox { overflow-x: auto; margin-top: 8px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { background: #f8fafc; color: var(--text-muted); font-weight: 600; }
+
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+    .modal.open { display: flex; }
+    .modal-content { background: var(--card-bg); padding: 24px; border-radius: var(--radius); width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); }
+    .form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+    .notice { padding: 12px; background: var(--danger-bg); color: var(--danger-text); border-radius: var(--radius); margin-bottom: 16px; }
+    .sync-info { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+    ul.type-list { list-style: none; margin-top: 10px; max-height: 200px; overflow-y: auto; }
+    ul.type-list li { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>Rejestr Przeglądów</h1>
+      <div id="syncInfo" class="sync-info">Łączenie z bazą...</div>
+    </div>
+    <div class="user-panel">
+      <span id="user"></span>
+      <button id="logout" class="secondary" hidden>Wyloguj</button>
+    </div>
+  </header>
+
+  <div id="notice" class="notice" hidden></div>
+
+  <div class="stats-bar">
+    <button type="button" class="stat-btn" data-quick-status="">Wszystkie: <span id="all">0</span></button>
+    <button type="button" class="stat-btn" data-quick-status="PO TERMINIE">Po terminie: <span id="overdue">0</span></button>
+    <button type="button" class="stat-btn" data-quick-status="DO WYKONANIA">Do wykonania: <span id="due">0</span></button>
+    <button type="button" class="stat-btn" data-quick-status="OK">W normie: <span id="ok">0</span></button>
+  </div>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Szukaj (lokal, rodzaj, uwagi)...">
+    <select id="city"><option value="">Wszystkie miasta</option></select>
+    <select id="status">
+      <option value="">Wszystkie statusy</option>
+      <option value="PO TERMINIE">PO TERMINIE</option>
+      <option value="DO WYKONANIA">DO WYKONANIA</option>
+      <option value="OK">OK</option>
+    </select>
+    <select id="protocol">
+      <option value="">Status protokołu</option>
+      <option value="DODANY">DODANY</option>
+      <option value="BRAK PROTOKOŁU">BRAK PROTOKOŁU</option>
+    </select>
+  </div>
+
+  <div class="controls">
+    <button type="button" id="add">+ Dodaj przegląd</button>
+    <button type="button" id="manageTypes" class="secondary">Zarządzaj rodzajami</button>
+    <button type="button" id="importExcelBtn" class="secondary">Importuj z Excela</button>
+    <button type="button" id="export" class="secondary">Eksportuj CSV</button>
+  </div>
+
+  <div id="cityGroups"></div>
+</div>
+
+<!-- Modal Edycji/Dodawania -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h3 id="formTitle">Dodaj przegląd</h3>
+    <form id="editForm" style="margin-top: 14px;">
+      <div class="form-group">
+        <label>Miasto</label>
+        <input type="text" name="city" list="cities" required placeholder="np. WARSZAWA">
+      </div>
+      <div class="form-group">
+        <label>Lokal</label>
+        <input type="text" name="local" list="locals" required placeholder="np. 170 (Glamour)">
+      </div>
+      <div class="form-group">
+        <label>Rodzaj przeglądu</label>
+        <input type="text" name="type" list="types" required placeholder="np. Klimatyzacja">
+      </div>
+      <div class="form-group">
+        <label>Data wykonania</label>
+        <input type="date" name="done">
+      </div>
+      <div class="form-group">
+        <label>Ważny przez (miesiące)</label>
+        <input type="number" name="months" value="12" required min="1">
+      </div>
+      <div class="form-group">
+        <label>Data dodania protokołu</label>
+        <input type="date" name="protocolDate">
+      </div>
+      <div class="form-group">
+        <label>Plik protokołu (PDF / zdjęcie)</label>
+        <input type="file" name="file" accept="image/*,application/pdf">
+        <span id="fileInfo" class="sync-info"></span>
+      </div>
+      <div class="form-group">
+        <label>Uwagi</label>
+        <input type="text" name="notes" placeholder="Opcjonalne uwagi...">
+      </div>
+      <div class="form-actions">
+        <button type="button" id="cancel" class="secondary">Anuluj</button>
+        <button type="submit">Zapisz</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Rodzajów -->
+<div id="typesModal" class="modal">
+  <div class="modal-content">
+    <h3>Zarządzanie rodzajami przeglądów</h3>
+    <div class="form-group" style="margin-top: 10px;">
+      <input type="text" id="newType" placeholder="Nowy rodzaj przeglądu...">
+      <button type="button" id="addType" style="margin-top: 6px;">Dodaj rodzaj</button>
+    </div>
+    <ul id="typeList" class="type-list"></ul>
+    <div class="form-actions">
+      <button type="button" id="closeTypes" class="secondary">Zamknij</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Logowania -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <h3>Logowanie do rejestru</h3>
+    <form id="loginForm" style="margin-top: 14px;">
+      <div class="form-group">
+        <label>Adres E-mail</label>
+        <input type="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label>Hasło</label>
+        <input type="password" name="password" required>
+      </div>
+      <div id="loginMessage" class="sync-info" style="color: var(--danger); margin-bottom: 8px;"></div>
+      <div class="form-actions">
+        <button type="button" id="register" class="secondary">Zarejestruj</button>
+        <button type="submit">Zaloguj</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<datalist id="cities"></datalist>
+<datalist id="locals"></datalist>
+<datalist id="types"></datalist>
 
 <script>
 const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
 
-// Bezpieczny magazyn pamięci na przypadek blokady localStorage
+// Bezpieczny magazyn pamięci (na przypadek blokady localStorage)
 const safeStorage = (() => {
   try {
     window.localStorage.setItem('__test', '1');
@@ -309,25 +524,30 @@ $('#cityGroups').addEventListener('click',async event=>{
 ['search','city','status','protocol'].forEach(x=>$('#'+x).addEventListener(x==='search'?'input':'change',render));
 $('#editForm').elements.city.addEventListener('input',refreshLocalList);
 
-// AUTOMATYCZNE UZUPEŁNIANIE MIESIĘCY WAŻNOŚCI W ZALEŻNOŚCI OD RODZAJU PRZEGLĄDU
+// AUTOMATYCZNE UZUPEŁNIANIE MIESIĘCY WAŻNOŚCI PO WYBORZE RODZAJU PRZEGLĄDU
 $('#editForm').elements.type.addEventListener('input', e => {
   const typeValue = e.target.value.trim().toLowerCase();
   
-  // Słownik z przypisanymi miesiącami
   const monthsMap = {
     'elektryczny (5-cio letni)': 60,
+    'elektryczny 5-cio letni': 60,
     'elektryczny (roczny)': 12,
+    'roczny': 12,
     'klimatyzacja': 3,
+    'klimatyzacji': 3,
     'mycie jednostek klimatyzacji': 36,
+    'mycie jednostek': 36,
     'wentylacja': 12,
     'rolety': 12,
     'rolety sklepowe': 12,
     'gaśnice': 12,
+    'gasnice': 12,
     'oświetlenie': 1,
-    'sprawdzenie pompy odpływowej': 2
+    'osiwetlenie': 1,
+    'sprawdzenie pompy odpływowej': 2,
+    'sprawdzenie pompy odpluwowej': 2
   };
   
-  // Jeśli wpisany rodzaj znajduje się w słowniku, ustawiamy miesiące
   if (monthsMap[typeValue] !== undefined) {
     $('#editForm').elements.months.value = monthsMap[typeValue];
   }
@@ -366,31 +586,38 @@ document.querySelectorAll('[data-quick-status]').forEach(button=>button.addEvent
   render();
 }));
 
+// Dedykowany mechanizm importu pliku Excel (np. przeglądy.xlsx)
 async function handleExcelImport(file){
-  const dataBuf = await file.arrayBuffer();
-  const workbook = XLSX.read(dataBuf);
-  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-  
-  let importedCount = 0;
-  for(let i=1; i<rows.length; i++){
-    const city = String(rows[i][1]||'').trim();
-    const local = String(rows[i][2]||'').trim();
-    if(city && local && local !== 'Wszystkie lokale'){
-      const {error} = await sb.from('locations').upsert({city, local}, {onConflict: 'city,local'});
-      if(!error) importedCount++;
+  try {
+    const dataBuf = await file.arrayBuffer();
+    const workbook = XLSX.read(dataBuf);
+    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+    
+    let importedCount = 0;
+    for(let i=1; i<rows.length; i++){
+      const city = String(rows[i][1]||'').trim();
+      const local = String(rows[i][2]||'').trim();
+      if(city && local && local !== 'Wszystkie lokale'){
+        const {error} = await sb.from('locations').upsert({city, local}, {onConflict: 'city,local'});
+        if(!error) importedCount++;
+      }
     }
+    alert(`Zaimportowano pomyślnie ${importedCount} lokalizacji do bazy!`);
+    await load();
+  } catch(err) {
+    alert('Wystąpił błąd podczas odczytu pliku Excel: ' + err.message);
   }
-  alert(`Zaimportowano pomyślnie ${importedCount} lokalizacji z pliku Excel!`);
-  load();
 }
 
-const fileInput = document.createElement('input');
-fileInput.type = 'file';
-fileInput.accept = '.xlsx, .xls';
-fileInput.style.display = 'none';
-fileInput.onchange = e => { if(e.target.files[0]) handleExcelImport(e.target.files[0]); };
-document.body.appendChild(fileInput);
+const excelFileInput = document.createElement('input');
+excelFileInput.type = 'file';
+excelFileInput.accept = '.xlsx, .xls';
+excelFileInput.style.display = 'none';
+excelFileInput.onchange = e => { if(e.target.files[0]) handleExcelImport(e.target.files[0]); };
+document.body.appendChild(excelFileInput);
+
+$('#importExcelBtn').onclick = () => excelFileInput.click();
 
 $('#export').onclick=()=>{
   const h=['Miasto','Nr lokalu','Rodzaj przeglądu','Data wykonania','Ważny przez (mies.)','Data następnego przeglądu','Status','Data dodania protokołu','Uwagi'];
