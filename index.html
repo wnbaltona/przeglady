@@ -4,152 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Przeglądy</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script src="dane-startowe.js"></script>
-  <style>
-    :root{--n:#12304a;--b:#075985;--bg:#f1f5f9;--line:#cbd5e1;--red:#991b1b;--amber:#92400e;--green:#065f46}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:#172033}
-    .top{background:var(--n);color:#fff;padding:22px max(20px,calc((100% - 1280px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:4px solid #38bdf8}
-    .top h1{margin:0;font-size:26px}
-    .top p{margin:4px 0 0;color:#dbeafe}
-    .wrap{max-width:1300px;margin:24px auto;padding:0 18px}
-    .notice,.panel,.card{background:#fff;border:1px solid var(--line);border-radius:12px}
-    .notice{padding:15px 17px;margin-bottom:16px;background:#e0f2fe;color:#123e5c;border-left:4px solid var(--b)}
-    .panel{padding:16px;margin-bottom:16px}
-    .tools,.filters,.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .filters{margin-top:14px}
-    .filters input,.filters select{flex:1;min-width:155px}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
-    .stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:#fff;color:#172033;text-align:left;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
-    .stat b{display:block;font-size:27px;margin-top:4px}
-    .stat:hover{transform:translateY(-2px);box-shadow:0 8px 18px #0f172a18}
-    .stat:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
-    .stat.active{box-shadow:0 0 0 3px #38bdf866,0 8px 18px #0f172a18}
-    .overdue{border-color:#ef4444}
-    .due{border-color:#f59e0b}
-    .ok{border-color:#10b981}
-    .total{border-color:#075985}
-    .city-groups{display:grid;gap:12px}
-    .city-group{overflow:hidden}
-    .city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none;background:#fff}
-    .city-summary::-webkit-details-marker{display:none}
-    .city-summary::after{content:'›';font-size:25px;line-height:1;transform:rotate(0deg);transition:transform .18s ease;color:var(--b);margin-left:4px}
-    .city-group[open] .city-summary::after{transform:rotate(90deg)}
-    .city-summary-main{display:flex;align-items:baseline;gap:10px;min-width:0}
-    .city-summary strong{font-size:17px}
-    .city-summary-count{color:#475569;white-space:nowrap}
-    .city-summary-stats{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
-    .city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:#f8fafc}
-    .tablebox{overflow:auto;max-height:62vh}
-    table{border-collapse:collapse;width:100%;min-width:980px}
-    th,td{padding:11px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}
-    th{position:sticky;top:0;background:#eaf0f6;color:#334155;font-size:12px}
-    button{border:0;border-radius:8px;background:var(--b);color:white;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}
-    .secondary{background:#e2e8f0;color:#172033}
-    .danger{background:#fee2e2;color:var(--red)}
-    input,select,textarea{border:1px solid #94a3b8;border-radius:8px;padding:9px;background:#fff;font:inherit}
-    .badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}
-    .PO{background:#fee2e2;color:var(--red)}
-    .DO{background:#fef3c7;color:var(--amber)}
-    .OK{background:#d1fae5;color:var(--green)}
-    .BRAK{background:#ede9fe;color:#5b21b6}
-    .modal{display:none;position:fixed;inset:0;background:#17203388;place-items:center;padding:18px}
-    .modal.open{display:grid}
-    .dialog{background:#fff;border-radius:14px;padding:24px;width:min(720px,100%);max-height:90vh;overflow:auto}
-    .form{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
-    .form label{display:grid;gap:5px;font-weight:650}
-    .wide{grid-column:1/-1}
-    .dialog footer{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}
-    .type-list{list-style:none;padding:0;margin:16px 0;display:grid;gap:7px;max-height:48vh;overflow:auto}
-    .type-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc}
-    .type-add{display:flex;gap:8px}
-    .type-add input{flex:1}
-    .muted{color:#475569}
-    .top .secondary{background:#fff;color:var(--n)}
-    #user{font-weight:650}
-    @media(max-width:700px){
-      .top{align-items:flex-start;flex-direction:column}
-      .stats{grid-template-columns:repeat(2,1fr)}
-      .form{grid-template-columns:1fr}
-      .wide{grid-column:auto}
-    }
-  </style>
-</head>
-<body>
-<header class="top">
-  <div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły <small id="version">wersja 2.4</small></p></div>
-  <div class="actions"><span id="user"></span><button id="logout" class="secondary" hidden>Wyloguj</button><button id="add">+ Dodaj przegląd</button></div>
-</header>
-<main class="wrap">
-  <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
-  <section class="panel">
-    <div class="tools"><button id="export" class="secondary">Eksportuj CSV</button><button id="manageTypes" class="secondary">Rodzaje przeglądów</button><span id="syncInfo" class="muted"></span></div>
-    <div class="filters">
-      <input id="search" placeholder="Szukaj: miasto, lokal, rodzaj…">
-      <select id="city"><option value="">Wszystkie miasta</option></select>
-      <select id="status"><option value="">Wszystkie statusy</option><option>PO TERMINIE</option><option>DO WYKONANIA</option><option>OK</option></select>
-      <select id="protocol"><option value="">Wszystkie protokoły</option><option value="DODANY">Dodany</option><option value="BRAK PROTOKOŁU">Brak protokołu</option></select>
-    </div>
-  </section>
-  <section class="stats">
-    <button type="button" class="card stat overdue" data-quick-status="PO TERMINIE" aria-pressed="false">Po terminie<b id="overdue">0</b></button>
-    <button type="button" class="card stat due" data-quick-status="DO WYKONANIA" aria-pressed="false">Do wykonania (14 dni)<b id="due">0</b></button>
-    <button type="button" class="card stat ok" data-quick-status="OK" aria-pressed="false">Aktualne<b id="ok">0</b></button>
-    <button type="button" class="card stat total" data-quick-status="" aria-pressed="true">Wszystkie wpisy<b id="all">0</b></button>
-  </section>
-  <section id="cityGroups" class="city-groups" aria-label="Przeglądy według miast"></section>
-</main>
-
-<div class="modal" id="loginModal">
-  <form class="dialog" id="loginForm">
-    <h2>Dostęp do rejestru</h2>
-    <p>Logowanie jest wymagane, aby dane działu były wspólne i chronione.</p>
-    <div class="form">
-      <label class="wide">E-mail<input required type="email" name="email" autocomplete="email"></label>
-      <label class="wide">Hasło<input required type="password" name="password" autocomplete="current-password"></label>
-    </div>
-    <p id="loginMessage" class="muted"></p>
-    <footer><button type="button" id="register" class="secondary">Utwórz konto</button><button>Zaloguj</button></footer>
-  </form>
-</div>
-
-<div class="modal" id="editModal">
-  <form class="dialog" id="editForm">
-    <h2 id="formTitle">Dodaj przegląd</h2>
-    <div class="form">
-      <label>Miasto<input required name="city" list="cities"></label>
-      <label>Nr lokalu<input required name="local" list="locals"></label>
-      <label>Rodzaj przeglądu<input required name="type" list="types"></label>
-      <label>Data wykonania<input required type="date" name="done"></label>
-      <label>Ważny przez (mies.)<input required min="1" type="number" name="months" value="12"></label>
-      <label>Data dodania protokołu<input type="date" name="protocolDate"></label>
-      <label class="wide">Plik protokołu<input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"><small id="fileInfo" class="muted">Opcjonalnie: PDF, dokument lub zdjęcie.</small></label>
-      <label class="wide">Uwagi<textarea name="notes" rows="3"></textarea></label>
-    </div>
-    <footer><button type="button" id="cancel" class="secondary">Anuluj</button><button>Zapisz</button></footer>
-  </form>
-</div>
-
-<datalist id="cities"></datalist>
-<datalist id="types"></datalist>
-<datalist id="locals"></datalist>
-
-<div class="modal" id="typesModal">
-  <section class="dialog" aria-labelledby="typesTitle">
-    <h2 id="typesTitle">Rodzaje przeglądów</h2>
-    <p class="muted">Usunięta nazwa znika z listy podpowiedzi, ale nie usuwa istniejących przeglądów.</p>
-    <div class="type-add"><input id="newType" placeholder="Nowy rodzaj przeglądu"><button type="button" id="addType">Dodaj</button></div>
-    <ul id="typeList" class="type-list"></ul>
-    <footer><button type="button" id="closeTypes" class="secondary">Zamknij</button></footer>
-  </section>
-</div>
+  <!-- Biblioteka do obsługi plików Excel w przeglądarce -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
 
-// Bezpieczny magazyn pamięci na przypadek blokady localStorage (Tracking Prevention)
+// Bezpieczny magazyn pamięci na przypadek blokady localStorage
 const safeStorage = (() => {
   try {
     window.localStorage.setItem('__test', '1');
@@ -175,7 +36,7 @@ const sb = ready ? window.supabase.createClient(config.supabaseUrl, config.supab
 }) : null;
 
 let data=[],inspectionTypes=[],locations=[],typeCatalogAvailable=false,editing=null,currentUser=null;
-const defaultInspectionTypes=['Elektryczny (roczny)','Elektryczny (5-cio letni)','Systemy PPOŻ','Gaśnice','Klimatyzacja','Alarmy','Hydranty','Rolety','Wentylacja','Wymiana filtrów','Regałów magazynowych','CRO','Mroźnia/Chłodnia','Regały chłodnicze','Separatory tłuszczu','Vendingi','UDT (wózki widłowe, paleciaki)','BHP (drabiny, schodki, podesty)','Ansul','Okap','Brama garażowa','Żaluzje (gastro)','Bramki antykradzieżowe','Klamki na kod','Oświetlenie','Drzwi przeciwpożarowe','Drzwi na zaplecze','Systemy multmedialne','Posadzki, wykładziny','Kontrola kurzu','Light boxy','Floorboxy','Meble','Szyby','Lampy owadobójcze','Samochody','Windy w samochodach','Mycie jednostek klimatyzacji','Sprawdzenie pompy odpływowej','ffff'];
+const defaultInspectionTypes=['Elektryczny (roczny)','Elektryczny (5-cio letni)','Systemy PPOŻ','Gaśnice','Klimatyzacja','Alarmy','Hydranty','Rolety','Wentylacja','Wymiana filtrów','Regałów magazynowych','CRO','Mroźnia/Chłodnia','Regały chłodnicze','Separatory tłuszczu','Vendingi','UDT (wózki widłowe, paleciaki)','BHP (drabiny, schodki, podesty)','Ansul','Okap','Brama garażowa','Żaluzje (gastro)','Bramki antykradzieżowe','Klamki na kod','Oświetlenie','Drzwi przeciwpożarowe','Drzwi na zaplecze','Systemy multmedialne','Posadzki, wykładziny','Kontrola kurzu','Light boxy','Floorboxy','Meble','Szyby','Lampy owadobójcze','Samochody','Windy w samochodach','Mycie jednostek klimatyzacji','Sprawdzenie pompy odpływowej'];
 
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const iso=v=>v?String(v).slice(0,10):'';
@@ -201,15 +62,12 @@ function refreshLists(){
   const sourceTypes=typeCatalogAvailable?inspectionTypes:defaultInspectionTypes;
   const typeNames=[...new Set(sourceTypes.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
   
-  // Pobieramy wszystkie miasta ze słownika locations ORAZ z wpisów przeglądów
   const allCities=[...data.map(x=>x.city), ...locations.map(x=>x.city)];
   const cities=[...new Set(allCities.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
   
-  // Wypełniamy główną listę rozwijaną miast
   $('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
   $('#city').value=currentSelectedCity;
   
-  // Wypełniamy podpowiedzi datalist w formularzach
   $('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');
   $('#types').innerHTML=typeNames.map(x=>`<option value="${esc(x)}">`).join('');
 }
@@ -217,7 +75,6 @@ function refreshLists(){
 function refreshLocalList(){
   const selectedCity=String($('#editForm').elements.city.value||'').trim().toLowerCase();
   
-  // Pobieramy lokale ze słownika locations ORAZ ze wszystkich istniejących przeglądów
   const sourceLocations=[
     ...locations,
     ...data.map(row=>({city:row.city, local:row.local}))
@@ -298,12 +155,7 @@ async function load(){
   inspectionTypes=(typeRows||[]).map(row=>row.name).filter(Boolean);
   locations=(locationRows||[]).map(row=>({city:String(row.city||'').trim(),local:String(row.local||'').trim()})).filter(row=>row.city||row.local);
   data=rows.map(fromDb);
-  if(!data.length&&window.DEFAULT_DATA?.length){
-    const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));
-    const {error:e}=await sb.from('inspections').upsert(seed);
-    if(e)return showError(e.message);
-    return load();
-  }
+  
   refreshLists();
   render();
   $('#notice').hidden=true;
@@ -393,7 +245,6 @@ $('#editForm').onsubmit=async e=>{
     const {error}=await sb.from('inspections').upsert([dbRecord]);
     if(error)throw error;
 
-    // Automatyczne dodawanie nowego miasta i lokalu do słownika locations
     if(payload.city && payload.local){
       sb.from('locations').upsert({city:payload.city.trim(),local:payload.local.trim()},{onConflict:'city,local'}).then(({error:locErr})=>{
         if(locErr)console.warn('Wpis zapisano, ale nie udało się dodać lokalizacji do słownika:',locErr.message);
@@ -458,6 +309,30 @@ $('#cityGroups').addEventListener('click',async event=>{
 ['search','city','status','protocol'].forEach(x=>$('#'+x).addEventListener(x==='search'?'input':'change',render));
 $('#editForm').elements.city.addEventListener('input',refreshLocalList);
 
+// AUTOMATYCZNE UZUPEŁNIANIE MIESIĘCY WAŻNOŚCI W ZALEŻNOŚCI OD RODZAJU PRZEGLĄDU
+$('#editForm').elements.type.addEventListener('input', e => {
+  const typeValue = e.target.value.trim().toLowerCase();
+  
+  // Słownik z przypisanymi miesiącami
+  const monthsMap = {
+    'elektryczny (5-cio letni)': 60,
+    'elektryczny (roczny)': 12,
+    'klimatyzacja': 3,
+    'mycie jednostek klimatyzacji': 36,
+    'wentylacja': 12,
+    'rolety': 12,
+    'rolety sklepowe': 12,
+    'gaśnice': 12,
+    'oświetlenie': 1,
+    'sprawdzenie pompy odpływowej': 2
+  };
+  
+  // Jeśli wpisany rodzaj znajduje się w słowniku, ustawiamy miesiące
+  if (monthsMap[typeValue] !== undefined) {
+    $('#editForm').elements.months.value = monthsMap[typeValue];
+  }
+});
+
 $('#manageTypes').onclick=()=>{
   renderTypeList();
   $('#typesModal').classList.add('open');
@@ -490,6 +365,32 @@ document.querySelectorAll('[data-quick-status]').forEach(button=>button.addEvent
   $('#status').value=status&&$('#status').value===status?'':status;
   render();
 }));
+
+async function handleExcelImport(file){
+  const dataBuf = await file.arrayBuffer();
+  const workbook = XLSX.read(dataBuf);
+  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+  
+  let importedCount = 0;
+  for(let i=1; i<rows.length; i++){
+    const city = String(rows[i][1]||'').trim();
+    const local = String(rows[i][2]||'').trim();
+    if(city && local && local !== 'Wszystkie lokale'){
+      const {error} = await sb.from('locations').upsert({city, local}, {onConflict: 'city,local'});
+      if(!error) importedCount++;
+    }
+  }
+  alert(`Zaimportowano pomyślnie ${importedCount} lokalizacji z pliku Excel!`);
+  load();
+}
+
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.accept = '.xlsx, .xls';
+fileInput.style.display = 'none';
+fileInput.onchange = e => { if(e.target.files[0]) handleExcelImport(e.target.files[0]); };
+document.body.appendChild(fileInput);
 
 $('#export').onclick=()=>{
   const h=['Miasto','Nr lokalu','Rodzaj przeglądu','Data wykonania','Ważny przez (mies.)','Data następnego przeglądu','Status','Data dodania protokołu','Uwagi'];
