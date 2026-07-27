@@ -61,7 +61,7 @@
 </head>
 <body>
 <header class="top">
-  <div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły <small id="version">wersja 2.3</small></p></div>
+  <div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły <small id="version">wersja 2.4</small></p></div>
   <div class="actions"><span id="user"></span><button id="logout" class="secondary" hidden>Wyloguj</button><button id="add">+ Dodaj przegląd</button></div>
 </header>
 <main class="wrap">
@@ -125,9 +125,9 @@
 <datalist id="types"></datalist>
 
 <script>
-const $ = s => document.querySelector(s), config = window.APP_CONFIG || {}, ready = Boolean(config.supabaseUrl && config.supabaseAnonKey);
+const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
 
-// Bezpieczny magazyn pamięci na przypadek blokady localStorage przez przeglądarkę
+// Bezpieczny magazyn pamięci na przypadek blokady localStorage (Tracking Prevention)
 const safeStorage = (() => {
   try {
     window.localStorage.setItem('__test', '1');
@@ -151,6 +151,7 @@ const sb = ready ? window.supabase.createClient(config.supabaseUrl, config.supab
     detectSessionInUrl: true
   }
 }) : null;
+
 let data=[],editing=null,currentUser=null;
 
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -180,7 +181,7 @@ function render(){
   for(const [id,s] of [['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;
   $('#all').textContent=data.length;
   
-  =shown.map(r=>{
+  $('#rows').innerHTML=shown.map(r=>{
     const s=state(r),p=protocol(r);
     return `<tr>
       <td>${esc(r.city)}</td>
@@ -344,7 +345,7 @@ $('#export').onclick=()=>{
   const h=['Miasto','Nr lokalu','Rodzaj przeglądu','Data wykonania','Ważny przez (mies.)','Data następnego przeglądu','Status','Data dodania protokołu','Uwagi'];
   const csv=[h,...data.map(r=>[r.city,r.local,r.type,r.done,r.months,nextDate(r.done,r.months),state(r),r.protocolDate,r.notes])].map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\r\n');
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'});
   a.download='przeglady-export.csv';
   a.click();
   URL.revokeObjectURL(a.href);
