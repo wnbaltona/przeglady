@@ -68,15 +68,35 @@ def main():
             "protocol_date": date(value(cells, "data dodania protokol")),
             "notes": str(value(cells, "uwagi") or "").strip(),
         })
-    request = urllib.request.Request(
-        f"{url}/rest/v1/inspections?on_conflict=id", data=json.dumps(records).encode(), method="POST",
-        headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates,return=minimal"},
-    )
-    try:
-        with urllib.request.urlopen(request) as response:
-            print(f"Zsynchronizowano {len(records)} wpisów (HTTP {response.status}).")
-    except urllib.error.HTTPError as error:
-        raise SystemExit(f"Supabase zwrócił HTTP {error.code}: {error.read().decode(errors='replace')}")
+    list_sheet = next((book[n] for n in book.sheetnames if norm(n) == "listy"), None)
+    type_names = []
+    if list_sheet:
+        list_headers = [norm(c.value) for c in next(list_sheet.iter_rows(min_row=1, max_row=1))]
+        type_index = next((i for i, header in enumerate(list_headers) if "rodzaj przegl" in header), None)
+        if type_index is not None:
+            for row in list_sheet.iter_rows(min_row=2, values_only=True):
+                name = str(row[type_index] or "").strip()
+                if name and name not in type_names:
+                    type_names.append(name)
+    if not type_names:
+        type_names = list(dict.fromkeys(record["type"] for record in records if record["type"]))
+
+    def upsert(table, rows, conflict):
+        if not rows:
+            return
+        request = urllib.request.Request(
+            f"{url}/rest/v1/{table}?on_conflict={conflict}", data=json.dumps(rows).encode(), method="POST",
+            headers={"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json", "Prefer": "resolution=merge-duplicates,return=minimal"},
+        )
+        try:
+            with urllib.request.urlopen(request) as response:
+                return response.status
+        except urllib.error.HTTPError as error:
+            raise SystemExit(f"Supabase zwrócił HTTP {error.code}: {error.read().decode(errors='replace')}")
+
+    inspections_status = upsert("inspections", records, "id")
+    types_status = upsert("inspection_types", [{"name": name} for name in type_names], "name")
+    print(f"Zsynchronizowano {len(records)} wpisów (HTTP {inspections_status}) i {len(type_names)} rodzajów przeglądów (HTTP {types_status}).")
 
 
 if __name__ == "__main__":

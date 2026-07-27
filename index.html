@@ -6,6 +6,7 @@
   <title>Przeglądy</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="dane-startowe.js"></script>
   <style>
     :root{--n:#12304a;--b:#075985;--bg:#f1f5f9;--line:#cbd5e1;--red:#991b1b;--amber:#92400e;--green:#065f46}
     *{box-sizing:border-box}
@@ -74,7 +75,7 @@
 </head>
 <body>
 <header class="top">
-  <div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły</p></div>
+  <div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły <small id="version">wersja 2.4</small></p></div>
   <div class="actions"><span id="user"></span><button id="logout" class="secondary" hidden>Wyloguj</button><button id="add">+ Dodaj przegląd</button></div>
 </header>
 <main class="wrap">
@@ -158,7 +159,8 @@ const sb = ready ? window.supabase.createClient(config.supabaseUrl, config.supab
   }
 }) : null;
 
-let data=[],editing=null,currentUser=null;
+let data=[],inspectionTypes=[],editing=null,currentUser=null;
+const defaultInspectionTypes=['Elektryczny (roczny)','Elektryczny (5-cio letni)','Systemy PPOŻ','Gaśnice','Klimatyzacja','Alarmy','Hydranty','Rolety','Wentylacja','Wymiana filtrów','Regałów magazynowych','CRO','Mroźnia/Chłodnia','Regały chłodnicze','Separatory tłuszczu','Vendingi','UDT (wózki widłowe, paleciaki)','BHP (drabiny, schodki, podesty)','Ansul','Okap','Brama garażowa','Żaluzje (gastro)','Bramki antykradzieżowe','Klamki na kod','Oświetlenie','Drzwi przeciwpożarowe','Drzwi na zaplecze','Systemy multmedialne','Posadzki, wykładziny','Kontrola kurzu','Light boxy','Floorboxy','Meble','Szyby','Lampy owadobójcze','Samochody','Windy w samochodach','Mycie jednostek klimatyzacji','Sprawdzenie pompy odpływowej','ffff'];
 
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const iso=v=>v?String(v).slice(0,10):'';
@@ -180,7 +182,7 @@ function fromDb(r){return{id:r.id,city:r.city,local:r.local,type:r.type,done:iso
 function toDb(r){return{id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''}}
 
 function refreshLists(){
-  const city=$('#city').value,typeNames=[...new Set(data.map(x=>x.type).filter(Boolean))].sort(),cities=[...new Set(data.map(x=>x.city).filter(Boolean))].sort();
+  const city=$('#city').value,typeNames=[...new Set([...defaultInspectionTypes,...inspectionTypes,...data.map(x=>x.type)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl')),cities=[...new Set(data.map(x=>x.city).filter(Boolean))].sort();
   $('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
   $('#city').value=city;
   $('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');
@@ -236,8 +238,13 @@ function render(){
 }
 
 async function load(){
-  const {data:rows,error}=await sb.from('inspections').select('*').order('updated_at',{ascending:false});
+  const [{data:rows,error},{data:typeRows,error:typeError}]=await Promise.all([
+    sb.from('inspections').select('*').order('updated_at',{ascending:false}),
+    sb.from('inspection_types').select('name').order('name')
+  ]);
   if(error)return showError(error.message);
+  if(typeError)console.warn('Nie udało się pobrać słownika rodzajów przeglądów:',typeError.message);
+  inspectionTypes=(typeRows||[]).map(row=>row.name).filter(Boolean);
   data=rows.map(fromDb);
   if(!data.length&&window.DEFAULT_DATA?.length){
     const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));
@@ -257,7 +264,10 @@ async function start(){
   const {data:{session}}=await sb.auth.getSession();
   await applySession(session);
   sb.auth.onAuthStateChange((_e,s)=>applySession(s));
-  sb.channel('inspections-live').on('postgres_changes',{event:'*',schema:'public',table:'inspections'},()=>load()).subscribe();
+  sb.channel('inspections-live')
+    .on('postgres_changes',{event:'*',schema:'public',table:'inspections'},()=>load())
+    .on('postgres_changes',{event:'*',schema:'public',table:'inspection_types'},()=>load())
+    .subscribe();
 }
 
 async function applySession(session){
@@ -327,6 +337,11 @@ $('#editForm').onsubmit=async e=>{
     const dbRecord=toDb(payload);
     const {error}=await sb.from('inspections').upsert([dbRecord]);
     if(error)throw error;
+    const typeName=String(payload.type||'').trim();
+    if(typeName){
+      const {error:typeError}=await sb.from('inspection_types').upsert({name:typeName},{onConflict:'name'});
+      if(typeError)console.warn('Wpis zapisano, ale nie udało się dodać rodzaju do słownika:',typeError.message);
+    }
     $('#editModal').classList.remove('open');
     await load();
   }catch(err){
