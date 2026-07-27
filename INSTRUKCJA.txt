@@ -30,3 +30,14 @@ zadanie, nigdy w pliku aplikacji, Excelu ani w Git.
 UWAGA: synchronizacja traktuje pola w Excelu jako nadrzędne dla wierszy importowanych z Excela.
 Jeśli dany wiersz ma być aktualizowany wyłącznie przez dział w aplikacji, usuń go z Excela albo
 nie obejmuj go harmonogramem synchronizacji.
+
+RODZAJE PRZEGLĄDÓW I LOKALE
+
+Po aktualizacji aplikacji uruchom ponownie plik supabase-schema.sql w SQL Editorze, a następnie
+jednorazowo uruchom synchronizację Excela. Skrypt zapisuje:
+- wszystkie nazwy z arkusza „Listy”, kolumny „Rodzaj przeglądu”;
+- wszystkie pary miasto–lokal z arkusza „Lokale”.
+
+W aplikacji po wybraniu miasta pole „Nr lokalu” podpowiada tylko lokale przypisane do tego miasta.
+Nowy rodzaj można dodać w oknie „Rodzaje przeglądów” albo podczas dodawania przeglądu.
+Usunięcie rodzaju w tym oknie ukrywa go z listy podpowiedzi; istniejące wpisy pozostają bez zmian.

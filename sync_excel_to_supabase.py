@@ -81,6 +81,24 @@ def main():
     if not type_names:
         type_names = list(dict.fromkeys(record["type"] for record in records if record["type"]))
 
+    locations_sheet = next((book[n] for n in book.sheetnames if norm(n) == "lokale"), None)
+    locations = []
+    if locations_sheet:
+        location_headers = [norm(c.value) for c in next(locations_sheet.iter_rows(min_row=1, max_row=1))]
+        city_index = next((i for i, header in enumerate(location_headers) if header == "miasto"), None)
+        local_index = next((i for i, header in enumerate(location_headers) if "nr lokalu" in header), None)
+        if city_index is not None and local_index is not None:
+            seen_locations = set()
+            for row in locations_sheet.iter_rows(min_row=2, values_only=True):
+                city = str(row[city_index] or "").strip()
+                local = str(row[local_index] or "").strip()
+                if city and local and (city, local) not in seen_locations:
+                    locations.append({"city": city, "local": local})
+                    seen_locations.add((city, local))
+    if not locations:
+        locations = list({(record["city"], record["local"]) for record in records if record["city"] and record["local"]})
+        locations = [{"city": city, "local": local} for city, local in locations]
+
     def upsert(table, rows, conflict):
         if not rows:
             return
@@ -96,7 +114,8 @@ def main():
 
     inspections_status = upsert("inspections", records, "id")
     types_status = upsert("inspection_types", [{"name": name} for name in type_names], "name")
-    print(f"Zsynchronizowano {len(records)} wpisów (HTTP {inspections_status}) i {len(type_names)} rodzajów przeglądów (HTTP {types_status}).")
+    locations_status = upsert("locations", locations, "city,local")
+    print(f"Zsynchronizowano {len(records)} wpisów (HTTP {inspections_status}), {len(type_names)} rodzajów przeglądów (HTTP {types_status}) i {len(locations)} lokali (HTTP {locations_status}).")
 
 
 if __name__ == "__main__":
