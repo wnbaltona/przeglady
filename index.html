@@ -62,6 +62,10 @@
     .form label{display:grid;gap:5px;font-weight:650}
     .wide{grid-column:1/-1}
     .dialog footer{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}
+    .type-list{list-style:none;padding:0;margin:16px 0;display:grid;gap:7px;max-height:48vh;overflow:auto}
+    .type-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc}
+    .type-add{display:flex;gap:8px}
+    .type-add input{flex:1}
     .muted{color:#475569}
     .top .secondary{background:#fff;color:var(--n)}
     #user{font-weight:650}
@@ -81,7 +85,7 @@
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
   <section class="panel">
-    <div class="tools"><button id="export" class="secondary">Eksportuj CSV</button><span id="syncInfo" class="muted"></span></div>
+    <div class="tools"><button id="export" class="secondary">Eksportuj CSV</button><button id="manageTypes" class="secondary">Rodzaje przeglądów</button><span id="syncInfo" class="muted"></span></div>
     <div class="filters">
       <input id="search" placeholder="Szukaj: miasto, lokal, rodzaj…">
       <select id="city"><option value="">Wszystkie miasta</option></select>
@@ -116,7 +120,7 @@
     <h2 id="formTitle">Dodaj przegląd</h2>
     <div class="form">
       <label>Miasto<input required name="city" list="cities"></label>
-      <label>Nr lokalu<input required name="local"></label>
+      <label>Nr lokalu<input required name="local" list="locals"></label>
       <label>Rodzaj przeglądu<input required name="type" list="types"></label>
       <label>Data wykonania<input required type="date" name="done"></label>
       <label>Ważny przez (mies.)<input required min="1" type="number" name="months" value="12"></label>
@@ -130,6 +134,17 @@
 
 <datalist id="cities"></datalist>
 <datalist id="types"></datalist>
+<datalist id="locals"></datalist>
+
+<div class="modal" id="typesModal">
+  <section class="dialog" aria-labelledby="typesTitle">
+    <h2 id="typesTitle">Rodzaje przeglądów</h2>
+    <p class="muted">Usunięta nazwa znika z listy podpowiedzi, ale nie usuwa istniejących przeglądów.</p>
+    <div class="type-add"><input id="newType" placeholder="Nowy rodzaj przeglądu"><button type="button" id="addType">Dodaj</button></div>
+    <ul id="typeList" class="type-list"></ul>
+    <footer><button type="button" id="closeTypes" class="secondary">Zamknij</button></footer>
+  </section>
+</div>
 
 <script>
 const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
@@ -159,7 +174,7 @@ const sb = ready ? window.supabase.createClient(config.supabaseUrl, config.supab
   }
 }) : null;
 
-let data=[],inspectionTypes=[],editing=null,currentUser=null;
+let data=[],inspectionTypes=[],locations=[],typeCatalogAvailable=false,editing=null,currentUser=null;
 const defaultInspectionTypes=['Elektryczny (roczny)','Elektryczny (5-cio letni)','Systemy PPOŻ','Gaśnice','Klimatyzacja','Alarmy','Hydranty','Rolety','Wentylacja','Wymiana filtrów','Regałów magazynowych','CRO','Mroźnia/Chłodnia','Regały chłodnicze','Separatory tłuszczu','Vendingi','UDT (wózki widłowe, paleciaki)','BHP (drabiny, schodki, podesty)','Ansul','Okap','Brama garażowa','Żaluzje (gastro)','Bramki antykradzieżowe','Klamki na kod','Oświetlenie','Drzwi przeciwpożarowe','Drzwi na zaplecze','Systemy multmedialne','Posadzki, wykładziny','Kontrola kurzu','Light boxy','Floorboxy','Meble','Szyby','Lampy owadobójcze','Samochody','Windy w samochodach','Mycie jednostek klimatyzacji','Sprawdzenie pompy odpływowej','ffff'];
 
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -182,11 +197,23 @@ function fromDb(r){return{id:r.id,city:r.city,local:r.local,type:r.type,done:iso
 function toDb(r){return{id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''}}
 
 function refreshLists(){
-  const city=$('#city').value,typeNames=[...new Set([...defaultInspectionTypes,...inspectionTypes,...data.map(x=>x.type)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl')),cities=[...new Set(data.map(x=>x.city).filter(Boolean))].sort();
+  const city=$('#city').value,sourceTypes=typeCatalogAvailable?inspectionTypes:defaultInspectionTypes,typeNames=[...new Set(sourceTypes.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl')),cities=[...new Set([...data.map(x=>x.city),...locations.map(x=>x.city)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
   $('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
   $('#city').value=city;
   $('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');
   $('#types').innerHTML=typeNames.map(x=>`<option value="${esc(x)}">`).join('');
+}
+
+function refreshLocalList(){
+  const selectedCity=String($('#editForm').elements.city.value||'').trim();
+  const sourceLocations=locations.length?locations:data.map(row=>({city:row.city,local:row.local}));
+  const localNames=[...new Set(sourceLocations.filter(row=>!selectedCity||row.city===selectedCity).map(row=>String(row.local||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
+  $('#locals').innerHTML=localNames.map(name=>`<option value="${esc(name)}">`).join('');
+}
+
+function renderTypeList(){
+  const names=[...inspectionTypes].sort((a,b)=>a.localeCompare(b,'pl'));
+  $('#typeList').innerHTML=names.length?names.map(name=>`<li><span>${esc(name)}</span><button type="button" class="danger" data-action="delete-type" data-name="${esc(name)}">Usuń</button></li>`).join(''):'<li class="muted">Brak aktywnych rodzajów przeglądów.</li>';
 }
 
 function inspectionRows(records){
@@ -238,13 +265,17 @@ function render(){
 }
 
 async function load(){
-  const [{data:rows,error},{data:typeRows,error:typeError}]=await Promise.all([
+  const [{data:rows,error},{data:typeRows,error:typeError},{data:locationRows,error:locationError}]=await Promise.all([
     sb.from('inspections').select('*').order('updated_at',{ascending:false}),
-    sb.from('inspection_types').select('name').order('name')
+    sb.from('inspection_types').select('name').eq('active',true).order('name'),
+    sb.from('locations').select('city,local').order('city').order('local')
   ]);
   if(error)return showError(error.message);
   if(typeError)console.warn('Nie udało się pobrać słownika rodzajów przeglądów:',typeError.message);
+  if(locationError)console.warn('Nie udało się pobrać listy lokali:',locationError.message);
+  typeCatalogAvailable=!typeError;
   inspectionTypes=(typeRows||[]).map(row=>row.name).filter(Boolean);
+  locations=(locationRows||[]).map(row=>({city:String(row.city||'').trim(),local:String(row.local||'').trim()})).filter(row=>row.city&&row.local);
   data=rows.map(fromDb);
   if(!data.length&&window.DEFAULT_DATA?.length){
     const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));
@@ -267,6 +298,7 @@ async function start(){
   sb.channel('inspections-live')
     .on('postgres_changes',{event:'*',schema:'public',table:'inspections'},()=>load())
     .on('postgres_changes',{event:'*',schema:'public',table:'inspection_types'},()=>load())
+    .on('postgres_changes',{event:'*',schema:'public',table:'locations'},()=>load())
     .subscribe();
 }
 
@@ -300,6 +332,7 @@ function openForm(r=null){
   f.reset();
   const values=r||{months:12};
   ['city','local','type','done','months','protocolDate','notes'].forEach(name=>{if(f.elements[name])f.elements[name].value=values[name]??''});
+  refreshLocalList();
   const editMode=Boolean(r);
   ['city','local','type','months','notes'].forEach(name=>{if(f.elements[name])f.elements[name].readOnly=editMode});
   $('#formTitle').textContent=editMode?'Edytuj datę lub protokół':'Dodaj przegląd';
@@ -339,7 +372,7 @@ $('#editForm').onsubmit=async e=>{
     if(error)throw error;
     const typeName=String(payload.type||'').trim();
     if(typeName){
-      const {error:typeError}=await sb.from('inspection_types').upsert({name:typeName},{onConflict:'name'});
+      const {error:typeError}=await sb.from('inspection_types').upsert({name:typeName,active:true},{onConflict:'name'});
       if(typeError)console.warn('Wpis zapisano, ale nie udało się dodać rodzaju do słownika:',typeError.message);
     }
     $('#editModal').classList.remove('open');
@@ -393,6 +426,34 @@ $('#cityGroups').addEventListener('click',async event=>{
 });
 
 ['search','city','status','protocol'].forEach(x=>$('#'+x).addEventListener(x==='search'?'input':'change',render));
+$('#editForm').elements.city.addEventListener('input',refreshLocalList);
+
+$('#manageTypes').onclick=()=>{
+  renderTypeList();
+  $('#typesModal').classList.add('open');
+};
+$('#closeTypes').onclick=()=>$('#typesModal').classList.remove('open');
+$('#addType').onclick=async()=>{
+  const name=$('#newType').value.trim();
+  if(!name)return;
+  const {error}=await sb.from('inspection_types').upsert({name,active:true},{onConflict:'name'});
+  if(error)return alert('Nie udało się dodać rodzaju: '+error.message);
+  if(!inspectionTypes.includes(name))inspectionTypes.push(name);
+  $('#newType').value='';
+  refreshLists();
+  renderTypeList();
+};
+$('#typeList').addEventListener('click',async event=>{
+  const button=event.target.closest('button[data-action="delete-type"]');
+  if(!button)return;
+  const name=button.dataset.name;
+  if(!confirm(`Usunąć „${name}” z listy rodzajów przeglądów? Istniejące wpisy pozostaną bez zmian.`))return;
+  const {error}=await sb.from('inspection_types').update({active:false}).eq('name',name);
+  if(error)return alert('Nie udało się usunąć rodzaju: '+error.message);
+  inspectionTypes=inspectionTypes.filter(item=>item!==name);
+  refreshLists();
+  renderTypeList();
+});
 
 document.querySelectorAll('[data-quick-status]').forEach(button=>button.addEventListener('click',()=>{
   const status=button.dataset.quickStatus;

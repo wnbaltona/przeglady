@@ -18,7 +18,17 @@ create table if not exists public.inspections (
 -- Słownik rodzajów przeglądów, niezależny od podziału w Excelu na grupy.
 create table if not exists public.inspection_types (
   name text primary key,
+  active boolean not null default true,
   created_at timestamptz not null default now()
+);
+
+alter table public.inspection_types add column if not exists active boolean not null default true;
+
+create table if not exists public.locations (
+  city text not null,
+  local text not null,
+  created_at timestamptz not null default now(),
+  primary key (city, local)
 );
 
 alter table public.inspections add column if not exists protocol_path text;
@@ -34,6 +44,7 @@ for each row execute function public.set_updated_at();
 
 alter table public.inspections enable row level security;
 alter table public.inspection_types enable row level security;
+alter table public.locations enable row level security;
 
 drop policy if exists "Zalogowani odczytują przeglądy" on public.inspections;
 drop policy if exists "Zalogowani dodają przeglądy" on public.inspections;
@@ -46,11 +57,17 @@ create policy "Zalogowani usuwają przeglądy" on public.inspections for delete 
 
 drop policy if exists "Zalogowani odczytują rodzaje przeglądów" on public.inspection_types;
 drop policy if exists "Zalogowani dodają rodzaje przeglądów" on public.inspection_types;
+drop policy if exists "Zalogowani edytują rodzaje przeglądów" on public.inspection_types;
 create policy "Zalogowani odczytują rodzaje przeglądów" on public.inspection_types for select to authenticated using (true);
 create policy "Zalogowani dodają rodzaje przeglądów" on public.inspection_types for insert to authenticated with check (true);
+create policy "Zalogowani edytują rodzaje przeglądów" on public.inspection_types for update to authenticated using (true) with check (true);
+
+drop policy if exists "Zalogowani odczytują lokale" on public.locations;
+create policy "Zalogowani odczytują lokale" on public.locations for select to authenticated using (true);
 
 do $$ begin alter publication supabase_realtime add table public.inspections; exception when duplicate_object then null; end $$;
 do $$ begin alter publication supabase_realtime add table public.inspection_types; exception when duplicate_object then null; end $$;
+do $$ begin alter publication supabase_realtime add table public.locations; exception when duplicate_object then null; end $$;
 
 -- Załączniki protokołów: prywatny bucket, dostępny tylko po zalogowaniu.
 insert into storage.buckets (id, name, public) values ('protocols', 'protocols', false) on conflict (id) do nothing;
