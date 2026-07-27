@@ -22,12 +22,26 @@
     .filters{margin-top:14px}
     .filters input,.filters select{flex:1;min-width:155px}
     .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
-    .stat{padding:15px;border-left:5px solid #64748b}
+    .stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:#fff;color:#172033;text-align:left;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
     .stat b{display:block;font-size:27px;margin-top:4px}
+    .stat:hover{transform:translateY(-2px);box-shadow:0 8px 18px #0f172a18}
+    .stat:focus-visible{outline:3px solid #38bdf8;outline-offset:2px}
+    .stat.active{box-shadow:0 0 0 3px #38bdf866,0 8px 18px #0f172a18}
     .overdue{border-color:#ef4444}
     .due{border-color:#f59e0b}
     .ok{border-color:#10b981}
     .total{border-color:#075985}
+    .city-groups{display:grid;gap:12px}
+    .city-group{overflow:hidden}
+    .city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none;background:#fff}
+    .city-summary::-webkit-details-marker{display:none}
+    .city-summary::after{content:'›';font-size:25px;line-height:1;transform:rotate(0deg);transition:transform .18s ease;color:var(--b);margin-left:4px}
+    .city-group[open] .city-summary::after{transform:rotate(90deg)}
+    .city-summary-main{display:flex;align-items:baseline;gap:10px;min-width:0}
+    .city-summary strong{font-size:17px}
+    .city-summary-count{color:#475569;white-space:nowrap}
+    .city-summary-stats{display:flex;gap:7px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+    .city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:#f8fafc}
     .tablebox{overflow:auto;max-height:62vh}
     table{border-collapse:collapse;width:100%;min-width:980px}
     th,td{padding:11px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}
@@ -76,19 +90,12 @@
     </div>
   </section>
   <section class="stats">
-    <div class="card stat overdue">Po terminie<b id="overdue">0</b></div>
-    <div class="card stat due">Do wykonania (14 dni)<b id="due">0</b></div>
-    <div class="card stat ok">Aktualne<b id="ok">0</b></div>
-    <div class="card stat total">Wszystkie wpisy<b id="all">0</b></div>
+    <button type="button" class="card stat overdue" data-quick-status="PO TERMINIE" aria-pressed="false">Po terminie<b id="overdue">0</b></button>
+    <button type="button" class="card stat due" data-quick-status="DO WYKONANIA" aria-pressed="false">Do wykonania (14 dni)<b id="due">0</b></button>
+    <button type="button" class="card stat ok" data-quick-status="OK" aria-pressed="false">Aktualne<b id="ok">0</b></button>
+    <button type="button" class="card stat total" data-quick-status="" aria-pressed="true">Wszystkie wpisy<b id="all">0</b></button>
   </section>
-  <section class="card tablebox">
-    <table>
-      <thead>
-        <tr><th>Miasto</th><th>Lokal</th><th>Rodzaj</th><th>Wykonano</th><th>Następny termin</th><th>Status</th><th>Protokół</th><th>Uwagi</th><th></th></tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
-  </section>
+  <section id="cityGroups" class="city-groups" aria-label="Przeglądy według miast"></section>
 </main>
 
 <div class="modal" id="loginModal">
@@ -161,6 +168,14 @@ const format=v=>v?new Date(v+'T12:00:00').toLocaleDateString('pl-PL'):'—';
 function nextDate(done,months){if(!done||!months)return '';const d=new Date(done+'T12:00:00');d.setMonth(d.getMonth()+Number(months));return d.toISOString().slice(0,10)}
 function state(r){const n=nextDate(r.done,r.months);if(!n)return '';const days=Math.ceil((new Date(n+'T12:00:00')-new Date())/86400000);return days<0?'PO TERMINIE':days<=14?'DO WYKONANIA':'OK'}
 function protocol(r){return r.protocolFileName||r.protocolDate?'DODANY':'BRAK PROTOKOŁU'}
+function inspectionCountLabel(count){
+  const lastTwo=count%100,last=count%10;
+  if(count===1)return '1 przegląd';
+  if(lastTwo<12||lastTwo>14){
+    if(last>=2&&last<=4)return `${count} przeglądy`;
+  }
+  return `${count} przeglądów`;
+}
 
 function fromDb(r){return{id:r.id,city:r.city,local:r.local,type:r.type,done:iso(r.done),months:r.months,protocolDate:iso(r.protocol_date),protocolFileName:r.protocol_file_name,protocolPath:r.protocol_path,notes:r.notes||''}}
 function toDb(r){return{id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''}}
@@ -173,6 +188,22 @@ function refreshLists(){
   $('#types').innerHTML=typeNames.map(x=>`<option value="${esc(x)}">`).join('');
 }
 
+function inspectionRows(records){
+  return records.map(r=>{
+    const s=state(r),p=protocol(r);
+    return `<tr>
+      <td><b>${esc(r.local)}</b></td>
+      <td>${esc(r.type)}</td>
+      <td>${format(r.done)}</td>
+      <td>${format(nextDate(r.done,r.months))}</td>
+      <td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td>
+      <td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?` <button type="button" class="secondary" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td>
+      <td>${esc(r.notes)}</td>
+      <td><button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button> <button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button></td>
+    </tr>`;
+  }).join('');
+}
+
 function render(){
   refreshLists();
   const q=$('#search').value.toLowerCase(),city=$('#city').value,st=$('#status').value,pr=$('#protocol').value;
@@ -180,21 +211,29 @@ function render(){
   
   for(const [id,s] of [['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;
   $('#all').textContent=data.length;
+  document.querySelectorAll('[data-quick-status]').forEach(button=>{
+    const active=button.dataset.quickStatus===st;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
   
-  $('#rows').innerHTML = shown.map(r=>{
-  const s=state(r),p=protocol(r);
-  return `<tr>
-    <td>${esc(r.city)}</td>
-    <td><b>${esc(r.local)}</b></td>
-    <td>${esc(r.type)}</td>
-    <td>${format(r.done)}</td>
-    <td>${format(nextDate(r.done,r.months))}</td>
-    <td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td>
-    <td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?` <button class="secondary" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td>
-    <td>${esc(r.notes)}</td>
-    <td><button class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button> <button class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button></td>
-  </tr>`;
-}).join('');
+  const expanded=new Set([...document.querySelectorAll('#cityGroups details[open]')].map(x=>x.dataset.city));
+  const cities=[...new Set(shown.map(r=>r.city||'Bez miasta'))].sort((a,b)=>a.localeCompare(b,'pl'));
+  $('#cityGroups').innerHTML=cities.length?cities.map(cityName=>{
+    const records=shown.filter(r=>(r.city||'Bez miasta')===cityName);
+    const overdue=records.filter(r=>state(r)==='PO TERMINIE').length;
+    const due=records.filter(r=>state(r)==='DO WYKONANIA').length;
+    return `<details class="card city-group" data-city="${esc(cityName)}"${expanded.has(cityName)?' open':''}>
+      <summary class="city-summary">
+        <span class="city-summary-main"><strong>${esc(cityName)}</strong><span class="city-summary-count">${inspectionCountLabel(records.length)}</span></span>
+        <span class="city-summary-stats">${overdue?`<span class="badge PO">Po terminie: ${overdue}</span>`:''}${due?`<span class="badge DO">Do wykonania: ${due}</span>`:''}</span>
+      </summary>
+      <div class="city-table tablebox"><table>
+        <thead><tr><th>Lokal</th><th>Rodzaj</th><th>Wykonano</th><th>Następny termin</th><th>Status</th><th>Protokół</th><th>Uwagi</th><th></th></tr></thead>
+        <tbody>${inspectionRows(records)}</tbody>
+      </table></div>
+    </details>`;
+  }).join(''):'<div class="notice">Brak przeglądów spełniających wybrane kryteria.</div>';
 }
 
 async function load(){
@@ -330,7 +369,7 @@ async function openFile(id){
   window.open(link.signedUrl,'_blank','noopener');
 }
 
-$('#rows').addEventListener('click',async event=>{
+$('#cityGroups').addEventListener('click',async event=>{
   const button=event.target.closest('button[data-action]');
   if(!button)return;
   const {action,id}=button.dataset;
@@ -341,11 +380,17 @@ $('#rows').addEventListener('click',async event=>{
 
 ['search','city','status','protocol'].forEach(x=>$('#'+x).addEventListener(x==='search'?'input':'change',render));
 
+document.querySelectorAll('[data-quick-status]').forEach(button=>button.addEventListener('click',()=>{
+  const status=button.dataset.quickStatus;
+  $('#status').value=status&&$('#status').value===status?'':status;
+  render();
+}));
+
 $('#export').onclick=()=>{
   const h=['Miasto','Nr lokalu','Rodzaj przeglądu','Data wykonania','Ważny przez (mies.)','Data następnego przeglądu','Status','Data dodania protokołu','Uwagi'];
   const csv=[h,...data.map(r=>[r.city,r.local,r.type,r.done,r.months,nextDate(r.done,r.months),state(r),r.protocolDate,r.notes])].map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\r\n');
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'});
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));
   a.download='przeglady-export.csv';
   a.click();
   URL.revokeObjectURL(a.href);
