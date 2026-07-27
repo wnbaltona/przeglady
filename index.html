@@ -197,17 +197,39 @@ function fromDb(r){return{id:r.id,city:r.city,local:r.local,type:r.type,done:iso
 function toDb(r){return{id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''}}
 
 function refreshLists(){
-  const city=$('#city').value,sourceTypes=typeCatalogAvailable?inspectionTypes:defaultInspectionTypes,typeNames=[...new Set(sourceTypes.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl')),cities=[...new Set([...data.map(x=>x.city),...locations.map(x=>x.city)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
+  const currentSelectedCity=$('#city').value;
+  const sourceTypes=typeCatalogAvailable?inspectionTypes:defaultInspectionTypes;
+  const typeNames=[...new Set(sourceTypes.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
+  
+  // Pobieramy wszystkie miasta ze słownika locations ORAZ z wpisów przeglądów
+  const allCities=[...data.map(x=>x.city), ...locations.map(x=>x.city)];
+  const cities=[...new Set(allCities.map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
+  
+  // Wypełniamy główną listę rozwijaną miast
   $('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-  $('#city').value=city;
+  $('#city').value=currentSelectedCity;
+  
+  // Wypełniamy podpowiedzi datalist w formularzach
   $('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');
   $('#types').innerHTML=typeNames.map(x=>`<option value="${esc(x)}">`).join('');
 }
 
 function refreshLocalList(){
-  const selectedCity=String($('#editForm').elements.city.value||'').trim();
-  const sourceLocations=locations.length?locations:data.map(row=>({city:row.city,local:row.local}));
-  const localNames=[...new Set(sourceLocations.filter(row=>!selectedCity||row.city===selectedCity).map(row=>String(row.local||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));
+  const selectedCity=String($('#editForm').elements.city.value||'').trim().toLowerCase();
+  
+  // Pobieramy lokale ze słownika locations ORAZ ze wszystkich istniejących przeglądów
+  const sourceLocations=[
+    ...locations,
+    ...data.map(row=>({city:row.city, local:row.local}))
+  ];
+  
+  const localNames=[...new Set(
+    sourceLocations
+      .filter(row=>!selectedCity || String(row.city||'').trim().toLowerCase()===selectedCity)
+      .map(row=>String(row.local||'').trim())
+      .filter(Boolean)
+  )].sort((a,b)=>a.localeCompare(b,'pl'));
+
   $('#locals').innerHTML=localNames.map(name=>`<option value="${esc(name)}">`).join('');
 }
 
@@ -233,7 +255,6 @@ function inspectionRows(records){
 }
 
 function render(){
-  refreshLists();
   const q=$('#search').value.toLowerCase(),city=$('#city').value,st=$('#status').value,pr=$('#protocol').value;
   const shown=data.filter(r=>(!q||Object.values(r).join(' ').toLowerCase().includes(q))&&(!city||r.city===city)&&(!st||state(r)===st)&&(!pr||protocol(r)===pr)).sort((a,b)=>(nextDate(a.done,a.months)||'9999').localeCompare(nextDate(b.done,b.months)||'9999'));
   
@@ -266,16 +287,16 @@ function render(){
 
 async function load(){
   const [{data:rows,error},{data:typeRows,error:typeError},{data:locationRows,error:locationError}]=await Promise.all([
-    sb.from('inspections').select('*').order('updated_at',{ascending:false}),
-    sb.from('inspection_types').select('name').eq('active',true).order('name'),
-    sb.from('locations').select('city,local').order('city').order('local')
+    sb.from('inspections').select('*').limit(5000).order('updated_at',{ascending:false}),
+    sb.from('inspection_types').select('name').limit(1000).eq('active',true).order('name'),
+    sb.from('locations').select('city,local').limit(5000).order('city').order('local')
   ]);
   if(error)return showError(error.message);
   if(typeError)console.warn('Nie udało się pobrać słownika rodzajów przeglądów:',typeError.message);
   if(locationError)console.warn('Nie udało się pobrać listy lokali:',locationError.message);
   typeCatalogAvailable=!typeError;
   inspectionTypes=(typeRows||[]).map(row=>row.name).filter(Boolean);
-  locations=(locationRows||[]).map(row=>({city:String(row.city||'').trim(),local:String(row.local||'').trim()})).filter(row=>row.city&&row.local);
+  locations=(locationRows||[]).map(row=>({city:String(row.city||'').trim(),local:String(row.local||'').trim()})).filter(row=>row.city||row.local);
   data=rows.map(fromDb);
   if(!data.length&&window.DEFAULT_DATA?.length){
     const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));
@@ -283,6 +304,7 @@ async function load(){
     if(e)return showError(e.message);
     return load();
   }
+  refreshLists();
   render();
   $('#notice').hidden=true;
   $('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`;
@@ -370,6 +392,14 @@ $('#editForm').onsubmit=async e=>{
     const dbRecord=toDb(payload);
     const {error}=await sb.from('inspections').upsert([dbRecord]);
     if(error)throw error;
+
+    // Automatyczne dodawanie nowego miasta i lokalu do słownika locations
+    if(payload.city && payload.local){
+      sb.from('locations').upsert({city:payload.city.trim(),local:payload.local.trim()},{onConflict:'city,local'}).then(({error:locErr})=>{
+        if(locErr)console.warn('Wpis zapisano, ale nie udało się dodać lokalizacji do słownika:',locErr.message);
+      });
+    }
+
     const typeName=String(payload.type||'').trim();
     if(typeName){
       const {error:typeError}=await sb.from('inspection_types').upsert({name:typeName,active:true},{onConflict:'name'});
