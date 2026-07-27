@@ -125,7 +125,32 @@
 <datalist id="types"></datalist>
 
 <script>
-const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey),sb=ready?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey):null;
+const $ = s => document.querySelector(s), config = window.APP_CONFIG || {}, ready = Boolean(config.supabaseUrl && config.supabaseAnonKey);
+
+// Bezpieczny magazyn pamięci na przypadek blokady localStorage przez przeglądarkę
+const safeStorage = (() => {
+  try {
+    window.localStorage.setItem('__test', '1');
+    window.localStorage.removeItem('__test');
+    return window.localStorage;
+  } catch (e) {
+    const store = {};
+    return {
+      getItem: k => store[k] || null,
+      setItem: (k, v) => { store[k] = String(v); },
+      removeItem: k => { delete store[k]; }
+    };
+  }
+})();
+
+const sb = ready ? window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+  auth: {
+    storage: safeStorage,
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+}) : null;
 let data=[],editing=null,currentUser=null;
 
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -155,7 +180,7 @@ function render(){
   for(const [id,s] of [['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;
   $('#all').textContent=data.length;
   
-  $('#rows').innerHTML=shown.map(r=>{
+  =shown.map(r=>{
     const s=state(r),p=protocol(r);
     return `<tr>
       <td>${esc(r.city)}</td>
