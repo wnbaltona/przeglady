@@ -61,7 +61,7 @@
 </head>
 <body>
 <header class="top">
-  <div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły <small id="version">wersja 2.2</small></p></div>
+  <div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły <small id="version">wersja 2.3</small></p></div>
   <div class="actions"><span id="user"></span><button id="logout" class="secondary" hidden>Wyloguj</button><button id="add">+ Dodaj przegląd</button></div>
 </header>
 <main class="wrap">
@@ -157,7 +157,17 @@ function render(){
   
   $('#rows').innerHTML=shown.map(r=>{
     const s=state(r),p=protocol(r);
-    return `<tr><td>${esc(r.city)}</td><td><b>${esc(r.local)}</b></td><td>${esc(r.type)}</td><td>${format(r.done)}</td><td>${format(nextDate(r.done,r.months))}</td><td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td><td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?' <button class="secondary" data-action="open" data-id="'+esc(r.id)+'">Otwórz</button>':''}</td><td>${esc(r.notes)}</td><td><button class="secondary" data-action="edit" data-id="'+esc(r.id)+'">Edytuj</button> <button class="danger" data-action="delete" data-id="'+esc(r.id)+'">Usuń</button></td></tr>`
+    return `<tr>
+      <td>${esc(r.city)}</td>
+      <td><b>${esc(r.local)}</b></td>
+      <td>${esc(r.type)}</td>
+      <td>${format(r.done)}</td>
+      <td>${format(nextDate(r.done,r.months))}</td>
+      <td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td>
+      <td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?` <button class="secondary" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td>
+      <td>${esc(r.notes)}</td>
+      <td><button class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button> <button class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button></td>
+    </tr>`;
   }).join('');
 }
 
@@ -247,7 +257,7 @@ $('#editForm').onsubmit=async e=>{
     if(protocolFileName){
       payload.protocolFileName=protocolFileName;payload.protocolPath=protocolPath;
     }else if(editing){
-      const existing=data.find(r=>r.id===editing);
+      const existing=data.find(r=>String(r.id)===String(editing));
       if(existing){payload.protocolFileName=existing.protocolFileName;payload.protocolPath=existing.protocolPath;}
     }
     const dbRecord=toDb(payload);
@@ -261,20 +271,20 @@ $('#editForm').onsubmit=async e=>{
 };
 
 async function editRow(id){
-  const record=data.find(r=>r.id===id);
+  const record=data.find(r=>String(r.id)===String(id));
   if(!record)return alert('Nie odnaleziono wpisu. Odśwież stronę i spróbuj ponownie.');
   openForm(record);
 }
 
 async function deleteRow(id){
   try{
-    const record=data.find(r=>r.id===id);
+    const record=data.find(r=>String(r.id)===String(id));
     if(!record)return alert('Nie odnaleziono wpisu. Odśwież stronę i spróbuj ponownie.');
     if(!confirm(`Usunąć wpis „${record.local} — ${record.type}”?`))return;
     const {data:deleted,error}=await sb.from('inspections').delete().eq('id',record.id).select('id');
     if(error)throw new Error(error.message);
     if(!deleted?.length)throw new Error('Brak potwierdzenia usunięcia. Konto nie ma uprawnienia do usuwania lub wpis został już zmieniony.');
-    data=data.filter(item=>item.id!==record.id);
+    data=data.filter(item=>String(item.id)!==String(record.id));
     render();
     $('#syncInfo').textContent='Wpis został usunięty.';
     if(record.protocolPath){
@@ -287,7 +297,7 @@ async function deleteRow(id){
 }
 
 async function openFile(id){
-  const record=data.find(r=>r.id===id);
+  const record=data.find(r=>String(r.id)===String(id));
   if(!record?.protocolPath)return;
   const {data:link,error}=await sb.storage.from('protocols').createSignedUrl(record.protocolPath,60);
   if(error)return alert(error.message);
