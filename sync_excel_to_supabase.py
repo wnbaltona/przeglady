@@ -143,6 +143,9 @@ def main():
 
     inspections_status = upsert("inspections", records, "source_id")
     types_status = upsert("inspection_types", [{"name": name} for name in type_names], "name")
+    print("LOKALIZACJE Z EXCELA:")
+    for loc in locations:
+        print(loc)
     locations_status = upsert("locations", locations, "city,local")
     print(f"Zsynchronizowano {len(records)} wpisów (HTTP {inspections_status}), {len(type_names)} rodzajów przeglądów (HTTP {types_status}) i {len(locations)} lokali (HTTP {locations_status}).")
 
