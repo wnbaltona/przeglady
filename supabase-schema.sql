@@ -11,6 +11,7 @@ create table if not exists public.inspections (
   protocol_file_name text,
   protocol_path text,
   notes text not null default '',
+  source_id text unique,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -33,6 +34,18 @@ create table if not exists public.locations (
 
 alter table public.inspections add column if not exists protocol_path text;
 alter table public.inspections add column if not exists created_at timestamptz not null default now();
+alter table public.inspections add column if not exists source_id text;
+do $$ begin
+  alter table public.inspections add constraint inspections_source_id_key unique (source_id);
+exception when duplicate_object then null;
+end $$;
+
+-- Zapobiega ponownemu załadowaniu danych startowych po celowym usunięciu wszystkich wpisów.
+create table if not exists public.app_state (
+  key text primary key,
+  value text not null default '',
+  updated_at timestamptz not null default now()
+);
 
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
@@ -45,6 +58,7 @@ for each row execute function public.set_updated_at();
 alter table public.inspections enable row level security;
 alter table public.inspection_types enable row level security;
 alter table public.locations enable row level security;
+alter table public.app_state enable row level security;
 
 drop policy if exists "Zalogowani odczytują przeglądy" on public.inspections;
 drop policy if exists "Zalogowani dodają przeglądy" on public.inspections;
@@ -71,12 +85,22 @@ create policy "Zalogowani dodają lokale" on public.locations for insert to auth
 create policy "Zalogowani edytują lokale" on public.locations for update to authenticated using (true) with check (true);
 create policy "Zalogowani usuwają lokale" on public.locations for delete to authenticated using (true);
 
+drop policy if exists "Zalogowani odczytują stan aplikacji" on public.app_state;
+drop policy if exists "Zalogowani zapisują stan aplikacji" on public.app_state;
+create policy "Zalogowani odczytują stan aplikacji" on public.app_state for select to authenticated using (true);
+create policy "Zalogowani zapisują stan aplikacji" on public.app_state for insert to authenticated with check (true);
+create policy "Zalogowani aktualizują stan aplikacji" on public.app_state for update to authenticated using (true) with check (true);
+
 do $$ begin alter publication supabase_realtime add table public.inspections; exception when duplicate_object then null; end $$;
 do $$ begin alter publication supabase_realtime add table public.inspection_types; exception when duplicate_object then null; end $$;
 do $$ begin alter publication supabase_realtime add table public.locations; exception when duplicate_object then null; end $$;
 
 -- Załączniki protokołów: prywatny bucket, dostępny tylko po zalogowaniu.
 insert into storage.buckets (id, name, public) values ('protocols', 'protocols', false) on conflict (id) do nothing;
+update storage.buckets
+set file_size_limit = 10485760,
+    allowed_mime_types = array['application/pdf','image/jpeg','image/png','image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+where id = 'protocols';
 drop policy if exists "Zalogowani odczytują protokoły" on storage.objects;
 drop policy if exists "Zalogowani dodają protokoły" on storage.objects;
 drop policy if exists "Zalogowani aktualizują protokoły" on storage.objects;

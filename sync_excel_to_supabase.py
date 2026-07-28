@@ -5,6 +5,7 @@ Wymagane zmienne środowiskowe:
   SUPABASE_SERVICE_ROLE_KEY=...  (sekretny klucz, nigdy do aplikacji WWW)
 """
 import datetime as dt
+import hashlib
 import json
 import os
 import sys
@@ -30,6 +31,12 @@ def date(value):
         return dt.datetime.fromisoformat(str(value)).strftime("%Y-%m-%d")
     except ValueError:
         return None
+
+
+def source_id(city, local, inspection_type):
+    """Stały identyfikator rekordu z Excela, niezależny od numeru wiersza."""
+    identity = "|".join(norm(value) for value in (city, local, inspection_type))
+    return "excel-" + hashlib.sha256(identity.encode("utf-8")).hexdigest()[:24]
 
 
 def main():
@@ -61,9 +68,13 @@ def main():
             months = int(months)
         except (TypeError, ValueError):
             months = 12
+        city, local, kind = str(city or "").strip(), str(local or "").strip(), str(kind or "").strip()
+        if not (city and local and kind):
+            print(f"Pomijam wiersz {excel_row}: brakuje miasta, lokalu lub rodzaju przeglądu.")
+            continue
         records.append({
-            "id": f"seed-{excel_row - 1}", "city": str(city or "").strip(),
-            "local": str(local or "").strip(), "type": str(kind or "").strip(),
+            "id": source_id(city, local, kind), "source_id": source_id(city, local, kind),
+            "city": city, "local": local, "type": kind,
             "done": date(value(cells, "data wykon")), "months": months,
             "protocol_date": date(value(cells, "data dodania protokol")),
             "notes": str(value(cells, "uwagi") or "").strip(),
@@ -112,7 +123,25 @@ def main():
         except urllib.error.HTTPError as error:
             raise SystemExit(f"Supabase zwrócił HTTP {error.code}: {error.read().decode(errors='replace')}")
 
-    inspections_status = upsert("inspections", records, "id")
+    # Pierwsze uruchomienie po aktualizacji zachowuje dotychczasowe identyfikatory
+    # rekordów (seed-...) i dopisuje im trwały source_id.
+    existing_request = urllib.request.Request(
+        f"{url}/rest/v1/inspections?select=id,city,local,type,source_id",
+        headers={"apikey": key, "Authorization": f"Bearer {key}"},
+    )
+    try:
+        with urllib.request.urlopen(existing_request) as response:
+            existing = json.load(response)
+    except urllib.error.HTTPError as error:
+        raise SystemExit(f"Nie można odczytać istniejących przeglądów (HTTP {error.code}): {error.read().decode(errors='replace')}")
+    legacy_ids = {
+        source_id(row.get("city"), row.get("local"), row.get("type")): row["id"]
+        for row in existing if not row.get("source_id")
+    }
+    for record in records:
+        record["id"] = legacy_ids.get(record["source_id"], record["id"])
+
+    inspections_status = upsert("inspections", records, "source_id")
     types_status = upsert("inspection_types", [{"name": name} for name in type_names], "name")
     locations_status = upsert("locations", locations, "city,local")
     print(f"Zsynchronizowano {len(records)} wpisów (HTTP {inspections_status}), {len(type_names)} rodzajów przeglądów (HTTP {types_status}) i {len(locations)} lokali (HTTP {locations_status}).")
