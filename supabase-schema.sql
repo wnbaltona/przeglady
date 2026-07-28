@@ -64,8 +64,12 @@ create policy "Zalogowani edytują rodzaje przeglądów" on public.inspection_ty
 
 drop policy if exists "Zalogowani odczytują lokale" on public.locations;
 drop policy if exists "Zalogowani dodają lokale" on public.locations;
+drop policy if exists "Zalogowani edytują lokale" on public.locations;
+drop policy if exists "Zalogowani usuwają lokale" on public.locations;
 create policy "Zalogowani odczytują lokale" on public.locations for select to authenticated using (true);
 create policy "Zalogowani dodają lokale" on public.locations for insert to authenticated with check (true);
+create policy "Zalogowani edytują lokale" on public.locations for update to authenticated using (true) with check (true);
+create policy "Zalogowani usuwają lokale" on public.locations for delete to authenticated using (true);
 
 do $$ begin alter publication supabase_realtime add table public.inspections; exception when duplicate_object then null; end $$;
 do $$ begin alter publication supabase_realtime add table public.inspection_types; exception when duplicate_object then null; end $$;
