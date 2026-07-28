@@ -12,6 +12,8 @@ create table if not exists public.inspections (
   protocol_path text,
   notes text not null default '',
   source_id text unique,
+  version integer not null default 1,
+  deleted_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -35,6 +37,8 @@ create table if not exists public.locations (
 alter table public.inspections add column if not exists protocol_path text;
 alter table public.inspections add column if not exists created_at timestamptz not null default now();
 alter table public.inspections add column if not exists source_id text;
+alter table public.inspections add column if not exists version integer not null default 1;
+alter table public.inspections add column if not exists deleted_at timestamptz;
 do $$ begin
   alter table public.inspections add constraint inspections_source_id_key unique (source_id);
 exception when duplicate_object then null;
@@ -47,18 +51,49 @@ create table if not exists public.app_state (
   updated_at timestamptz not null default now()
 );
 
+-- Pełna historia wpisów, także dla pozycji przeniesionych do kosza.
+create table if not exists public.inspection_audit (
+  id bigint generated always as identity primary key,
+  inspection_id text not null,
+  action text not null check (action in ('INSERT','UPDATE','DELETE')),
+  old_data jsonb,
+  new_data jsonb,
+  changed_at timestamptz not null default now(),
+  changed_by uuid
+);
+create index if not exists inspection_audit_inspection_id_changed_at_idx on public.inspection_audit (inspection_id, changed_at desc);
+
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
-begin new.updated_at = now(); return new; end $$;
+begin new.updated_at = now(); new.version = old.version + 1; return new; end $$;
+
+create or replace function public.audit_inspection_change()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if TG_OP = 'INSERT' then
+    insert into public.inspection_audit (inspection_id, action, new_data, changed_by) values (new.id, TG_OP, to_jsonb(new), auth.uid());
+    return new;
+  elsif TG_OP = 'UPDATE' then
+    insert into public.inspection_audit (inspection_id, action, old_data, new_data, changed_by) values (new.id, TG_OP, to_jsonb(old), to_jsonb(new), auth.uid());
+    return new;
+  else
+    insert into public.inspection_audit (inspection_id, action, old_data, changed_by) values (old.id, TG_OP, to_jsonb(old), auth.uid());
+    return old;
+  end if;
+end $$;
 
 drop trigger if exists inspections_set_updated_at on public.inspections;
 create trigger inspections_set_updated_at before update on public.inspections
 for each row execute function public.set_updated_at();
+drop trigger if exists inspections_audit_change on public.inspections;
+create trigger inspections_audit_change after insert or update or delete on public.inspections
+for each row execute function public.audit_inspection_change();
 
 alter table public.inspections enable row level security;
 alter table public.inspection_types enable row level security;
 alter table public.locations enable row level security;
 alter table public.app_state enable row level security;
+alter table public.inspection_audit enable row level security;
 
 drop policy if exists "Zalogowani odczytują przeglądy" on public.inspections;
 drop policy if exists "Zalogowani dodają przeglądy" on public.inspections;
@@ -90,6 +125,9 @@ drop policy if exists "Zalogowani zapisują stan aplikacji" on public.app_state;
 create policy "Zalogowani odczytują stan aplikacji" on public.app_state for select to authenticated using (true);
 create policy "Zalogowani zapisują stan aplikacji" on public.app_state for insert to authenticated with check (true);
 create policy "Zalogowani aktualizują stan aplikacji" on public.app_state for update to authenticated using (true) with check (true);
+
+drop policy if exists "Zalogowani odczytują historię przeglądów" on public.inspection_audit;
+create policy "Zalogowani odczytują historię przeglądów" on public.inspection_audit for select to authenticated using (true);
 
 do $$ begin alter publication supabase_realtime add table public.inspections; exception when duplicate_object then null; end $$;
 do $$ begin alter publication supabase_realtime add table public.inspection_types; exception when duplicate_object then null; end $$;
