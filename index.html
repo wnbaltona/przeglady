@@ -1,73 +1,4831 @@
 <!doctype html>
 <html lang="pl">
+
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Przeglądy</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
-  <script src="dane-startowe.js"></script>
-  <style>
-    :root{--navy:#12304a;--blue:#075985;--bg:#f1f5f9;--line:#cbd5e1;--red:#991b1b;--amber:#92400e;--green:#065f46}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:#172033}
-    .top{background:var(--navy);color:#fff;padding:22px max(20px,calc((100% - 1280px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:4px solid #38bdf8}.top h1{margin:0;font-size:26px}.top p{margin:4px 0 0;color:#dbeafe}
-    .wrap{max-width:1300px;margin:24px auto;padding:0 18px}.panel,.card,.notice{background:#fff;border:1px solid var(--line);border-radius:12px}.panel{padding:16px;margin-bottom:16px}.notice{padding:15px 17px;margin-bottom:16px;background:#e0f2fe;color:#123e5c;border-left:4px solid var(--blue)}
-    .tools,.filters,.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.filters{margin-top:14px}.filters input,.filters select{flex:1;min-width:155px}.user-menu{position:relative}.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:10;min-width:250px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px #0f172a33}.menu-panel button{display:block;width:100%;margin-top:6px;text-align:left}.menu-user{padding:4px 6px 10px;color:#334155;border-bottom:1px solid #e2e8f0;word-break:break-word}
-    button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:#e2e8f0;color:#172033}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
-    input,select,textarea{width:100%;border:1px solid #94a3b8;border-radius:8px;padding:9px;background:#fff;font:inherit}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:#fff;color:#172033;text-align:left}.stat:hover,.stat.active{box-shadow:0 0 0 3px #38bdf866,0 8px 18px #0f172a18;transform:translateY(-1px)}.stat b{display:block;font-size:27px;margin-top:4px}.overdue{border-left-color:#ef4444}.due{border-left-color:#f59e0b}.ok{border-left-color:#10b981}.total{border-left-color:#075985}
-    .city-groups{display:grid;gap:12px}.city-group{overflow:hidden}.city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none}.city-summary::-webkit-details-marker{display:none}.city-summary::after{content:'›';font-size:25px;line-height:1;color:var(--blue);margin-left:4px;transition:transform .18s}.city-group[open] .city-summary::after{transform:rotate(90deg)}.city-summary-main{display:flex;gap:10px;align-items:baseline}.city-summary strong{font-size:17px}.city-summary-count,.muted{color:#475569}.city-summary-stats{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:#f8fafc}.tablebox{overflow:auto;max-height:62vh}table{border-collapse:collapse;width:100%;min-width:900px}th,td{padding:11px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}th{position:sticky;top:0;background:#eaf0f6;color:#334155;font-size:12px}.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}.PO{background:#fee2e2;color:var(--red)}.DO{background:#fef3c7;color:var(--amber)}.OK{background:#d1fae5;color:var(--green)}.BRAK{background:#ede9fe;color:#5b21b6}
-    .modal{display:none;position:fixed;inset:0;background:#17203388;place-items:center;padding:18px;z-index:5}.modal.open{display:grid}.dialog{background:#fff;border-radius:14px;padding:24px;width:min(720px,100%);max-height:90vh;overflow:auto}.form{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.form label{display:grid;gap:5px;font-weight:650}.wide{grid-column:1/-1}.dialog footer{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}.type-add{display:flex;gap:8px}.type-add input{flex:1}.type-list{list-style:none;padding:0;margin:16px 0;display:grid;gap:7px;max-height:48vh;overflow:auto}.type-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc}.row-actions{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;white-space:nowrap}.row-actions button{padding:8px 10px}
-    @media(max-width:700px){.top{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr)}.form{grid-template-columns:1fr}.wide{grid-column:auto}.city-summary{align-items:flex-start}.city-summary-stats{margin-left:0}.city-summary{flex-wrap:wrap}.city-summary::after{margin-left:auto}}
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Przeglądy</title>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="dane-startowe.js"></script>
+
+    <!-- =====================================================
+         STYLE
+    ====================================================== -->
+    <style>
+
+        /* =====================================================
+           KOLORY
+        ====================================================== */
+
+        :root {
+            --navy: #12304a;
+            --blue: #075985;
+            --bg: #f1f5f9;
+            --line: #cbd5e1;
+            --red: #991b1b;
+            --amber: #92400e;
+            --green: #065f46;
+        }
+
+        /* =====================================================
+           PODSTAWY
+        ====================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            font: 14px system-ui, Segoe UI, Arial;
+            color: #172033;
+        }
+
+        /* =====================================================
+           HEADER
+        ====================================================== */
+
+        .top {
+            background: var(--navy);
+            color: white;
+            padding: 22px max(20px, calc((100% - 1280px)/2));
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+
+            border-bottom: 4px solid #38bdf8;
+        }
+
+        .top h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .top p {
+            margin: 4px 0 0;
+            color: #dbeafe;
+        }
+
+        /* =====================================================
+           GŁÓWNY UKŁAD
+        ====================================================== */
+
+        .wrap {
+            max-width: 1300px;
+            margin: 24px auto;
+            padding: 0 18px;
+        }
+
+        .panel,
+        .card,
+        .notice {
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+        }
+
+        .panel {
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .notice {
+            padding: 15px 17px;
+            margin-bottom: 16px;
+
+            background: #e0f2fe;
+            color: #123e5c;
+
+            border-left: 4px solid var(--blue);
+        }
+
+        /* =====================================================
+           PRZYCISKI I FILTRY
+        ====================================================== */
+
+        .tools,
+        .filters,
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filters {
+            margin-top: 14px;
+        }
+
+        .filters input,
+        .filters select {
+            flex: 1;
+            min-width: 155px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+
+            background: var(--blue);
+            color: white;
+
+            padding: 10px 13px;
+
+            font: inherit;
+            font-weight: 700;
+
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .secondary {
+            background: #e2e8f0;
+            color: #172033;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: var(--red);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #94a3b8;
+            border-radius: 8px;
+            padding: 9px;
+            background: white;
+            font: inherit;
+        }
+
+        /* =====================================================
+           MENU UŻYTKOWNIKA
+        ====================================================== */
+
+        .user-menu {
+            position: relative;
+        }
+
+        .menu-panel {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+
+            z-index: 10;
+
+            min-width: 250px;
+
+            padding: 12px;
+
+            background: white;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+
+            box-shadow: 0 12px 28px #0f172a33;
+        }
+
+        .menu-panel button {
+            display: block;
+            width: 100%;
+            margin-top: 6px;
+            text-align: left;
+        }
+
+        .menu-user {
+            padding: 4px 6px 10px;
+            color: #334155;
+            border-bottom: 1px solid #e2e8f0;
+            word-break: break-word;
+        }
+
+        /* =====================================================
+           STATYSTYKI
+        ====================================================== */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat {
+            width: 100%;
+            padding: 15px;
+
+            border: 1px solid var(--line);
+            border-left: 5px solid #64748b;
+
+            background: white;
+
+            color: #172033;
+            text-align: left;
+        }
+
+        .stat:hover,
+        .stat.active {
+            box-shadow:
+                0 0 0 3px #38bdf866,
+                0 8px 18px #0f172a18;
+
+            transform: translateY(-1px);
+        }
+
+        .stat b {
+            display: block;
+            font-size: 27px;
+            margin-top: 4px;
+        }
+
+        .overdue {
+            border-left-color: #ef4444;
+        }
+
+        .due {
+            border-left-color: #f59e0b;
+        }
+
+        .ok {
+            border-left-color: #10b981;
+        }
+
+        .total {
+            border-left-color: #075985;
+        }
+
+        /* =====================================================
+           DALSZA CZĘŚĆ CSS...
+        ====================================================== */
+
+    </style>
+
 </head>
+
 <body>
-<header class="top"><div><h1>Przeglądy</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+
+  <!-- =====================================================
+     NAGŁÓWEK
+===================================================== -->
+
+<header class="top">
+
+    <div>
+        <h1>Przeglądy</h1>
+        <p>Wspólny rejestr, terminy i protokoły</p>
+    </div>
+
+    <div class="actions">
+
+        <button id="add">
+            + Dodaj przegląd
+        </button>
+
+        <div class="user-menu">
+
+            <button
+                id="menuToggle"
+                class="secondary"
+                type="button"
+                aria-expanded="false">
+
+                Menu ▾
+
+            </button>
+
+            <div
+                id="userMenu"
+                class="menu-panel"
+                hidden>
+
+                <div
+                    id="user"
+                    class="menu-user">
+
+                    Niezalogowano
+
+                </div>
+
+                <button
+                    id="manageTypes"
+                    class="secondary"
+                    type="button">
+
+                    Dodaj / usuń rodzaj przeglądu
+
+                </button>
+
+                <button
+                    id="addLocal"
+                    class="secondary"
+                    type="button">
+
+                    Dodaj lokal
+
+                </button>
+
+                <button
+                    id="manageLocations"
+                    class="secondary"
+                    type="button">
+
+                    Usuń lokal
+
+                </button>
+
+                <button
+                    id="showTrash"
+                    class="secondary"
+                    type="button">
+
+                    Kosz
+
+                </button>
+
+                <button
+                    id="logout"
+                    class="danger"
+                    type="button"
+                    hidden>
+
+                    Wyloguj
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     GŁÓWNA ZAWARTOŚĆ
+===================================================== -->
+
 <main class="wrap">
-  <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
-  <section class="panel"><div class="tools"><button id="export" class="secondary">Eksportuj CSV</button><span id="syncInfo" class="muted"></span></div><div class="filters"><input id="search" placeholder="Szukaj: miasto, lokal, rodzaj…"><select id="city"><option value="">Wszystkie miasta</option></select><select id="status"><option value="">Wszystkie statusy</option><option>PO TERMINIE</option><option>DO WYKONANIA</option><option>OK</option></select><select id="protocol"><option value="">Wszystkie protokoły</option><option value="DODANY">Dodany</option><option value="BRAK PROTOKOŁU">Brak protokołu</option></select></div></section>
-  <section class="stats"><button type="button" class="card stat overdue" data-quick-status="PO TERMINIE">Po terminie<b id="overdue">0</b></button><button type="button" class="card stat due" data-quick-status="DO WYKONANIA">Do wykonania (14 dni)<b id="due">0</b></button><button type="button" class="card stat ok" data-quick-status="OK">Aktualne<b id="ok">0</b></button><button type="button" class="card stat total" data-quick-status="">Wszystkie wpisy<b id="all">0</b></button></section>
-  <section id="cityGroups" class="city-groups"></section>
+
+    <!-- Powiadomienia -->
+
+    <div
+        id="notice"
+        class="notice">
+
+        Trwa łączenie ze wspólnym rejestrem…
+
+    </div>
+
+
+    <!-- =====================================================
+         PANEL FILTRÓW
+    ====================================================== -->
+
+    <section class="panel">
+
+        <div class="tools">
+
+            <button
+                id="export"
+                class="secondary">
+
+                Eksportuj CSV
+
+            </button>
+
+            <span
+                id="syncInfo"
+                class="muted">
+
+            </span>
+
+        </div>
+
+
+        <div class="filters">
+
+            <input
+                id="search"
+                placeholder="Szukaj: miasto, lokal, rodzaj…">
+
+            <select id="city">
+
+                <option value="">
+                    Wszystkie miasta
+                </option>
+
+            </select>
+
+            <select id="status">
+
+                <option value="">
+                    Wszystkie statusy
+                </option>
+
+                <option>
+                    PO TERMINIE
+                </option>
+
+                <option>
+                    DO WYKONANIA
+                </option>
+
+                <option>
+                    OK
+                </option>
+
+            </select>
+
+            <select id="protocol">
+
+                <option value="">
+                    Wszystkie protokoły
+                </option>
+
+                <option value="DODANY">
+                    Dodany
+                </option>
+
+                <option value="BRAK PROTOKOŁU">
+                    Brak protokołu
+                </option>
+
+            </select>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         STATYSTYKI
+    ====================================================== -->
+
+    <section class="stats">
+
+        <button
+            type="button"
+            class="card stat overdue"
+            data-quick-status="PO TERMINIE">
+
+            Po terminie
+
+            <b id="overdue">0</b>
+
+        </button>
+
+        <button
+            type="button"
+            class="card stat due"
+            data-quick-status="DO WYKONANIA">
+
+            Do wykonania (14 dni)
+
+            <b id="due">0</b>
+
+        </button>
+
+        <button
+            type="button"
+            class="card stat ok"
+            data-quick-status="OK">
+
+            Aktualne
+
+            <b id="ok">0</b>
+
+        </button>
+
+        <button
+            type="button"
+            class="card stat total"
+            data-quick-status="">
+
+            Wszystkie wpisy
+
+            <b id="all">0</b>
+
+        </button>
+
+    </section>
+
+
+    <!-- =====================================================
+         TABELA MIAST
+    ====================================================== -->
+
+    <section
+        id="cityGroups"
+        class="city-groups">
+
+    </section>
+
 </main>
-<div class="modal" id="loginModal"><form class="dialog" id="loginForm"><h2>Dostęp do rejestru</h2><p>Logowanie jest wymagane, aby dane były wspólne i chronione.</p><div class="form"><label class="wide">E-mail<input required type="email" name="email"></label><label class="wide">Hasło<input required type="password" name="password"></label></div><p id="loginMessage" class="muted"></p><footer><button type="button" id="register" class="secondary">Utwórz konto</button><button>Zaloguj</button></footer></form></div>
-<div class="modal" id="editModal"><form class="dialog" id="editForm"><h2 id="formTitle">Dodaj przegląd</h2><div class="form"><label>Miasto<input required name="city" list="cities"></label><label>Nr lokalu<input required name="local" list="locals"></label><label>Rodzaj przeglądu<input required name="type" list="types"></label><label>Data wykonania<input required type="date" name="done"></label><label>Ważny przez (mies.)<input required min="1" type="number" name="months" value="12"></label><label>Data dodania protokołu<input type="date" name="protocolDate"></label><label class="wide">Plik protokołu<input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"><small id="fileInfo" class="muted">Opcjonalnie: PDF, dokument lub zdjęcie.</small></label><label class="wide">Uwagi<textarea name="notes" rows="3"></textarea></label></div><footer><button type="button" id="cancel" class="secondary">Anuluj</button><button>Zapisz</button></footer></form></div>
-<div class="modal" id="typesModal"><section class="dialog"><h2>Rodzaje przeglądów</h2><p class="muted">Usunięta nazwa znika z podpowiedzi. Istniejące przeglądy pozostają bez zmian.</p><div class="type-add"><input id="newType" placeholder="Nowy rodzaj przeglądu"><button type="button" id="addType">Dodaj</button></div><ul id="typeList" class="type-list"></ul><footer><button type="button" id="closeTypes" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="localModal"><form class="dialog" id="localForm"><h2>Dodaj lokal</h2><p class="muted">Lokal pojawi się na liście po wybraniu wskazanego miasta.</p><div class="form"><label>Miasto<input required name="city" list="cities"></label><label>MPK<input required name="mpk" placeholder="np. B52 lub 208"></label><label class="wide">Nazwa lokalu<input required name="name" placeholder="np. Multistore"></label></div><footer><button type="button" id="cancelLocal" class="secondary">Anuluj</button><button>Zapisz lokal</button></footer></form></div>
-<div class="modal" id="locationsModal"><section class="dialog"><h2>Usuń lokal</h2><p class="muted">Usunięcie chowa lokal z podpowiedzi, ale nie kasuje istniejących przeglądów.</p><ul id="locationList" class="type-list"></ul><footer><button type="button" id="closeLocations" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="trashModal"><section class="dialog"><h2>Kosz</h2><p class="muted">Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.</p><ul id="trashList" class="type-list"></ul><footer><button type="button" id="closeTrash" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="historyModal"><section class="dialog"><h2>Historia wpisu</h2><ul id="historyList" class="type-list"></ul><footer><button type="button" id="closeHistory" class="secondary">Zamknij</button></footer></section></div>
-<datalist id="cities"></datalist><datalist id="locals"></datalist><datalist id="types"></datalist>
+
+
+<!-- =====================================================
+     MODALE
+===================================================== -->
+
+<!-- Logowanie -->
+<div class="modal" id="loginModal">
+
+<!-- Edycja przeglądu -->
+<div class="modal" id="editModal">
+
+<!-- Rodzaje przeglądów -->
+<div class="modal" id="typesModal">
+
+<!-- Dodawanie lokalu -->
+<div class="modal" id="localModal">
+
+<!-- Zarządzanie lokalami -->
+<div class="modal" id="locationsModal">
+
+<!-- Kosz -->
+<div class="modal" id="trashModal">
+
+<!-- Historia -->
+<div class="modal" id="historyModal">
+
+
+<!-- =====================================================
+     DATALISTY
+===================================================== -->
+
+<datalist id="cities"></datalist>
+
+<datalist id="locals"></datalist>
+
+<datalist id="types"></datalist>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
 <script>
-const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
-const safeStorage=(()=>{try{localStorage.setItem('__test','1');localStorage.removeItem('__test');return localStorage}catch{const s={};return{getItem:k=>s[k]||null,setItem:(k,v)=>s[k]=String(v),removeItem:k=>delete s[k]}}})();
-const sb=ready?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{storage:safeStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
-let data=[],inspectionTypes=[],locations=[],typeCatalogAvailable=false,editing=null,editingVersion=null;
-const MAX_PROTOCOL_SIZE=10*1024*1024,ALLOWED_PROTOCOL_TYPES=new Set(['application/pdf','image/jpeg','image/png','image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
-const fallbackTypes=['Elektryczny (roczny)','Elektryczny (5-cio letni)','Systemy PPOŻ','Gaśnice','Klimatyzacja','Alarmy','Hydranty','Rolety','Wentylacja','Wymiana filtrów','Regałów magazynowych','CRO','Mroźnia/Chłodnia','Regały chłodnicze','Separatory tłuszczu','Vendingi','UDT (wózki widłowe, paleciaki)','BHP (drabiny, schodki, podesty)','Ansul','Okap','Brama garażowa','Żaluzje (gastro)','Bramki antykradzieżowe','Klamki na kod','Oświetlenie','Drzwi przeciwpożarowe','Drzwi na zaplecze','Systemy multmedialne','Posadzki, wykładziny','Kontrola kurzu','Light boxy','Floorboxy','Meble','Szyby','Lampy owadobójcze','Samochody','Windy w samochodach','Mycie jednostek klimatyzacji','Sprawdzenie pompy odpływowej'];
-const monthsByType={'elektryczny (5-cio letni)':60,'elektryczny (roczny)':12,'klimatyzacja':3,'mycie jednostek klimatyzacji':36,'wentylacja':12,'rolety':12,'rolety sklepowe':12,'gasnice':12,'oswietlenie':1,'sprawdzenie pompy odplywowej':2};
-const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));const iso=v=>v?String(v).slice(0,10):'';const fmt=v=>v?new Date(v+'T12:00:00').toLocaleDateString('pl-PL'):'—';const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-const fromDb=r=>({id:r.id,city:r.city,local:r.local,type:r.type,done:iso(r.done),months:r.months,protocolDate:iso(r.protocol_date),protocolFileName:r.protocol_file_name,protocolPath:r.protocol_path,notes:r.notes||'',version:r.version,deletedAt:r.deleted_at});const toDb=r=>({id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''});
-function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function state(r){const n=nextDate(r.done,r.months);if(!n)return'';const days=Math.ceil((new Date(n+'T12:00:00')-new Date())/86400000);return days<0?'PO TERMINIE':days<=14?'DO WYKONANIA':'OK'}function protocol(r){return r.protocolFileName||r.protocolDate?'DODANY':'BRAK PROTOKOŁU'}function countLabel(n){return n===1?'1 przegląd':(n%100<12||n%100>14)&&n%10>=2&&n%10<=4?`${n} przeglądy`:`${n} przeglądów`}
-function refreshLists(){const selected=$('#city').value,types=typeCatalogAvailable?inspectionTypes:fallbackTypes,cities=[...new Set([...data.map(x=>x.city),...locations.map(x=>x.city)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');$('#city').value=selected;$('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');$('#types').innerHTML=[...new Set(types)].sort((a,b)=>a.localeCompare(b,'pl')).map(x=>`<option value="${esc(x)}">`).join('')}
-function refreshLocals(){const city=norm($('#editForm').elements.city.value),source=[...locations,...data.map(r=>({city:r.city,local:r.local}))],names=[...new Set(source.filter(r=>!city||norm(r.city)===city).map(r=>String(r.local||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#locals').innerHTML=names.map(x=>`<option value="${esc(x)}">`).join('')}
-function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);return`<tr><td><b>${esc(r.local)}</b></td><td>${esc(r.type)}</td><td>${fmt(r.done)}</td><td>${fmt(nextDate(r.done,r.months))}</td><td>${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td><td><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p}</span>${r.protocolPath?` <button type="button" class="secondary" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions"><button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button><button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button><button type="button" class="secondary" data-action="history" data-id="${esc(r.id)}">Historia</button></div></td></tr>`}).join('')}
-function render(){refreshLists();const q=$('#search').value.toLowerCase(),city=$('#city').value,st=$('#status').value,pr=$('#protocol').value,shown=data.filter(r=>(!q||Object.values(r).join(' ').toLowerCase().includes(q))&&(!city||r.city===city)&&(!st||state(r)===st)&&(!pr||protocol(r)===pr)).sort((a,b)=>(nextDate(a.done,a.months)||'9999').localeCompare(nextDate(b.done,b.months)||'9999'));for(const[id,s]of[['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;$('#all').textContent=data.length;document.querySelectorAll('[data-quick-status]').forEach(b=>b.classList.toggle('active',b.dataset.quickStatus===st));const expanded=new Set([...document.querySelectorAll('#cityGroups details[open]')].map(x=>x.dataset.city));const cities=[...new Set(shown.map(r=>r.city||'Bez miasta'))].sort((a,b)=>a.localeCompare(b,'pl'));$('#cityGroups').innerHTML=cities.length?cities.map(name=>{const rs=shown.filter(r=>(r.city||'Bez miasta')===name),o=rs.filter(r=>state(r)==='PO TERMINIE').length,d=rs.filter(r=>state(r)==='DO WYKONANIA').length;return`<details class="card city-group" data-city="${esc(name)}"${expanded.has(name)?' open':''}><summary class="city-summary"><span class="city-summary-main"><strong>${esc(name)}</strong><span class="city-summary-count">${countLabel(rs.length)}</span></span><span class="city-summary-stats">${o?`<span class="badge PO">Po terminie: ${o}</span>`:''}${d?`<span class="badge DO">Do wykonania: ${d}</span>`:''}</span></summary><div class="city-table tablebox"><table><thead><tr><th>Lokal</th><th>Rodzaj</th><th>Wykonano</th><th>Następny termin</th><th>Status</th><th>Protokół</th><th>Uwagi</th><th>Akcje</th></tr></thead><tbody>${rows(rs)}</tbody></table></div></details>`}).join(''):'<div class="notice">Brak przeglądów spełniających wybrane kryteria.</div>'}
-function showError(msg){$('#notice').hidden=false;$('#notice').textContent='Nie można połączyć się z rejestrem: '+msg}
-async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`}
-async function applySession(s){$('#user').textContent=s?.user?.email||'Niezalogowano';$('#logout').hidden=!s?.user;$('#loginModal').classList.toggle('open',!s?.user);if(s?.user)await load()}async function start(){if(!ready){showError('Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js.');$('#add').disabled=true;return}const{data:{session}}=await sb.auth.getSession();await applySession(session);sb.auth.onAuthStateChange((_e,s)=>applySession(s));sb.channel('live').on('postgres_changes',{event:'*',schema:'public',table:'inspections'},load).on('postgres_changes',{event:'*',schema:'public',table:'inspection_types'},load).on('postgres_changes',{event:'*',schema:'public',table:'locations'},load).subscribe()}
-$('#loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),{error}=await sb.auth.signInWithPassword({email:f.get('email'),password:f.get('password')});$('#loginMessage').textContent=error?error.message:''};$('#register').onclick=async()=>{if(!config.allowRegistration)return $('#loginMessage').textContent='Rejestracja jest wyłączona. Poproś administratora o utworzenie konta.';const f=new FormData($('#loginForm')),{error}=await sb.auth.signUp({email:f.get('email'),password:f.get('password')});$('#loginMessage').textContent=error?error.message:'Sprawdź skrzynkę e-mail i potwierdź konto.'};$('#logout').onclick=()=>sb.auth.signOut();$('#add').onclick=()=>openForm();$('#cancel').onclick=()=>$('#editModal').classList.remove('open');
-$('#menuToggle').onclick=()=>{const open=$('#userMenu').hidden;$('#userMenu').hidden=!open;$('#menuToggle').setAttribute('aria-expanded',String(open))};document.addEventListener('click',e=>{if(!e.target.closest('.user-menu')){$('#userMenu').hidden=true;$('#menuToggle').setAttribute('aria-expanded','false')}});
-function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;const f=$('#editForm');f.reset();const v=r||{months:12};['city','local','type','done','months','protocolDate','notes'].forEach(n=>f.elements[n].value=v[n]??'');refreshLocals();const edit=Boolean(r);['city','local'].forEach(n=>f.elements[n].readOnly=edit);$('#formTitle').textContent=edit?'Edytuj przegląd':'Dodaj przegląd';$('#fileInfo').textContent=r?.protocolFileName?`Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`:'Opcjonalnie: PDF, dokument lub zdjęcie.';$('#editModal').classList.add('open')}
-$('#editForm').elements.city.addEventListener('input',refreshLocals);function setDefaultMonths(){if(editing)return;const m=monthsByType[norm($('#editForm').elements.type.value)];if(m)$('#editForm').elements.months.value=m}$('#editForm').elements.type.addEventListener('input',setDefaultMonths);$('#editForm').elements.type.addEventListener('change',setDefaultMonths);
-$('#editForm').onsubmit=async e=>{e.preventDefault();const submit=e.submitter;let uploadedPath=null;try{const f=new FormData(e.target),file=f.get('file'),city=String(f.get('city')||'').trim(),local=String(f.get('local')||'').trim(),type=String(f.get('type')||'').trim(),months=Number(f.get('months'));if(!city||!local||!type)throw new Error('Uzupełnij miasto, lokal i rodzaj przeglądu.');if(!Number.isInteger(months)||months<1||months>120)throw new Error('Okres ważności musi wynosić od 1 do 120 miesięcy.');if(data.some(r=>String(r.id)!==String(editing)&&norm(r.city)===norm(city)&&norm(r.local)===norm(local)&&norm(r.type)===norm(type)))throw new Error('Taki przegląd dla tego lokalu już istnieje.');if(file&&file.size){if(file.size>MAX_PROTOCOL_SIZE)throw new Error('Plik protokołu może mieć maksymalnie 10 MB.');if(!ALLOWED_PROTOCOL_TYPES.has(file.type))throw new Error('Niedozwolony typ pliku protokołu.');const ext=file.name.split('.').pop().toLowerCase(),path=`${Date.now()}_${crypto.randomUUID()}.${ext}`,{error}=await sb.storage.from('protocols').upload(path,file,{contentType:file.type});if(error)throw error;uploadedPath=path}if(submit)submit.disabled=true;const old=data.find(x=>String(x.id)===String(editing)),payload={id:editing||`custom-${Date.now()}`,city,local,type,done:f.get('done')||null,months,protocolDate:f.get('protocolDate')||null,notes:f.get('notes')||''};if(uploadedPath){payload.protocolFileName=file.name;payload.protocolPath=uploadedPath}else if(old){payload.protocolFileName=old.protocolFileName;payload.protocolPath=old.protocolPath}let saveError;if(editing){const{data:changed,error}=await sb.from('inspections').update(toDb(payload)).eq('id',editing).eq('version',editingVersion).is('deleted_at',null).select('id');saveError=error;if(!saveError&&!changed?.length)throw new Error('Ten wpis został zmieniony lub przeniesiony do kosza przez inną osobę. Odśwież dane i spróbuj ponownie.')}else{const{error}=await sb.from('inspections').insert(toDb(payload));saveError=error}if(saveError)throw saveError;const{error:typeError}=await sb.from('inspection_types').upsert({name:type,active:true},{onConflict:'name'});if(typeError)throw typeError;const{error:locationError}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(locationError)throw locationError;if(uploadedPath&&old?.protocolPath&&old.protocolPath!==uploadedPath){const{error:removeError}=await sb.storage.from('protocols').remove([old.protocolPath]);if(removeError)console.warn('Nie udało się usunąć poprzedniego pliku:',removeError.message)}$('#editModal').classList.remove('open');await load()}catch(err){if(uploadedPath)await sb.storage.from('protocols').remove([uploadedPath]);alert('Błąd podczas zapisywania: '+err.message)}finally{if(submit)submit.disabled=false}};
-async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
-$('#cityGroups').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;if(b.dataset.action==='edit')await editRow(b.dataset.id);if(b.dataset.action==='delete')await deleteRow(b.dataset.id);if(b.dataset.action==='open')await openFile(b.dataset.id);if(b.dataset.action==='history')await showHistory(b.dataset.id)});['search','city','status','protocol'].forEach(x=>$('#'+x).addEventListener(x==='search'?'input':'change',render));document.querySelectorAll('[data-quick-status]').forEach(b=>b.onclick=()=>{$('#status').value=b.dataset.quickStatus&&$('#status').value===b.dataset.quickStatus?'':b.dataset.quickStatus;render()});
-function renderTypeList(){$('#typeList').innerHTML=inspectionTypes.length?inspectionTypes.sort((a,b)=>a.localeCompare(b,'pl')).map(n=>`<li><span>${esc(n)}</span><button type="button" class="danger" data-name="${esc(n)}">Usuń</button></li>`).join(''):'<li class="muted">Brak aktywnych rodzajów.</li>'}$('#manageTypes').onclick=()=>{renderTypeList();$('#userMenu').hidden=true;$('#typesModal').classList.add('open')};$('#closeTypes').onclick=()=>$('#typesModal').classList.remove('open');$('#addType').onclick=async()=>{const name=$('#newType').value.trim();if(!name)return;const{error}=await sb.from('inspection_types').upsert({name,active:true},{onConflict:'name'});if(error)return alert(error.message);$('#newType').value='';await load();renderTypeList()};$('#typeList').onclick=async e=>{const b=e.target.closest('button[data-name]');if(!b||!confirm(`Usunąć „${b.dataset.name}” z listy?`))return;const{error}=await sb.from('inspection_types').update({active:false}).eq('name',b.dataset.name);if(error)return alert(error.message);await load();renderTypeList()};
-$('#addLocal').onclick=()=>{$('#localForm').reset();$('#userMenu').hidden=true;$('#localModal').classList.add('open')};$('#cancelLocal').onclick=()=>$('#localModal').classList.remove('open');$('#localForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),city=String(f.get('city')).trim(),mpk=String(f.get('mpk')).trim(),name=String(f.get('name')).trim(),local=`${mpk} (${name})`,{error}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(error)return alert('Nie udało się dodać lokalu: '+error.message);$('#localModal').classList.remove('open');await load()};
-function renderLocationList(){$('#locationList').innerHTML=locations.length?locations.sort((a,b)=>a.city.localeCompare(b.city,'pl')||a.local.localeCompare(b.local,'pl')).map(row=>`<li><span><b>${esc(row.city)}</b> — ${esc(row.local)}</span><button type="button" class="danger" data-city="${esc(row.city)}" data-local="${esc(row.local)}">Usuń</button></li>`).join(''):'<li class="muted">Brak lokali na liście.</li>'}$('#manageLocations').onclick=()=>{renderLocationList();$('#userMenu').hidden=true;$('#locationsModal').classList.add('open')};$('#closeLocations').onclick=()=>$('#locationsModal').classList.remove('open');$('#locationList').onclick=async e=>{const button=e.target.closest('button[data-city][data-local]');if(!button)return;const city=button.dataset.city,local=button.dataset.local;if(!confirm(`Usunąć lokal „${local}” z miasta ${city}?`))return;const{error}=await sb.from('locations').delete().eq('city',city).eq('local',local);if(error)return alert('Nie udało się usunąć lokalu: '+error.message);await load();renderLocationList()};
-async function renderTrash(){const{data:deleted,error}=await sb.from('inspections').select('*').not('deleted_at','is',null).order('deleted_at',{ascending:false});if(error)return alert('Nie udało się pobrać kosza: '+error.message);$('#trashList').innerHTML=deleted?.length?deleted.map(row=>{const r=fromDb(row);return`<li><span><b>${esc(r.city)} — ${esc(r.local)}</b><br>${esc(r.type)} <small class="muted">(usunięto: ${fmt(iso(r.deletedAt))})</small></span><button type="button" class="secondary" data-restore="${esc(r.id)}" data-version="${esc(r.version)}">Przywróć</button></li>`}).join(''):'<li class="muted">Kosz jest pusty.</li>'}$('#showTrash').onclick=async()=>{$('#userMenu').hidden=true;await renderTrash();$('#trashModal').classList.add('open')};$('#closeTrash').onclick=()=>$('#trashModal').classList.remove('open');$('#trashList').onclick=async e=>{const b=e.target.closest('button[data-restore]');if(!b)return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:null}).eq('id',b.dataset.restore).eq('version',Number(b.dataset.version)).not('deleted_at','is',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież kosz i spróbuj ponownie.');await renderTrash();await load()};
-async function showHistory(id){const{data:events,error}=await sb.from('inspection_audit').select('action,changed_at,old_data,new_data').eq('inspection_id',id).order('changed_at',{ascending:false});if(error)return alert('Nie udało się pobrać historii: '+error.message);const labels={INSERT:'utworzono',UPDATE:'zaktualizowano',DELETE:'usunięto trwale'};$('#historyList').innerHTML=events?.length?events.map(event=>{const row=event.new_data||event.old_data||{},detail=[row.city,row.local,row.type].filter(Boolean).join(' — ');return`<li><span><b>${esc(labels[event.action]||event.action)}</b><br><small class="muted">${esc(new Date(event.changed_at).toLocaleString('pl-PL'))}${detail?` · ${esc(detail)}`:''}</small></span></li>`}).join(''):'<li class="muted">Brak zapisanej historii.</li>';$('#historyModal').classList.add('open')}$('#closeHistory').onclick=()=>$('#historyModal').classList.remove('open');
-$('#export').onclick=()=>{const h=['Miasto','Nr lokalu','Rodzaj przeglądu','Data wykonania','Ważny przez (mies.)','Data następnego przeglądu','Status','Data dodania protokołu','Uwagi'],csv=[h,...data.map(r=>[r.city,r.local,r.type,r.done,r.months,nextDate(r.done,r.months),state(r),r.protocolDate,r.notes])].map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\r\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='przeglady-export.csv';a.click();URL.revokeObjectURL(a.href)};
+
+  /* =========================================================
+   KONFIGURACJA
+========================================================= */
+
+const $ = selector => document.querySelector(selector);
+
+const config = window.APP_CONFIG || {};
+
+const ready = Boolean(
+    config.supabaseUrl &&
+    config.supabaseAnonKey
+);
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+const safeStorage = (() => {
+
+    try {
+
+        localStorage.setItem("__test", "1");
+        localStorage.removeItem("__test");
+
+        return localStorage;
+
+    } catch {
+
+        const storage = {};
+
+        return {
+
+            getItem: key => storage[key] || null,
+
+            setItem: (key, value) => {
+                storage[key] = String(value);
+            },
+
+            removeItem: key => {
+                delete storage[key];
+            }
+
+        };
+    }
+
+})();
+
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const sb = ready
+    ? window.supabase.createClient(
+        config.supabaseUrl,
+        config.supabaseAnonKey,
+        {
+            auth: {
+                storage: safeStorage,
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        }
+    )
+    : null;
+
+
+/* =========================================================
+   ZMIENNE GLOBALNE
+========================================================= */
+
+let data = [];
+
+let inspectionTypes = [];
+
+let locations = [];
+
+let typeCatalogAvailable = false;
+
+let editing = null;
+
+let editingVersion = null;
+
+
+/* =========================================================
+   OGRANICZENIA PLIKÓW
+========================================================= */
+
+const MAX_PROTOCOL_SIZE = 10 * 1024 * 1024;
+
+const ALLOWED_PROTOCOL_TYPES = new Set([
+
+    "application/pdf",
+
+    "image/jpeg",
+
+    "image/png",
+
+    "image/webp",
+
+    "application/msword",
+
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+    "application/vnd.ms-excel",
+
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+]);
+
+
+/* =========================================================
+   DOMYŚLNE RODZAJE PRZEGLĄDÓW
+========================================================= */
+
+const fallbackTypes = [
+
+    "Elektryczny (roczny)",
+    "Elektryczny (5-cio letni)",
+    "Systemy PPOŻ",
+    "Gaśnice",
+    "Klimatyzacja",
+    "Alarmy",
+    "Hydranty",
+    "Rolety",
+    "Wentylacja",
+    "Wymiana filtrów",
+    "Regałów magazynowych",
+    "CRO",
+    "Mroźnia/Chłodnia",
+    "Regały chłodnicze",
+    "Separatory tłuszczu",
+    "Vendingi",
+    "UDT (wózki widłowe, paleciaki)",
+    "BHP (drabiny, schodki, podesty)",
+    "Ansul",
+    "Okap",
+    "Brama garażowa",
+    "Żaluzje (gastro)",
+    "Bramki antykradzieżowe",
+    "Klamki na kod",
+    "Oświetlenie",
+    "Drzwi przeciwpożarowe",
+    "Drzwi na zaplecze",
+    "Systemy multimedialne",
+    "Posadzki, wykładziny",
+    "Kontrola kurzu",
+    "Light boxy",
+    "Floorboxy",
+    "Meble",
+    "Szyby",
+    "Lampy owadobójcze",
+    "Samochody",
+    "Windy w samochodach",
+    "Mycie jednostek klimatyzacji",
+    "Sprawdzenie pompy odpływowej"
+
+];
+
+
+/* =========================================================
+   DOMYŚLNA LICZBA MIESIĘCY
+========================================================= */
+
+const monthsByType = {
+
+    "elektryczny (5-cio letni)": 60,
+
+    "elektryczny (roczny)": 12,
+
+    "klimatyzacja": 3,
+
+    "mycie jednostek klimatyzacji": 36,
+
+    "wentylacja": 12,
+
+    "rolety": 12,
+
+    "rolety sklepowe": 12,
+
+    "gasnice": 12,
+
+    "oswietlenie": 1,
+
+    "sprawdzenie pompy odplywowej": 2
+
+};
+
+
+/* =========================================================
+   FUNKCJE POMOCNICZE
+========================================================= */
+
+
+/**
+ * Zamiana znaków HTML
+ */
+
+const esc = value =>
+    String(value ?? "")
+        .replace(
+            /[&<>"]/g,
+            character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;"
+            })[character]
+        );
+
+
+/**
+ * Data ISO
+ */
+
+const iso = value =>
+    value
+        ? String(value).slice(0, 10)
+        : "";
+
+
+/**
+ * Format daty
+ */
+
+const fmt = value =>
+    value
+        ? new Date(value + "T12:00:00")
+            .toLocaleDateString("pl-PL")
+        : "—";
+
+
+/**
+ * Usuwanie polskich znaków
+ */
+
+const norm = value =>
+
+    String(value || "")
+
+        .normalize("NFD")
+
+        .replace(/[\u0300-\u036f]/g, "")
+
+        .toLowerCase()
+
+        .trim();
+
+  /* =========================================================
+   MAPOWANIE DANYCH Z BAZY
+========================================================= */
+
+const fromDb = row => ({
+
+    id: row.id,
+
+    city: row.city,
+
+    local: row.local,
+
+    type: row.type,
+
+    done: iso(row.done),
+
+    months: row.months,
+
+    protocolDate: iso(row.protocol_date),
+
+    protocolFileName: row.protocol_file_name,
+
+    protocolPath: row.protocol_path,
+
+    notes: row.notes || "",
+
+    version: row.version,
+
+    deletedAt: row.deleted_at
+
+});
+
+
+const toDb = row => ({
+
+    id: row.id,
+
+    city: row.city.trim(),
+
+    local: row.local.trim(),
+
+    type: row.type.trim(),
+
+    done: row.done || null,
+
+    months: Number(row.months),
+
+    protocol_date: row.protocolDate || null,
+
+    protocol_file_name: row.protocolFileName || null,
+
+    protocol_path: row.protocolPath || null,
+
+    notes: row.notes || ""
+
+});
+
+
+
+/* =========================================================
+   WYLICZANIE NASTĘPNEGO TERMINU
+========================================================= */
+
+function nextDate(date, months) {
+
+    if (!date || !months) {
+        return "";
+    }
+
+
+    const [
+
+        year,
+
+        month,
+
+        day
+
+    ] = String(date)
+        .split("-")
+        .map(Number);
+
+
+    const addMonths = Number(months);
+
+
+    if (
+
+        !Number.isInteger(year) ||
+
+        !Number.isInteger(month) ||
+
+        !Number.isInteger(day) ||
+
+        !Number.isInteger(addMonths) ||
+
+        addMonths < 1
+
+    ) {
+
+        return "";
+
+    }
+
+
+    const target =
+        month - 1 + addMonths;
+
+
+    const targetYear =
+        year + Math.floor(target / 12);
+
+
+    const targetMonth =
+        ((target % 12) + 12) % 12;
+
+
+    const lastDay =
+        new Date(
+            Date.UTC(
+                targetYear,
+                targetMonth + 1,
+                0
+            )
+        )
+        .getUTCDate();
+
+
+    const targetDay =
+        Math.min(day, lastDay);
+
+
+    return (
+
+        `${targetYear}-` +
+
+        `${String(targetMonth + 1).padStart(2, "0")}-` +
+
+        `${String(targetDay).padStart(2, "0")}`
+
+    );
+
+}
+
+
+
+/* =========================================================
+   STATUS PRZEGLĄDU
+========================================================= */
+
+function state(row) {
+
+    const date =
+        nextDate(
+            row.done,
+            row.months
+        );
+
+
+    if (!date) {
+        return "";
+    }
+
+
+    const days =
+        Math.ceil(
+            (
+                new Date(date + "T12:00:00") -
+
+                new Date()
+
+            ) / 86400000
+        );
+
+
+    if (days < 0) {
+
+        return "PO TERMINIE";
+
+    }
+
+
+    if (days <= 14) {
+
+        return "DO WYKONANIA";
+
+    }
+
+
+    return "OK";
+
+}
+
+
+
+/* =========================================================
+   STATUS PROTOKOŁU
+========================================================= */
+
+function protocol(row) {
+
+    return (
+
+        row.protocolFileName ||
+
+        row.protocolDate
+
+    )
+
+        ? "DODANY"
+
+        : "BRAK PROTOKOŁU";
+
+}
+
+
+
+/* =========================================================
+   ODMIANA LICZNIKA
+========================================================= */
+
+function countLabel(number) {
+
+
+    if (number === 1) {
+
+        return "1 przegląd";
+
+    }
+
+
+    if (
+
+        number % 100 < 12 ||
+
+        number % 100 > 14
+
+    &&
+
+        number % 10 >= 2 &&
+
+        number % 10 <= 4
+
+    ) {
+
+        return `${number} przeglądy`;
+
+    }
+
+
+    return `${number} przeglądów`;
+
+}
+
+
+
+/* =========================================================
+   ODŚWIEŻANIE LIST PODPOWIEDZI
+========================================================= */
+
+function refreshLists() {
+
+
+    const selectedCity =
+        $("#city").value;
+
+
+    const types =
+        typeCatalogAvailable
+            ? inspectionTypes
+            : fallbackTypes;
+
+
+
+    const cities = [
+
+        ...new Set(
+
+            [
+
+                ...data.map(item => item.city),
+
+                ...locations.map(item => item.city)
+
+            ]
+
+            .map(city => String(city || "").trim())
+
+            .filter(Boolean)
+
+        )
+
+    ]
+
+    .sort(
+        (a,b) =>
+            a.localeCompare(
+                b,
+                "pl"
+            )
+    );
+
+
+
+    $("#city").innerHTML =
+
+        `<option value="">
+            Wszystkie miasta
+        </option>`
+
+        +
+
+        cities
+
+        .map(city =>
+
+            `<option value="${esc(city)}">
+                ${esc(city)}
+            </option>`
+
+        )
+
+        .join("");
+
+
+
+    $("#city").value =
+        selectedCity;
+
+
+
+    $("#cities").innerHTML =
+
+        cities
+
+        .map(city =>
+
+            `<option value="${esc(city)}">`
+
+        )
+
+        .join("");
+
+
+
+    $("#types").innerHTML =
+
+        [
+
+            ...new Set(types)
+
+        ]
+
+        .sort(
+            (a,b)=>
+                a.localeCompare(
+                    b,
+                    "pl"
+                )
+        )
+
+        .map(type =>
+
+            `<option value="${esc(type)}">`
+
+        )
+
+        .join("");
+
+}
+
+
+
+/* =========================================================
+   LISTA LOKALI
+========================================================= */
+
+function refreshLocals() {
+
+
+    const city =
+        norm(
+            $("#editForm")
+                .elements
+                .city
+                .value
+        );
+
+
+    const source = [
+
+        ...locations,
+
+        ...data.map(row => ({
+
+            city: row.city,
+
+            local: row.local
+
+        }))
+
+    ];
+
+
+
+    const locals = [
+
+        ...new Set(
+
+            source
+
+            .filter(row =>
+
+                !city ||
+
+                norm(row.city) === city
+
+            )
+
+            .map(row =>
+                String(row.local || "")
+                .trim()
+            )
+
+            .filter(Boolean)
+
+        )
+
+    ]
+
+    .sort(
+        (a,b)=>
+            a.localeCompare(
+                b,
+                "pl"
+            )
+    );
+
+
+
+    $("#locals").innerHTML =
+
+        locals
+
+        .map(local =>
+
+            `<option value="${esc(local)}">`
+
+        )
+
+        .join("");
+
+}
+
+  /* =========================================================
+   GENEROWANIE WIERSZY TABELI
+========================================================= */
+
+function rows(records) {
+
+    return records.map(row => {
+
+        const status = state(row);
+
+        const protocolStatus = protocol(row);
+
+
+        return `
+
+        <tr>
+
+            <td>
+                <b>${esc(row.local)}</b>
+            </td>
+
+
+            <td>
+                ${esc(row.type)}
+            </td>
+
+
+            <td>
+                ${fmt(row.done)}
+            </td>
+
+
+            <td>
+                ${fmt(
+                    nextDate(
+                        row.done,
+                        row.months
+                    )
+                )}
+            </td>
+
+
+            <td>
+
+                ${
+                    status
+
+                    ?
+
+                    `<span class="badge ${
+                        status.startsWith("PO")
+                            ? "PO"
+                            : status.startsWith("DO")
+                                ? "DO"
+                                : "OK"
+
+                    }">
+
+                        ${status}
+
+                    </span>`
+
+                    :
+
+                    "—"
+
+                }
+
+            </td>
+
+
+            <td>
+
+                <span class="badge ${
+                    protocolStatus === "DODANY"
+                        ? "OK"
+                        : "BRAK"
+
+                }">
+
+                    ${protocolStatus}
+
+                </span>
+
+
+                ${
+                    row.protocolPath
+
+                    ?
+
+                    `
+
+                    <button
+
+                        type="button"
+
+                        class="secondary"
+
+                        data-action="open"
+
+                        data-id="${esc(row.id)}">
+
+                        Otwórz
+
+                    </button>
+
+                    `
+
+                    :
+
+                    ""
+
+                }
+
+            </td>
+
+
+            <td>
+                ${esc(row.notes)}
+            </td>
+
+
+            <td>
+
+                <div class="row-actions">
+
+
+                    <button
+
+                        type="button"
+
+                        class="secondary"
+
+                        data-action="edit"
+
+                        data-id="${esc(row.id)}">
+
+                        Edytuj
+
+                    </button>
+
+
+
+                    <button
+
+                        type="button"
+
+                        class="danger"
+
+                        data-action="delete"
+
+                        data-id="${esc(row.id)}">
+
+                        Usuń
+
+                    </button>
+
+
+
+                    <button
+
+                        type="button"
+
+                        class="secondary"
+
+                        data-action="history"
+
+                        data-id="${esc(row.id)}">
+
+                        Historia
+
+                    </button>
+
+
+                </div>
+
+            </td>
+
+
+        </tr>
+
+        `;
+
+    }).join("");
+
+}
+
+
+
+/* =========================================================
+   GŁÓWNE RENDEROWANIE
+========================================================= */
+
+function render() {
+
+
+    refreshLists();
+
+
+    const query =
+        $("#search").value.toLowerCase();
+
+
+    const selectedCity =
+        $("#city").value;
+
+
+    const selectedStatus =
+        $("#status").value;
+
+
+    const selectedProtocol =
+        $("#protocol").value;
+
+
+
+    const filtered = data
+
+        .filter(row => {
+
+
+            const matchesSearch =
+
+                !query ||
+
+                Object.values(row)
+
+                    .join(" ")
+
+                    .toLowerCase()
+
+                    .includes(query);
+
+
+
+            const matchesCity =
+
+                !selectedCity ||
+
+                row.city === selectedCity;
+
+
+
+            const matchesStatus =
+
+                !selectedStatus ||
+
+                state(row) === selectedStatus;
+
+
+
+            const matchesProtocol =
+
+                !selectedProtocol ||
+
+                protocol(row) === selectedProtocol;
+
+
+
+            return (
+
+                matchesSearch &&
+
+                matchesCity &&
+
+                matchesStatus &&
+
+                matchesProtocol
+
+            );
+
+
+        })
+
+        .sort((a,b) =>
+
+
+            (
+
+                nextDate(
+                    a.done,
+                    a.months
+                )
+                ||
+
+                "9999"
+
+            )
+
+            .localeCompare(
+
+                nextDate(
+                    b.done,
+                    b.months
+                )
+
+                ||
+
+                "9999"
+
+            )
+
+        );
+
+
+
+    // Statystyki
+
+    [
+
+        ["overdue", "PO TERMINIE"],
+
+        ["due", "DO WYKONANIA"],
+
+        ["ok", "OK"]
+
+    ]
+
+    .forEach(([id,status]) => {
+
+
+        $("#" + id).textContent =
+
+            data.filter(
+                row =>
+                    state(row) === status
+            )
+
+            .length;
+
+
+    });
+
+
+    $("#all").textContent =
+        data.length;
+
+
+
+    // Aktywne filtry
+
+    document
+
+        .querySelectorAll(
+            "[data-quick-status]"
+        )
+
+        .forEach(button => {
+
+
+            button.classList.toggle(
+
+                "active",
+
+                button.dataset.quickStatus === selectedStatus
+
+            );
+
+
+        });
+
+
+
+    const openedCities = new Set(
+
+        [
+
+            ...
+
+            document
+
+                .querySelectorAll(
+                    "#cityGroups details[open]"
+                )
+
+        ]
+
+        .map(
+            item =>
+                item.dataset.city
+        )
+
+    );
+
+
+
+    const cities = [
+
+        ...
+
+        new Set(
+
+            filtered
+
+                .map(
+                    row =>
+                        row.city || "Bez miasta"
+                )
+
+        )
+
+    ]
+
+    .sort(
+        (a,b)=>
+            a.localeCompare(
+                b,
+                "pl"
+            )
+    );
+
+
+
+    $("#cityGroups").innerHTML =
+
+        cities.length
+
+        ?
+
+        cities.map(city => {
+
+
+            const records =
+
+                filtered.filter(
+                    row =>
+                        (
+                            row.city ||
+                            "Bez miasta"
+                        ) === city
+                );
+
+
+
+            const overdue =
+
+                records.filter(
+                    row =>
+                        state(row) === "PO TERMINIE"
+                )
+                .length;
+
+
+
+            const due =
+
+                records.filter(
+                    row =>
+                        state(row) === "DO WYKONANIA"
+                )
+                .length;
+
+
+
+            return `
+
+            <details
+
+                class="card city-group"
+
+                data-city="${esc(city)}"
+
+                ${openedCities.has(city)
+                    ? "open"
+                    : ""}
+
+            >
+
+
+                <summary class="city-summary">
+
+
+                    <span class="city-summary-main">
+
+
+                        <strong>
+                            ${esc(city)}
+                        </strong>
+
+
+                        <span class="city-summary-count">
+
+                            ${countLabel(records.length)}
+
+                        </span>
+
+
+                    </span>
+
+
+
+                    <span class="city-summary-stats">
+
+
+                        ${
+                            overdue
+
+                            ?
+
+                            `<span class="badge PO">
+
+                                Po terminie:
+                                ${overdue}
+
+                            </span>`
+
+                            :
+
+                            ""
+
+                        }
+
+
+
+                        ${
+                            due
+
+                            ?
+
+                            `<span class="badge DO">
+
+                                Do wykonania:
+                                ${due}
+
+                            </span>`
+
+                            :
+
+                            ""
+
+                        }
+
+
+                    </span>
+
+
+                </summary>
+
+
+
+                <div class="city-table tablebox">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Lokal</th>
+
+                                <th>Rodzaj</th>
+
+                                <th>Wykonano</th>
+
+                                <th>Następny termin</th>
+
+                                <th>Status</th>
+
+                                <th>Protokół</th>
+
+                                <th>Uwagi</th>
+
+                                <th>Akcje</th>
+
+                            </tr>
+
+                        </thead>
+
+
+
+                        <tbody>
+
+                            ${rows(records)}
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </details>
+
+
+            `;
+
+
+        }).join("")
+
+
+        :
+
+
+        `
+
+        <div class="notice">
+
+            Brak przeglądów spełniających wybrane kryteria.
+
+        </div>
+
+        `;
+
+
+}
+
+  /* =========================================================
+   KOMUNIKATY BŁĘDÓW
+========================================================= */
+
+function showError(message) {
+
+    $("#notice").hidden = false;
+
+    $("#notice").textContent =
+        "Nie można połączyć się z rejestrem: "
+        + message;
+
+}
+
+
+
+/* =========================================================
+   ŁADOWANIE DANYCH Z SUPABASE
+========================================================= */
+
+async function load() {
+
+
+    const [
+
+        {
+            data: inspections,
+            error
+        },
+
+
+        {
+            data: types,
+            error: typesError
+        },
+
+
+        {
+            data: locationsData,
+            error: locationsError
+        },
+
+
+        {
+            data: seedState,
+            error: seedError
+        }
+
+
+    ] = await Promise.all([
+
+
+        sb
+
+            .from("inspections")
+
+            .select("*")
+
+            .is(
+                "deleted_at",
+                null
+            )
+
+            .order(
+                "updated_at",
+                {
+                    ascending:false
+                }
+            ),
+
+
+
+        sb
+
+            .from("inspection_types")
+
+            .select("name")
+
+            .eq(
+                "active",
+                true
+            )
+
+            .order(
+                "name"
+            ),
+
+
+
+        sb
+
+            .from("locations")
+
+            .select(
+                "city,local"
+            )
+
+            .order(
+                "city"
+            )
+
+            .order(
+                "local"
+            ),
+
+
+
+        sb
+
+            .from("app_state")
+
+            .select("value")
+
+            .eq(
+                "key",
+                "initial_seed_done"
+            )
+
+            .maybeSingle()
+
+
+    ]);
+
+
+
+    if(error){
+
+        return showError(
+            error.message
+        );
+
+    }
+
+
+
+    if(
+        typesError ||
+        locationsError ||
+        seedError
+    ){
+
+        return showError(
+
+            [
+
+                typesError,
+
+                locationsError,
+
+                seedError
+
+            ]
+
+            .filter(Boolean)
+
+            .map(
+                item =>
+                    item.message
+            )
+
+            .join(" | ")
+
+        );
+
+    }
+
+
+
+    typeCatalogAvailable = true;
+
+
+
+    inspectionTypes =
+
+        (types || [])
+
+        .map(
+            item =>
+                item.name
+        )
+
+        .filter(Boolean);
+
+
+
+    locations =
+
+        (locationsData || [])
+
+        .map(item => ({
+
+            city:
+                String(item.city || "")
+                .trim(),
+
+
+            local:
+                String(item.local || "")
+                .trim()
+
+        }))
+
+        .filter(
+            item =>
+                item.city &&
+                item.local
+        );
+
+
+
+    data =
+
+        (inspections || [])
+
+        .map(fromDb);
+
+
+
+    /*
+       Pierwsze załadowanie danych
+       z pliku dane-startowe.js
+    */
+
+
+    if(
+
+        !data.length &&
+
+        !seedState &&
+
+        window.DEFAULT_DATA?.length
+
+    ){
+
+
+        const seed =
+
+            window.DEFAULT_DATA.map(
+
+                (row,index)=>
+
+                    toDb({
+
+                        ...row,
+
+                        id:
+                            row.id ||
+                            `seed-${index+1}`
+
+                    })
+
+            );
+
+
+
+        const {
+            error: insertError
+        }
+
+        = await sb
+
+            .from("inspections")
+
+            .upsert(seed);
+
+
+
+        if(insertError){
+
+            return showError(
+                insertError.message
+            );
+
+        }
+
+
+
+        const {
+            error: markError
+        }
+
+        = await sb
+
+            .from("app_state")
+
+            .upsert({
+
+                key:
+                    "initial_seed_done",
+
+                value:
+                    new Date()
+                    .toISOString()
+
+            });
+
+
+
+        if(markError){
+
+            return showError(
+                markError.message
+            );
+
+        }
+
+
+
+        return load();
+
+    }
+
+
+
+    render();
+
+
+
+    $("#notice").hidden = true;
+
+
+
+    $("#syncInfo").textContent =
+
+        "Ostatnie odświeżenie: "
+
+        +
+
+        new Date()
+
+        .toLocaleTimeString(
+            "pl-PL"
+        );
+
+
+}
+
+
+
+/* =========================================================
+   SESJA UŻYTKOWNIKA
+========================================================= */
+
+async function applySession(session){
+
+
+    $("#user").textContent =
+
+        session?.user?.email
+
+        ||
+
+        "Niezalogowano";
+
+
+
+    $("#logout").hidden =
+        !session?.user;
+
+
+
+    $("#loginModal")
+
+        .classList
+
+        .toggle(
+            "open",
+            !session?.user
+        );
+
+
+
+    if(session?.user){
+
+        await load();
+
+    }
+
+}
+
+
+
+/* =========================================================
+   START APLIKACJI
+========================================================= */
+
+async function start(){
+
+
+    if(!ready){
+
+
+        showError(
+
+            "Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js."
+
+        );
+
+
+        $("#add").disabled = true;
+
+
+        return;
+
+    }
+
+
+
+    const {
+
+        data:{
+            session
+
+        }
+
+    }
+
+    = await sb.auth.getSession();
+
+
+
+    await applySession(session);
+
+
+
+    sb.auth.onAuthStateChange(
+
+        (_event,session)=>{
+
+            applySession(session);
+
+        }
+
+    );
+
+
+
+    sb
+
+    .channel("live")
+
+
+    .on(
+
+        "postgres_changes",
+
+        {
+
+            event:"*",
+
+            schema:"public",
+
+            table:"inspections"
+
+        },
+
+        load
+
+    )
+
+
+    .on(
+
+        "postgres_changes",
+
+        {
+
+            event:"*",
+
+            schema:"public",
+
+            table:"inspection_types"
+
+        },
+
+        load
+
+    )
+
+
+    .on(
+
+        "postgres_changes",
+
+        {
+
+            event:"*",
+
+            schema:"public",
+
+            table:"locations"
+
+        },
+
+        load
+
+    )
+
+
+    .subscribe();
+
+
+}
+/* =========================================================
+   LOGOWANIE
+========================================================= */
+
+$("#loginForm").onsubmit = async event => {
+
+    event.preventDefault();
+
+
+    const form =
+        new FormData(event.target);
+
+
+    const {
+
+        error
+
+    } = await sb.auth.signInWithPassword({
+
+        email:
+            form.get("email"),
+
+
+        password:
+            form.get("password")
+
+    });
+
+
+
+    $("#loginMessage").textContent =
+
+        error
+
+        ? error.message
+
+        : "";
+
+};
+
+
+
+/* =========================================================
+   REJESTRACJA
+========================================================= */
+
+$("#register").onclick = async () => {
+
+
+    if(!config.allowRegistration){
+
+        $("#loginMessage").textContent =
+
+            "Rejestracja jest wyłączona. Poproś administratora o utworzenie konta.";
+
+        return;
+
+    }
+
+
+
+    const form =
+
+        new FormData(
+            $("#loginForm")
+        );
+
+
+
+    const {
+
+        error
+
+    } = await sb.auth.signUp({
+
+        email:
+            form.get("email"),
+
+
+        password:
+            form.get("password")
+
+    });
+
+
+
+    $("#loginMessage").textContent =
+
+        error
+
+        ? error.message
+
+        :
+
+        "Sprawdź skrzynkę e-mail i potwierdź konto.";
+
+};
+
+
+
+/* =========================================================
+   WYLOGOWANIE
+========================================================= */
+
+$("#logout").onclick = () => {
+
+    sb.auth.signOut();
+
+};
+
+
+
+/* =========================================================
+   MENU UŻYTKOWNIKA
+========================================================= */
+
+$("#menuToggle").onclick = () => {
+
+
+    const isOpen =
+        $("#userMenu").hidden;
+
+
+    $("#userMenu").hidden =
+        !isOpen;
+
+
+
+    $("#menuToggle")
+
+        .setAttribute(
+
+            "aria-expanded",
+
+            String(isOpen)
+
+        );
+
+};
+
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+
+        if(
+            !event.target.closest(".user-menu")
+        ){
+
+            $("#userMenu").hidden = true;
+
+
+            $("#menuToggle")
+
+                .setAttribute(
+
+                    "aria-expanded",
+
+                    "false"
+
+                );
+
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   OTWIERANIE FORMULARZA
+========================================================= */
+
+function openForm(row = null){
+
+
+    editing =
+        row?.id || null;
+
+
+
+    editingVersion =
+        row?.version ?? null;
+
+
+
+    const form =
+        $("#editForm");
+
+
+
+    form.reset();
+
+
+
+    const values =
+        row || {
+
+            months:12
+
+        };
+
+
+
+    [
+
+        "city",
+
+        "local",
+
+        "type",
+
+        "done",
+
+        "months",
+
+        "protocolDate",
+
+        "notes"
+
+    ]
+
+    .forEach(name => {
+
+
+        form.elements[name].value =
+
+            values[name] ?? "";
+
+
+    });
+
+
+
+    refreshLocals();
+
+
+
+    const isEdit =
+        Boolean(row);
+
+
+
+    form.elements.city.readOnly =
+        isEdit;
+
+
+
+    form.elements.local.readOnly =
+        isEdit;
+
+
+
+    $("#formTitle").textContent =
+
+        isEdit
+
+        ?
+
+        "Edytuj przegląd"
+
+        :
+
+        "Dodaj przegląd";
+
+
+
+    $("#fileInfo").textContent =
+
+        row?.protocolFileName
+
+        ?
+
+        `Obecny plik: ${row.protocolFileName}. Wybranie nowego zastąpi obecny.`
+
+        :
+
+        "Opcjonalnie: PDF, dokument lub zdjęcie.";
+
+
+
+    $("#editModal")
+
+        .classList
+
+        .add("open");
+
+
+}
+
+
+
+/* =========================================================
+   ZAMYKANIE FORMULARZA
+========================================================= */
+
+$("#add").onclick = () => {
+
+    openForm();
+
+};
+
+
+
+$("#cancel").onclick = () => {
+
+    $("#editModal")
+
+        .classList
+
+        .remove("open");
+
+};
+
+
+
+/* =========================================================
+   PODPOWIEDZI LOKALI
+========================================================= */
+
+$("#editForm")
+
+    .elements
+
+    .city
+
+    .addEventListener(
+
+        "input",
+
+        refreshLocals
+
+    );
+
+
+
+/* =========================================================
+   AUTOMATYCZNY OKRES WAŻNOŚCI
+========================================================= */
+
+function setDefaultMonths(){
+
+
+    if(editing){
+
+        return;
+
+    }
+
+
+
+    const months =
+
+        monthsByType[
+
+            norm(
+
+                $("#editForm")
+
+                .elements
+
+                .type
+
+                .value
+
+            )
+
+        ];
+
+
+
+    if(months){
+
+        $("#editForm")
+
+            .elements
+
+            .months
+
+            .value = months;
+
+    }
+
+}
+
+
+
+$("#editForm")
+
+    .elements
+
+    .type
+
+    .addEventListener(
+
+        "input",
+
+        setDefaultMonths
+
+    );
+
+
+
+$("#editForm")
+
+    .elements
+
+    .type
+
+    .addEventListener(
+
+        "change",
+
+        setDefaultMonths
+
+    );
+
+  /* =========================================================
+   ZAPIS FORMULARZA PRZEGLĄDU
+========================================================= */
+
+$("#editForm").onsubmit = async event => {
+
+
+    event.preventDefault();
+
+
+    const submitButton =
+        event.submitter;
+
+
+    let uploadedPath = null;
+
+
+
+    try {
+
+
+        const formData =
+            new FormData(
+                event.target
+            );
+
+
+
+        const file =
+            formData.get("file");
+
+
+
+        const city =
+            String(
+                formData.get("city") || ""
+            )
+            .trim();
+
+
+
+        const local =
+            String(
+                formData.get("local") || ""
+            )
+            .trim();
+
+
+
+        const type =
+            String(
+                formData.get("type") || ""
+            )
+            .trim();
+
+
+
+        const months =
+            Number(
+                formData.get("months")
+            );
+
+
+
+        /* -------------------------
+           WALIDACJA
+        ------------------------- */
+
+
+        if(
+            !city ||
+            !local ||
+            !type
+        ){
+
+            throw new Error(
+                "Uzupełnij miasto, lokal i rodzaj przeglądu."
+            );
+
+        }
+
+
+
+        if(
+            !Number.isInteger(months) ||
+
+            months < 1 ||
+
+            months > 120
+
+        ){
+
+            throw new Error(
+                "Okres ważności musi wynosić od 1 do 120 miesięcy."
+            );
+
+        }
+
+
+
+        const duplicate =
+
+            data.some(row =>
+
+
+                String(row.id) !== String(editing)
+
+                &&
+
+                norm(row.city) === norm(city)
+
+                &&
+
+                norm(row.local) === norm(local)
+
+                &&
+
+                norm(row.type) === norm(type)
+
+            );
+
+
+
+        if(duplicate){
+
+            throw new Error(
+                "Taki przegląd dla tego lokalu już istnieje."
+            );
+
+        }
+
+
+
+        /* -------------------------
+           UPLOAD PROTOKOŁU
+        ------------------------- */
+
+
+        if(
+            file &&
+            file.size
+        ){
+
+
+            if(
+                file.size >
+                MAX_PROTOCOL_SIZE
+            ){
+
+                throw new Error(
+                    "Plik protokołu może mieć maksymalnie 10 MB."
+                );
+
+            }
+
+
+
+            if(
+                !ALLOWED_PROTOCOL_TYPES.has(
+                    file.type
+                )
+            ){
+
+                throw new Error(
+                    "Niedozwolony typ pliku protokołu."
+                );
+
+            }
+
+
+
+            const extension =
+
+                file.name
+
+                    .split(".")
+
+                    .pop()
+
+                    .toLowerCase();
+
+
+
+            const path =
+
+                `${Date.now()}_${crypto.randomUUID()}.${extension}`;
+
+
+
+            const {
+
+                error
+
+            } = await sb.storage
+
+                .from("protocols")
+
+                .upload(
+
+                    path,
+
+                    file,
+
+                    {
+
+                        contentType:
+                            file.type
+
+                    }
+
+                );
+
+
+
+            if(error){
+
+                throw error;
+
+            }
+
+
+
+            uploadedPath = path;
+
+        }
+
+
+
+        if(submitButton){
+
+            submitButton.disabled = true;
+
+        }
+
+
+
+        const oldRecord =
+
+            data.find(
+
+                row =>
+                    String(row.id) === String(editing)
+
+            );
+
+
+
+        const payload = {
+
+
+            id:
+
+                editing ||
+
+                `custom-${Date.now()}`,
+
+
+
+            city,
+
+
+            local,
+
+
+            type,
+
+
+            done:
+
+                formData.get("done")
+
+                ||
+
+                null,
+
+
+
+            months,
+
+
+
+            protocolDate:
+
+                formData.get("protocolDate")
+
+                ||
+
+                null,
+
+
+
+            notes:
+
+                formData.get("notes")
+
+                ||
+
+                ""
+
+        };
+
+
+
+        if(uploadedPath){
+
+
+            payload.protocolFileName =
+                file.name;
+
+
+
+            payload.protocolPath =
+                uploadedPath;
+
+
+
+        }
+
+        else if(oldRecord){
+
+
+            payload.protocolFileName =
+                oldRecord.protocolFileName;
+
+
+
+            payload.protocolPath =
+                oldRecord.protocolPath;
+
+
+        }
+
+
+
+        /* -------------------------
+           ZAPIS DO BAZY
+        ------------------------- */
+
+
+        let saveError;
+
+
+
+        if(editing){
+
+
+
+            const {
+
+                data:changed,
+
+                error
+
+            }
+
+            = await sb
+
+                .from("inspections")
+
+                .update(
+                    toDb(payload)
+                )
+
+                .eq(
+                    "id",
+                    editing
+                )
+
+                .eq(
+                    "version",
+                    editingVersion
+                )
+
+                .is(
+                    "deleted_at",
+                    null
+                )
+
+                .select("id");
+
+
+
+            saveError = error;
+
+
+
+            if(
+                !saveError &&
+                !changed?.length
+            ){
+
+                throw new Error(
+                    "Ten wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie."
+                );
+
+            }
+
+
+
+        }
+
+        else {
+
+
+
+            const {
+
+                error
+
+            } = await sb
+
+                .from("inspections")
+
+                .insert(
+                    toDb(payload)
+                );
+
+
+
+            saveError = error;
+
+        }
+
+
+
+        if(saveError){
+
+            throw saveError;
+
+        }
+
+
+
+        /* -------------------------
+           AKTUALIZACJA SŁOWNIKÓW
+        ------------------------- */
+
+
+        const {
+
+            error:typeError
+
+        } = await sb
+
+            .from("inspection_types")
+
+            .upsert(
+
+                {
+
+                    name:type,
+
+                    active:true
+
+                },
+
+                {
+
+                    onConflict:"name"
+
+                }
+
+            );
+
+
+
+        if(typeError){
+
+            throw typeError;
+
+        }
+
+
+
+        const {
+
+            error:locationError
+
+        } = await sb
+
+            .from("locations")
+
+            .upsert(
+
+                {
+
+                    city,
+
+                    local
+
+                },
+
+                {
+
+                    onConflict:"city,local"
+
+                }
+
+            );
+
+
+
+        if(locationError){
+
+            throw locationError;
+
+        }
+
+
+
+        /* -------------------------
+           USUWANIE STAREGO PLIKU
+        ------------------------- */
+
+
+        if(
+
+            uploadedPath &&
+
+            oldRecord?.protocolPath &&
+
+            oldRecord.protocolPath !== uploadedPath
+
+        ){
+
+
+            const {
+
+                error:removeError
+
+            } = await sb.storage
+
+                .from("protocols")
+
+                .remove([
+
+                    oldRecord.protocolPath
+
+                ]);
+
+
+
+            if(removeError){
+
+                console.warn(
+                    "Nie udało się usunąć poprzedniego pliku:",
+                    removeError.message
+                );
+
+            }
+
+        }
+
+
+
+        $("#editModal")
+
+            .classList
+
+            .remove("open");
+
+
+
+        await load();
+
+
+
+    }
+
+
+    catch(error){
+
+
+        if(uploadedPath){
+
+
+            await sb.storage
+
+                .from("protocols")
+
+                .remove([
+
+                    uploadedPath
+
+                ]);
+
+        }
+
+
+
+        alert(
+
+            "Błąd podczas zapisywania: "
+
+            +
+
+            error.message
+
+        );
+
+
+    }
+
+
+    finally{
+
+
+        if(submitButton){
+
+            submitButton.disabled = false;
+
+        }
+
+    }
+
+
+};
+
+  /* =========================================================
+   EDYCJA WIERSZA
+========================================================= */
+
+async function editRow(id) {
+
+    const row =
+        data.find(
+            item =>
+                String(item.id) === String(id)
+        );
+
+
+    if(row){
+
+        openForm(row);
+
+    }
+
+}
+
+
+
+/* =========================================================
+   USUWANIE DO KOSZA
+========================================================= */
+
+async function deleteRow(id) {
+
+
+    const row =
+        data.find(
+            item =>
+                String(item.id) === String(id)
+        );
+
+
+
+    if(
+        !row ||
+        !confirm(
+            `Przenieść wpis „${row.local} — ${row.type}” do kosza? Można go później przywrócić.`
+        )
+    ){
+
+        return;
+
+    }
+
+
+
+    const {
+
+        data:changed,
+
+        error
+
+    } = await sb
+
+        .from("inspections")
+
+        .update({
+
+            deleted_at:
+                new Date()
+                .toISOString()
+
+        })
+
+        .eq(
+            "id",
+            row.id
+        )
+
+        .eq(
+            "version",
+            row.version
+        )
+
+        .is(
+            "deleted_at",
+            null
+        )
+
+        .select("id");
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    if(!changed?.length){
+
+        return alert(
+            "Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie."
+        );
+
+    }
+
+
+
+    await load();
+
+}
+
+
+
+/* =========================================================
+   OTWIERANIE PROTOKOŁU
+========================================================= */
+
+async function openFile(id){
+
+
+    const row =
+
+        data.find(
+
+            item =>
+                String(item.id) === String(id)
+
+        );
+
+
+
+    if(!row?.protocolPath){
+
+        return;
+
+    }
+
+
+
+    const {
+
+        data:link,
+
+        error
+
+    } = await sb.storage
+
+        .from("protocols")
+
+        .createSignedUrl(
+
+            row.protocolPath,
+
+            60
+
+        );
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    window.open(
+
+        link.signedUrl,
+
+        "_blank",
+
+        "noopener"
+
+    );
+
+}
+
+
+
+/* =========================================================
+   OBSŁUGA AKCJI W TABELI
+========================================================= */
+
+$("#cityGroups")
+
+.addEventListener(
+
+    "click",
+
+    async event => {
+
+
+        const button =
+
+            event.target.closest(
+                "button[data-action]"
+            );
+
+
+
+        if(!button){
+
+            return;
+
+        }
+
+
+
+        const id =
+            button.dataset.id;
+
+
+
+        switch(
+            button.dataset.action
+        ){
+
+
+            case "edit":
+
+                await editRow(id);
+
+                break;
+
+
+
+            case "delete":
+
+                await deleteRow(id);
+
+                break;
+
+
+
+            case "open":
+
+                await openFile(id);
+
+                break;
+
+
+
+            case "history":
+
+                await showHistory(id);
+
+                break;
+
+        }
+
+
+    }
+
+);
+
+
+
+/* =========================================================
+   FILTRY
+========================================================= */
+
+[
+
+    "search",
+
+    "city",
+
+    "status",
+
+    "protocol"
+
+]
+
+.forEach(id => {
+
+
+    const eventName =
+
+        id === "search"
+
+        ?
+
+        "input"
+
+        :
+
+        "change";
+
+
+
+    $("#" + id)
+
+        .addEventListener(
+
+            eventName,
+
+            render
+
+        );
+
+
+});
+
+
+
+/* =========================================================
+   SZYBKIE FILTRY STATUSU
+========================================================= */
+
+document
+
+.querySelectorAll(
+
+    "[data-quick-status]"
+
+)
+
+.forEach(button => {
+
+
+    button.onclick = () => {
+
+
+        const status =
+            button.dataset.quickStatus;
+
+
+
+        $("#status").value =
+
+            $("#status").value === status
+
+            ?
+
+            ""
+
+            :
+
+            status;
+
+
+
+        render();
+
+
+    };
+
+
+});
+
+  /* =========================================================
+   RODZAJE PRZEGLĄDÓW
+========================================================= */
+
+function renderTypeList(){
+
+    $("#typeList").innerHTML =
+
+        inspectionTypes.length
+
+        ?
+
+        inspectionTypes
+
+        .sort(
+            (a,b)=>
+                a.localeCompare(
+                    b,
+                    "pl"
+                )
+        )
+
+        .map(type => `
+
+            <li>
+
+                <span>
+                    ${esc(type)}
+                </span>
+
+
+                <button
+
+                    type="button"
+
+                    class="danger"
+
+                    data-name="${esc(type)}">
+
+                    Usuń
+
+                </button>
+
+
+            </li>
+
+        `)
+
+        .join("")
+
+
+        :
+
+        `
+
+        <li class="muted">
+
+            Brak aktywnych rodzajów.
+
+        </li>
+
+        `;
+
+}
+
+
+
+/* Otwieranie okna */
+
+$("#manageTypes").onclick = () => {
+
+
+    renderTypeList();
+
+
+    $("#userMenu").hidden = true;
+
+
+    $("#typesModal")
+
+        .classList
+
+        .add("open");
+
+
+};
+
+
+
+$("#closeTypes").onclick = () => {
+
+
+    $("#typesModal")
+
+        .classList
+
+        .remove("open");
+
+
+};
+
+
+
+/* Dodanie rodzaju */
+
+$("#addType").onclick = async () => {
+
+
+    const name =
+        $("#newType")
+        .value
+        .trim();
+
+
+
+    if(!name){
+
+        return;
+
+    }
+
+
+
+    const {
+
+        error
+
+    } = await sb
+
+        .from("inspection_types")
+
+        .upsert(
+
+            {
+
+                name,
+
+                active:true
+
+            },
+
+            {
+
+                onConflict:"name"
+
+            }
+
+        );
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    $("#newType").value = "";
+
+
+    await load();
+
+
+    renderTypeList();
+
+};
+
+
+
+/* Usuwanie rodzaju */
+
+$("#typeList").onclick = async event => {
+
+
+    const button =
+
+        event.target.closest(
+            "button[data-name]"
+        );
+
+
+
+    if(
+        !button ||
+        !confirm(
+            `Usunąć „${button.dataset.name}” z listy?`
+        )
+    ){
+
+        return;
+
+    }
+
+
+
+    const {
+
+        error
+
+    } = await sb
+
+        .from("inspection_types")
+
+        .update({
+
+            active:false
+
+        })
+
+        .eq(
+            "name",
+            button.dataset.name
+        );
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    await load();
+
+
+    renderTypeList();
+
+};
+
+
+
+/* =========================================================
+   DODAWANIE LOKALU
+========================================================= */
+
+$("#addLocal").onclick = () => {
+
+
+    $("#localForm").reset();
+
+
+    $("#userMenu").hidden = true;
+
+
+    $("#localModal")
+
+        .classList
+
+        .add("open");
+
+};
+
+
+
+$("#cancelLocal").onclick = () => {
+
+
+    $("#localModal")
+
+        .classList
+
+        .remove("open");
+
+
+};
+
+
+
+$("#localForm").onsubmit = async event => {
+
+
+    event.preventDefault();
+
+
+
+    const form =
+
+        new FormData(
+            event.target
+        );
+
+
+
+    const city =
+        String(
+            form.get("city")
+        )
+        .trim();
+
+
+
+    const mpk =
+        String(
+            form.get("mpk")
+        )
+        .trim();
+
+
+
+    const name =
+        String(
+            form.get("name")
+        )
+        .trim();
+
+
+
+    const local =
+
+        `${mpk} (${name})`;
+
+
+
+    const {
+
+        error
+
+    } = await sb
+
+        .from("locations")
+
+        .upsert(
+
+            {
+
+                city,
+
+                local
+
+            },
+
+            {
+
+                onConflict:"city,local"
+
+            }
+
+        );
+
+
+
+    if(error){
+
+        return alert(
+            "Nie udało się dodać lokalu: "
+            +
+            error.message
+        );
+
+    }
+
+
+
+    $("#localModal")
+
+        .classList
+
+        .remove("open");
+
+
+
+    await load();
+
+};
+
+  /* =========================================================
+   ZARZĄDZANIE LOKALAMI
+========================================================= */
+
+$("#manageLocations").onclick = () => {
+
+    $("#userMenu").hidden = true;
+
+
+    renderLocations();
+
+
+    $("#locationsModal")
+
+        .classList
+
+        .add("open");
+
+};
+
+
+
+$("#closeLocations").onclick = () => {
+
+    $("#locationsModal")
+
+        .classList
+
+        .remove("open");
+
+};
+
+
+
+function renderLocations(){
+
+
+    const grouped = {};
+
+
+    locations.forEach(item => {
+
+
+        if(!grouped[item.city]){
+
+            grouped[item.city] = [];
+
+        }
+
+
+        grouped[item.city].push(
+            item.local
+        );
+
+
+    });
+
+
+
+    $("#locationsList").innerHTML =
+
+
+        Object.entries(grouped)
+
+        .map(([city,items]) => `
+
+
+            <div class="location-group">
+
+
+                <h4>
+                    ${esc(city)}
+                </h4>
+
+
+                ${
+
+                    items.map(local => `
+
+
+                        <div class="location-row">
+
+
+                            <span>
+                                ${esc(local)}
+                            </span>
+
+
+                            <button
+
+                                class="danger"
+
+                                data-city="${esc(city)}"
+
+                                data-local="${esc(local)}">
+
+                                Usuń
+
+                            </button>
+
+
+                        </div>
+
+
+                    `)
+
+                    .join("")
+
+                }
+
+
+            </div>
+
+
+        `)
+
+        .join("");
+
+}
+
+
+
+/* Usuwanie lokalu */
+
+$("#locationsList").onclick = async event => {
+
+
+    const button =
+
+        event.target.closest(
+            "button[data-local]"
+        );
+
+
+
+    if(!button){
+
+        return;
+
+    }
+
+
+
+    if(
+
+        !confirm(
+            `Usunąć lokal ${button.dataset.local}?`
+        )
+
+    ){
+
+        return;
+
+    }
+
+
+
+    const {
+
+        error
+
+    } = await sb
+
+        .from("locations")
+
+        .delete()
+
+        .eq(
+            "city",
+            button.dataset.city
+        )
+
+        .eq(
+            "local",
+            button.dataset.local
+        );
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    await load();
+
+
+    renderLocations();
+
+
+};
+
+
+
+
+
+/* =========================================================
+   KOSZ
+========================================================= */
+
+
+$("#showTrash").onclick = async () => {
+
+
+    $("#userMenu").hidden = true;
+
+
+    const {
+
+        data:trash,
+
+        error
+
+    } = await sb
+
+        .from("inspections")
+
+        .select("*")
+
+        .not(
+            "deleted_at",
+            "is",
+            null
+        )
+
+        .order(
+            "deleted_at",
+            {
+                ascending:false
+            }
+        );
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    $("#trashList").innerHTML =
+
+
+        trash.length
+
+
+        ?
+
+
+        trash.map(row => `
+
+
+            <div class="trash-row">
+
+
+                <span>
+
+                    ${esc(row.local)}
+                    -
+                    ${esc(row.type)}
+
+                </span>
+
+
+                <button
+
+                    class="secondary"
+
+                    data-restore="${esc(row.id)}">
+
+                    Przywróć
+
+                </button>
+
+
+            </div>
+
+
+        `)
+
+        .join("")
+
+
+
+        :
+
+
+        `
+
+        <p>
+            Kosz jest pusty.
+        </p>
+
+        `;
+
+
+
+    $("#trashModal")
+
+        .classList
+
+        .add("open");
+
+};
+
+
+
+$("#closeTrash").onclick = () => {
+
+
+    $("#trashModal")
+
+        .classList
+
+        .remove("open");
+
+};
+
+
+
+/* Przywracanie */
+
+$("#trashList").onclick = async event => {
+
+
+    const button =
+
+        event.target.closest(
+            "[data-restore]"
+        );
+
+
+
+    if(!button){
+
+        return;
+
+    }
+
+
+
+    const {
+
+        error
+
+    } = await sb
+
+        .from("inspections")
+
+        .update({
+
+            deleted_at:null
+
+        })
+
+        .eq(
+
+            "id",
+
+            button.dataset.restore
+
+        );
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    await load();
+
+};
+
+
+
+
+/* =========================================================
+   HISTORIA ZMIAN
+========================================================= */
+
+
+async function showHistory(id){
+
+
+    const {
+
+        data:history,
+
+        error
+
+    } = await sb
+
+        .from("inspection_history")
+
+        .select("*")
+
+        .eq(
+            "inspection_id",
+            id
+        )
+
+        .order(
+            "created_at",
+            {
+                ascending:false
+            }
+        );
+
+
+
+    if(error){
+
+        return alert(
+            error.message
+        );
+
+    }
+
+
+
+    $("#historyList").innerHTML =
+
+
+        history.length
+
+
+        ?
+
+
+        history.map(item => `
+
+
+            <div class="history-row">
+
+
+                <b>
+                    ${esc(item.action)}
+                </b>
+
+
+                <br>
+
+
+                ${fmt(
+                    item.created_at
+                )}
+
+
+                <br>
+
+
+                ${esc(
+                    item.user_email || ""
+                )}
+
+
+            </div>
+
+
+        `)
+
+        .join("")
+
+
+        :
+
+
+        `
+
+        <p>
+            Brak historii.
+        </p>
+
+        `;
+
+
+
+    $("#historyModal")
+
+        .classList
+
+        .add("open");
+
+}
+
+
+
+$("#closeHistory").onclick = () => {
+
+
+    $("#historyModal")
+
+        .classList
+
+        .remove("open");
+
+};
+
+
+
+
+
+/* =========================================================
+   EKSPORT CSV
+========================================================= */
+
+
+$("#export").onclick = () => {
+
+
+    const header = [
+
+        "Miasto",
+
+        "Lokal",
+
+        "Rodzaj",
+
+        "Wykonano",
+
+        "Następny termin",
+
+        "Status",
+
+        "Protokół",
+
+        "Uwagi"
+
+    ];
+
+
+
+    const csv = [
+
+
+        header.join(","),
+
+
+
+        ...data.map(row => [
+
+
+            row.city,
+
+
+            row.local,
+
+
+            row.type,
+
+
+            row.done,
+
+
+            nextDate(
+                row.done,
+                row.months
+            ),
+
+
+            state(row),
+
+
+            protocol(row),
+
+
+            row.notes
+
+
+        ]
+
+        .map(value =>
+
+            `"${String(value || "")
+
+                .replace(/"/g,'""')
+
+            }"`
+
+        )
+
+        .join(",")
+
+        )
+
+
+    ]
+
+    .join("\n");
+
+
+
+    const blob =
+
+        new Blob(
+
+            [
+
+                "\ufeff" + csv
+
+            ],
+
+            {
+
+                type:
+                "text/csv;charset=utf-8"
+
+            }
+
+        );
+
+
+
+    const url =
+
+        URL.createObjectURL(
+            blob
+        );
+
+
+
+    const link =
+        document.createElement("a");
+
+
+
+    link.href = url;
+
+
+
+    link.download =
+        "przeglady.csv";
+
+
+
+    link.click();
+
+
+
+    URL.revokeObjectURL(url);
+
+};
+
+
+
+
+
+/* =========================================================
+   URUCHOMIENIE APLIKACJI
+========================================================= */
+
+
 start();
-</script>
-</body>
-</html>
+  
