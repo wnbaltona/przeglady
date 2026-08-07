@@ -50,7 +50,23 @@ body.theme-dark th{
     button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:#e2e8f0;color:#172033}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
     input,select,textarea{width:100%;border:1px solid #94a3b8;border-radius:8px;padding:9px;background:#fff;font:inherit}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:#fff;color:#172033;text-align:left}.stat:hover,.stat.active{box-shadow:0 0 0 3px #38bdf866,0 8px 18px #0f172a18;transform:translateY(-1px)}.stat b{display:block;font-size:27px;margin-top:4px}.overdue{border-left-color:#ef4444}.due{border-left-color:#f59e0b}.ok{border-left-color:#10b981}.total{border-left-color:#075985}
     .city-groups{display:grid;gap:12px}.city-group{overflow:hidden}.city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none}.city-summary::-webkit-details-marker{display:none}.city-summary::after{content:'›';font-size:25px;line-height:1;color:var(--blue);margin-left:4px;transition:transform .18s}.city-group[open] .city-summary::after{transform:rotate(90deg)}.city-summary-main{display:flex;gap:10px;align-items:baseline}.city-summary strong{font-size:17px}.city-summary-count,.muted{color:#475569}.city-summary-stats{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:#f8fafc;overflow:hidden;}.tablebox{overflow:auto;max-height:62vh}table{border-collapse:collapse;width:100%;table-layout:auto;}th:nth-child(1),td:nth-child(1){width:14%;}th:nth-child(2),td:nth-child(2){width:18%;}th:nth-child(3),td:nth-child(3){width:11%;}th:nth-child(4),td:nth-child(4){width:12%;}th:nth-child(5),td:nth-child(5){width:8%;text-align:center;}th:nth-child(6),td:nth-child(6){width:13%}th:nth-child(7),td:nth-child(7){width:12%;font-size:11px;max-width:180px;}th:nth-child(8),td:nth-child(8){width:15%;text-align:center}th,td{padding:10px 11px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:middle;font-size:14px;line-height:1.3;}th{position:sticky;top:0;background:#eaf0f6;color:#334155;font-size:13px;font-weight:700}.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}.PO{background:#fee2e2;color:var(--red)}.DO{background:#fef3c7;color:var(--amber)}.OK{background:#d1fae5;color:var(--green)}.BRAK{background:#ede9fe;color:#5b21b6}
-    .modal{display:none;position:fixed;inset:0;background:#17203388;place-items:center;padding:18px;z-index:5}.modal.open{display:grid}.dialog{background:#fff;border-radius:14px;padding:24px;width:min(720px,100%);max-height:90vh;overflow:auto}.form{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.form label{display:grid;gap:5px;font-weight:650}.wide{grid-column:1/-1}.dialog footer{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}.type-add{display:flex;gap:8px}.type-add input{flex:1}.type-list{list-style:none;padding:0;margin:16px 0;display:grid;gap:7px;max-height:48vh;overflow:auto}.type-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc}.row-actions{display:flex;gap:4px;align-items:center;flex-wrap:nowrap;white-space:nowrap}.row-actions button{padding:6px 9px;font-size:12px;line-height:1.2;}.open-file{background:#f8fafc;color:#172033;border:1px solid #cbd5e1;padding:6px 9px;font-size:12px;font-weight:700;border-radius:8px;line-height:1.2;}.open-file:hover{background:#e2e8f0;}.protocol-cell{white-space:nowrap;text-align:left;}.protocol-cell .badge{vertical-align:middle;}.protocol-cell .open-file{margin-left:6px; vertical-align:middle;}.status-cell{white-space:nowrap;text-align:center;vertical-align:middle;}.status-cell .badge{display:inline-flex;justify-content:center;align-items:center;height:22px;min-width:38px;}
+    .modal{display:none;position:fixed;inset:0;background:#17203388;place-items:center;padding:18px;z-index:5}.modal.open{display:grid}.dialog{background:#fff;border-radius:14px;padding:24px;width:min(720px,100%);max-height:90vh;overflow:auto}.form{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.form label{display:grid;gap:5px;font-weight:650}.wide{grid-column:1/-1}.dialog footer{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}.type-add{display:flex;gap:8px}.type-add input{flex:1}.type-list{list-style:none;padding:0;margin:16px 0;display:grid;gap:7px;max-height:48vh;overflow:auto}.type-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc}
+    .theme-options{
+    display:grid;
+    gap:10px;
+    margin-top:20px;
+}
+
+.theme-options button{
+    text-align:left;
+    background:#fff;
+    color:#172033;
+    border:1px solid var(--line);
+}
+
+.theme-options button:hover{
+    background:#e0f2fe;
+}.row-actions{display:flex;gap:4px;align-items:center;flex-wrap:nowrap;white-space:nowrap}.row-actions button{padding:6px 9px;font-size:12px;line-height:1.2;}.open-file{background:#f8fafc;color:#172033;border:1px solid #cbd5e1;padding:6px 9px;font-size:12px;font-weight:700;border-radius:8px;line-height:1.2;}.open-file:hover{background:#e2e8f0;}.protocol-cell{white-space:nowrap;text-align:left;}.protocol-cell .badge{vertical-align:middle;}.protocol-cell .open-file{margin-left:6px; vertical-align:middle;}.status-cell{white-space:nowrap;text-align:center;vertical-align:middle;}.status-cell .badge{display:inline-flex;justify-content:center;align-items:center;height:22px;min-width:38px;}
    /* ============================
    RESPONSYWNOŚĆ EKRANÓW
 ============================ */
@@ -285,7 +301,7 @@ body.theme-dark th{
   </style>
 </head>
 <body>
-<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeToggle" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
   <section class="panel"><div class="tools"><button id="export" class="secondary">Eksportuj CSV</button><span id="syncInfo" class="muted"></span></div><div class="filters"><input id="search" placeholder="Szukaj: miasto, lokal, rodzaj…"><select id="city"><option value="">Wszystkie miasta</option></select><select id="status"><option value="">Wszystkie statusy</option><option>PO TERMINIE</option><option>DO WYKONANIA</option><option>OK</option></select><select id="protocol"><option value="">Wszystkie protokoły</option><option value="DODANY">Dodany</option><option value="BRAK PROTOKOŁU">Brak protokołu</option></select></div></section>
@@ -299,6 +315,23 @@ body.theme-dark th{
 <div class="modal" id="locationsModal"><section class="dialog"><h2>Usuń lokal</h2><p class="muted">Usunięcie chowa lokal z podpowiedzi, ale nie kasuje istniejących przeglądów.</p><ul id="locationList" class="type-list"></ul><footer><button type="button" id="closeLocations" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="trashModal"><section class="dialog"><h2>Kosz</h2><p class="muted">Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.</p><ul id="trashList" class="type-list"></ul><footer><button type="button" id="closeTrash" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="historyModal"><section class="dialog"><h2>Historia wpisu</h2><ul id="historyList" class="type-list"></ul><footer><button type="button" id="closeHistory" class="secondary">Zamknij</button></footer></section></div>
+<div class="modal" id="themeModal">
+<section class="dialog">
+<h2>Zmień motyw</h2>
+
+<div class="theme-options">
+<button type="button" data-theme="default">🔵 Granatowy (domyślny)</button>
+<button type="button" data-theme="green">🟢 Zielony</button>
+<button type="button" data-theme="dark">⚫ Ciemny</button>
+<button type="button" data-theme="light">⚪ Jasny</button>
+</div>
+
+<footer>
+<button type="button" id="closeTheme" class="secondary">Zamknij</button>
+</footer>
+
+</section>
+</div>
 <datalist id="cities"></datalist><datalist id="locals"></datalist><datalist id="types"></datalist>
 <script>
 const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
@@ -350,6 +383,48 @@ $('#themeToggle').onclick=()=>{
 
     $('#userMenu').hidden=true;
 };document.addEventListener('click',e=>{if(!e.target.closest('.user-menu')){$('#userMenu').hidden=true;$('#menuToggle').setAttribute('aria-expanded','false')}});
+  $('#changeTheme').onclick=()=>{
+    $('#userMenu').hidden=true;
+    $('#themeModal').classList.add('open');
+};
+
+
+$('#closeTheme').onclick=()=>{
+    $('#themeModal').classList.remove('open');
+};
+
+
+document.querySelectorAll('[data-theme]').forEach(btn=>{
+    btn.onclick=()=>{
+        const theme=btn.dataset.theme;
+
+        if(theme==='green'){
+            document.documentElement.style.setProperty('--navy','#14532d');
+            document.documentElement.style.setProperty('--blue','#15803d');
+        }
+
+        if(theme==='blue'){
+            document.documentElement.style.setProperty('--navy','#12304a');
+            document.documentElement.style.setProperty('--blue','#075985');
+        }
+
+        if(theme==='dark'){
+            document.documentElement.style.setProperty('--navy','#020617');
+            document.documentElement.style.setProperty('--blue','#334155');
+            document.documentElement.style.setProperty('--bg','#0f172a');
+        }
+
+        if(theme==='light'){
+            document.documentElement.style.setProperty('--navy','#64748b');
+            document.documentElement.style.setProperty('--blue','#0ea5e9');
+            document.documentElement.style.setProperty('--bg','#f8fafc');
+        }
+
+        $('#themeModal').classList.remove('open');
+
+        localStorage.setItem('theme',theme);
+    }
+});
 function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;const f=$('#editForm');f.reset();const v=r||{months:12};['city','local','type','done','months','protocolDate','notes'].forEach(n=>f.elements[n].value=v[n]??'');refreshLocals();const edit=Boolean(r);['city','local'].forEach(n=>f.elements[n].readOnly=edit);$('#formTitle').textContent=edit?'Edytuj przegląd':'Dodaj przegląd';$('#fileInfo').textContent=r?.protocolFileName?`Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`:'Opcjonalnie: PDF, dokument lub zdjęcie.';$('#editModal').classList.add('open')}
 $('#editForm').elements.city.addEventListener('input',refreshLocals);function setDefaultMonths(){if(editing)return;const m=monthsByType[norm($('#editForm').elements.type.value)];if(m)$('#editForm').elements.months.value=m}$('#editForm').elements.type.addEventListener('input',setDefaultMonths);$('#editForm').elements.type.addEventListener('change',setDefaultMonths);
 $('#editForm').onsubmit=async e=>{e.preventDefault();const submit=e.submitter;let uploadedPath=null;try{const f=new FormData(e.target),file=f.get('file'),city=String(f.get('city')||'').trim(),local=String(f.get('local')||'').trim(),type=String(f.get('type')||'').trim(),months=Number(f.get('months'));if(!city||!local||!type)throw new Error('Uzupełnij miasto, lokal i rodzaj przeglądu.');if(!Number.isInteger(months)||months<1||months>120)throw new Error('Okres ważności musi wynosić od 1 do 120 miesięcy.');if(data.some(r=>String(r.id)!==String(editing)&&norm(r.city)===norm(city)&&norm(r.local)===norm(local)&&norm(r.type)===norm(type)))throw new Error('Taki przegląd dla tego lokalu już istnieje.');if(file&&file.size){if(file.size>MAX_PROTOCOL_SIZE)throw new Error('Plik protokołu może mieć maksymalnie 10 MB.');if(!ALLOWED_PROTOCOL_TYPES.has(file.type))throw new Error('Niedozwolony typ pliku protokołu.');const ext=file.name.split('.').pop().toLowerCase(),path=`${Date.now()}_${crypto.randomUUID()}.${ext}`,{error}=await sb.storage.from('protocols').upload(path,file,{contentType:file.type});if(error)throw error;uploadedPath=path}if(submit)submit.disabled=true;const old=data.find(x=>String(x.id)===String(editing)),payload={id:editing||`custom-${Date.now()}`,city,local,type,done:f.get('done')||null,months,protocolDate:f.get('protocolDate')||null,notes:f.get('notes')||''};if(uploadedPath){payload.protocolFileName=file.name;payload.protocolPath=uploadedPath}else if(old){payload.protocolFileName=old.protocolFileName;payload.protocolPath=old.protocolPath}let saveError;if(editing){const{data:changed,error}=await sb.from('inspections').update(toDb(payload)).eq('id',editing).eq('version',editingVersion).is('deleted_at',null).select('id');saveError=error;if(!saveError&&!changed?.length)throw new Error('Ten wpis został zmieniony lub przeniesiony do kosza przez inną osobę. Odśwież dane i spróbuj ponownie.')}else{const{error}=await sb.from('inspections').insert(toDb(payload));saveError=error}if(saveError)throw saveError;const{error:typeError}=await sb.from('inspection_types').upsert({name:type,active:true},{onConflict:'name'});if(typeError)throw typeError;const{error:locationError}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(locationError)throw locationError;if(uploadedPath&&old?.protocolPath&&old.protocolPath!==uploadedPath){const{error:removeError}=await sb.storage.from('protocols').remove([old.protocolPath]);if(removeError)console.warn('Nie udało się usunąć poprzedniego pliku:',removeError.message)}$('#editModal').classList.remove('open');await load()}catch(err){if(uploadedPath)await sb.storage.from('protocols').remove([uploadedPath]);alert('Błąd podczas zapisywania: '+err.message)}finally{if(submit)submit.disabled=false}};
@@ -361,6 +436,11 @@ function renderLocationList(){$('#locationList').innerHTML=locations.length?loca
 async function renderTrash(){const{data:deleted,error}=await sb.from('inspections').select('*').not('deleted_at','is',null).order('deleted_at',{ascending:false});if(error)return alert('Nie udało się pobrać kosza: '+error.message);$('#trashList').innerHTML=deleted?.length?deleted.map(row=>{const r=fromDb(row);return`<li><span><b>${esc(r.city)} — ${esc(r.local)}</b><br>${esc(r.type)} <small class="muted">(usunięto: ${fmt(iso(r.deletedAt))})</small></span><button type="button" class="secondary" data-restore="${esc(r.id)}" data-version="${esc(r.version)}">Przywróć</button></li>`}).join(''):'<li class="muted">Kosz jest pusty.</li>'}$('#showTrash').onclick=async()=>{$('#userMenu').hidden=true;await renderTrash();$('#trashModal').classList.add('open')};$('#closeTrash').onclick=()=>$('#trashModal').classList.remove('open');$('#trashList').onclick=async e=>{const b=e.target.closest('button[data-restore]');if(!b)return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:null}).eq('id',b.dataset.restore).eq('version',Number(b.dataset.version)).not('deleted_at','is',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież kosz i spróbuj ponownie.');await renderTrash();await load()};
 async function showHistory(id){const{data:events,error}=await sb.from('inspection_audit').select('action,changed_at,old_data,new_data').eq('inspection_id',id).order('changed_at',{ascending:false});if(error)return alert('Nie udało się pobrać historii: '+error.message);const labels={INSERT:'utworzono',UPDATE:'zaktualizowano',DELETE:'usunięto trwale'};$('#historyList').innerHTML=events?.length?events.map(event=>{const row=event.new_data||event.old_data||{},detail=[row.city,row.local,row.type].filter(Boolean).join(' — ');return`<li><span><b>${esc(labels[event.action]||event.action)}</b><br><small class="muted">${esc(new Date(event.changed_at).toLocaleString('pl-PL'))}${detail?` · ${esc(detail)}`:''}</small></span></li>`}).join(''):'<li class="muted">Brak zapisanej historii.</li>';$('#historyModal').classList.add('open')}$('#closeHistory').onclick=()=>$('#historyModal').classList.remove('open');
 $('#export').onclick=()=>{const h=['Miasto','Nr lokalu','Rodzaj przeglądu','Data wykonania','Ważny przez (mies.)','Data następnego przeglądu','Status','Data dodania protokołu','Uwagi'],csv=[h,...data.map(r=>[r.city,r.local,r.type,r.done,r.months,nextDate(r.done,r.months),state(r),r.protocolDate,r.notes])].map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\r\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='przeglady-export.csv';a.click();URL.revokeObjectURL(a.href)};
+const savedTheme=localStorage.getItem('theme');
+
+if(savedTheme){
+    document.querySelector(`[data-theme="${savedTheme}"]`)?.click();
+}
 start();
 </script>
 </body>
