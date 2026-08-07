@@ -8,7 +8,7 @@
   <script src="supabase-config.js"></script>
   <script src="dane-startowe.js"></script>
   <style>
-    :root{--navy:#12304a;--blue:#075985;--bg:#f1f5f9;--line:#cbd5e1;--red:#991b1b;--amber:#92400e;--green:#065f46}
+    :root{--navy:#12304a;--blue:#075985;--bg:#f1f5f9;--line:#cbd5e1;--text:#172033;--red:#991b1b;--amber:#92400e;--green:#065f46}
     body.theme-green{
  --navy:#14532d;
  --blue:#15803d;
@@ -28,7 +28,14 @@ body.theme-dark{
  --blue:#38bdf8;
  --bg:#0f172a;
  --line:#334155;
- color:#e2e8f0;
+ --text:#e2e8f0;
+}
+    
+body.theme-light{
+ --navy:#64748b;
+ --blue:#0ea5e9;
+ --bg:#f8fafc;
+ --line:#cbd5e1;
 }
 
 body.theme-dark .panel,
@@ -43,7 +50,9 @@ body.theme-dark th{
  background:#334155;
  color:white;
 }
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:#172033}
+
+
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:var(--text,#172033)}
     .top{background:var(--navy);color:#fff;padding:22px max(24px,calc((100% - 1300px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:4px solid #38bdf8}.top h1{margin:0;font-size:26px}.top p{margin:4px 0 0;color:#dbeafe}
     .wrap{max-width:1300px;width:100%;margin:24px auto;padding:0 18px}.panel,.card,.notice{background:#fff;border:1px solid var(--line);border-radius:12px}.panel{padding:16px;margin-bottom:16px}.notice{padding:15px 17px;margin-bottom:16px;background:#e0f2fe;color:#123e5c;border-left:4px solid var(--blue)}
     .tools,.filters,.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.filters{margin-top:14px}.filters input,.filters select{flex:1;min-width:155px}.user-menu{position:relative}.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:10;min-width:250px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px #0f172a33}.menu-panel button{display:block;width:100%;margin-top:6px;text-align:left}.menu-user{padding:4px 6px 10px;color:#334155;border-bottom:1px solid #e2e8f0;word-break:break-word}
@@ -367,40 +376,24 @@ $('#closeTheme').onclick=()=>{
 
 document.querySelectorAll('[data-theme]').forEach(btn=>{
     btn.onclick=()=>{
-        const theme=btn.dataset.theme;
-      
-        if(theme==='default'){
-            document.documentElement.style.setProperty('--navy','#12304a');
-            document.documentElement.style.setProperty('--blue','#075985');
-            document.documentElement.style.setProperty('--bg','#f1f5f9');
-            document.documentElement.style.setProperty('--line','#cbd5e1');
+        const theme = btn.dataset.theme;
+
+        // usuwamy stare motywy
+        document.body.classList.remove(
+            'theme-green',
+            'theme-dark',
+            'theme-purple',
+            'theme-light'
+        );
+
+        // dodajemy nowy
+        if(theme !== 'default'){
+            document.body.classList.add('theme-' + theme);
         }
 
-        if(theme==='green'){
-            document.documentElement.style.setProperty('--navy','#14532d');
-            document.documentElement.style.setProperty('--blue','#15803d');
-        }
-
-        if(theme==='blue'){
-            document.documentElement.style.setProperty('--navy','#12304a');
-            document.documentElement.style.setProperty('--blue','#075985');
-        }
-
-        if(theme==='dark'){
-            document.documentElement.style.setProperty('--navy','#020617');
-            document.documentElement.style.setProperty('--blue','#334155');
-            document.documentElement.style.setProperty('--bg','#0f172a');
-        }
-
-        if(theme==='light'){
-            document.documentElement.style.setProperty('--navy','#64748b');
-            document.documentElement.style.setProperty('--blue','#0ea5e9');
-            document.documentElement.style.setProperty('--bg','#f8fafc');
-        }
+        localStorage.setItem('theme', theme);
 
         $('#themeModal').classList.remove('open');
-
-        localStorage.setItem('theme',theme);
     }
 });
 function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;const f=$('#editForm');f.reset();const v=r||{months:12};['city','local','type','done','months','protocolDate','notes'].forEach(n=>f.elements[n].value=v[n]??'');refreshLocals();const edit=Boolean(r);['city','local'].forEach(n=>f.elements[n].readOnly=edit);$('#formTitle').textContent=edit?'Edytuj przegląd':'Dodaj przegląd';$('#fileInfo').textContent=r?.protocolFileName?`Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`:'Opcjonalnie: PDF, dokument lub zdjęcie.';$('#editModal').classList.add('open')}
