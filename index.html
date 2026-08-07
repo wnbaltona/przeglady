@@ -348,10 +348,25 @@ body.theme-dark th{
 
 
 <div class="theme-options">
-<button type="button" data-theme="default">🔵 Granatowy (domyślny)</button>
-<button type="button" data-theme="green">🟢 Zielony</button>
-<button type="button" data-theme="dark">⚫ Ciemny</button>
-<button type="button" data-theme="light">⚪ Jasny</button>
+<button type="button" data-theme="default">
+🔵 Domyślny granat
+</button>
+
+<button type="button" data-theme="green">
+🌿 Las + złoto
+</button>
+
+<button type="button" data-theme="gold">
+🟡 Złoty elegancki
+</button>
+
+<button type="button" data-theme="beige">
+☕ Ciepły beż
+</button>
+
+<button type="button" data-theme="dark">
+🌑 Ciemny premium
+</button>
 </div>
 
 <footer>
@@ -399,9 +414,11 @@ document.querySelectorAll('[data-theme]').forEach(btn=>{
         // usuwamy stare motywy
         document.body.classList.remove(
             'theme-green',
-            'theme-dark',
+            'theme-gold',
+            'theme-beige',
             'theme-purple',
-            'theme-light'
+            'theme-light',
+            'theme-dark'
         );
 
         // dodajemy nowy
