@@ -109,8 +109,283 @@ body.theme-dark{
     --red:#F08078;
     --amber:#E5B968;
     --green:#6FC495;
+
+    /* dodatkowe kolory ciemnego motywu */
+    --surface:#1A2228;
+    --surface-2:#202A31;
+    --surface-3:#26323A;
+    --text-muted:#AEBBC3;
+    --input-bg:#151C21;
 }
 
+   /* =========================================
+   CIEMNY MOTYW — DODATKOWE ELEMENTY
+========================================= */
+
+body.theme-dark{
+    background:var(--bg);
+    color:var(--text);
+}
+
+/* Górny pasek */
+body.theme-dark .top{
+    background:var(--navy);
+    color:#F4F7F9;
+    border-bottom-color:var(--blue);
+}
+
+body.theme-dark .top p{
+    color:#B8C7D0;
+}
+
+/* Główne panele */
+body.theme-dark .panel,
+body.theme-dark .card,
+body.theme-dark .notice{
+    background:var(--surface);
+    color:var(--text);
+    border-color:var(--line);
+}
+
+/* Informacja */
+body.theme-dark .notice{
+    background:#182B34;
+    color:#D5E5EB;
+    border-left-color:var(--blue);
+}
+
+/* Filtry / pola */
+body.theme-dark input,
+body.theme-dark select,
+body.theme-dark textarea{
+    background:var(--input-bg);
+    color:var(--text);
+    border-color:#4A5A64;
+}
+
+body.theme-dark input::placeholder,
+body.theme-dark textarea::placeholder{
+    color:#8797A2;
+}
+
+body.theme-dark select option{
+    background:var(--input-bg);
+    color:var(--text);
+}
+
+/* Przyciski */
+body.theme-dark button{
+    background:var(--blue);
+    color:#F7FAFC;
+}
+
+body.theme-dark button:hover{
+    filter:brightness(1.08);
+}
+
+body.theme-dark .secondary{
+    background:#2A353D;
+    color:#E8EDF0;
+    border-color:#46545D;
+}
+
+body.theme-dark .secondary:hover{
+    background:#34414A;
+}
+
+body.theme-dark .danger{
+    background:#432629;
+    color:#FFB0AA;
+    border-color:#6B3839;
+}
+
+body.theme-dark .danger:hover{
+    background:#593033;
+}
+
+/* Menu */
+body.theme-dark .menu-panel{
+    background:var(--surface);
+    border-color:var(--line);
+    box-shadow:0 12px 28px #00000066;
+}
+
+body.theme-dark .menu-user{
+    color:var(--text-muted);
+    border-bottom-color:var(--line);
+}
+
+/* Teksty pomocnicze */
+body.theme-dark .muted,
+body.theme-dark .city-summary-count{
+    color:var(--text-muted);
+}
+
+/* =========================================
+   STATYSTYKI
+========================================= */
+
+body.theme-dark .stat{
+    background:var(--surface);
+    color:var(--text);
+    border-color:var(--line);
+}
+
+body.theme-dark .stat b{
+    color:#F3F7F9;
+}
+
+body.theme-dark .stat:hover,
+body.theme-dark .stat.active{
+    box-shadow:0 0 0 3px #6F9EAD55,
+               0 8px 18px #00000055;
+}
+
+/* =========================================
+   MIASTA
+========================================= */
+
+body.theme-dark .city-group{
+    background:var(--surface);
+    border-color:var(--line);
+}
+
+/* NAJWAŻNIEJSZE — nazwa miasta */
+body.theme-dark .city-summary strong{
+    color:#F1F5F7;
+}
+
+/* liczba przeglądów */
+body.theme-dark .city-summary-count{
+    color:#AEBBC3;
+}
+
+/* strzałka */
+body.theme-dark .city-summary::after{
+    color:#8FB5C4;
+}
+
+/* tabela pod miastem */
+body.theme-dark .city-table{
+    background:#151C21;
+    border-top-color:var(--line);
+}
+
+/* =========================================
+   TABELA
+========================================= */
+
+body.theme-dark th,
+body.theme-dark td{
+    border-bottom-color:#34414A;
+    color:#E8EDF0;
+}
+
+body.theme-dark th{
+    background:#26323A;
+    color:#DCE5E9;
+}
+
+body.theme-dark tr:hover td{
+    background:#1E282F;
+}
+
+/* =========================================
+   BADGE STATUSÓW
+========================================= */
+
+body.theme-dark .PO{
+    background:#4A292B;
+    color:#FFAAA3;
+}
+
+body.theme-dark .DO{
+    background:#493A22;
+    color:#F2CA79;
+}
+
+body.theme-dark .OK{
+    background:#203D31;
+    color:#83D3A8;
+}
+
+body.theme-dark .BRAK{
+    background:#342D4A;
+    color:#C7B8F0;
+}
+
+/* =========================================
+   PRZYCISK "OTWÓRZ"
+========================================= */
+
+body.theme-dark .open-file{
+    background:#26323A;
+    color:#DCE5E9;
+    border-color:#4A5963;
+}
+
+body.theme-dark .open-file:hover{
+    background:#34414A;
+}
+
+/* =========================================
+   MODALE
+========================================= */
+
+body.theme-dark .modal{
+    background:#080C0FBB;
+}
+
+body.theme-dark .dialog{
+    background:var(--surface);
+    color:var(--text);
+    border:1px solid var(--line);
+}
+
+body.theme-dark .dialog h2{
+    color:#F1F5F7;
+}
+
+/* listy w modalach */
+body.theme-dark .type-list li{
+    background:#202A31;
+    border-color:#3A4851;
+    color:#E8EDF0;
+}
+
+/* =========================================
+   WYBÓR MOTYWU
+========================================= */
+
+body.theme-dark .theme-options button{
+    background:#202A31;
+    color:#E8EDF0;
+    border-color:#3A4851;
+}
+
+body.theme-dark .theme-options button:hover{
+    background:#2C3942;
+}
+
+/* =========================================
+   POLA FORMULARZY
+========================================= */
+
+body.theme-dark label{
+    color:#DCE5E9;
+}
+
+body.theme-dark small{
+    color:#9EADB6;
+}
+
+/* =========================================
+   LINKI / DROBNE ELEMENTY
+========================================= */
+
+body.theme-dark a{
+    color:#8FBCCB;
+}
     *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:var(--text,#172033)}
     .top{background:var(--navy);color:#fff;padding:22px max(24px,calc((100% - 1300px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:4px solid var(--blue);}.top h1{margin:0;font-size:26px}.top p{margin:4px 0 0;color:#dbeafe}
     .wrap{max-width:1300px;width:100%;margin:24px auto;padding:0 18px}.panel,.card,.notice{background:#fff;border:1px solid var(--line);border-radius:12px}.panel{padding:16px;margin-bottom:16px}.notice{padding:15px 17px;margin-bottom:16px;background:#e0f2fe;color:#123e5c;border-left:4px solid var(--blue)}
