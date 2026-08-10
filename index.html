@@ -28,7 +28,6 @@
 
 /* =========================================
    GRANATOWY — PROFESJONALNY
-   Główny motyw aplikacji
 ========================================= */
 
 body.theme-blue{
@@ -45,72 +44,71 @@ body.theme-blue{
 
 
 /* =========================================
-   SZARO-NIEBIESKI — FIRMOWY
+   ZIELONY SZAŁWIOWY — SPOKOJNY
 ========================================= */
 
 body.theme-corporate{
-    --navy:#41444B;
-    --blue:#52575D;
-    --bg:#F3F4F6;
-    --line:#D1D5DB;
-    --text:#1F2937;
+    --navy:#354A40;
+    --blue:#587A6B;
+    --bg:#F4F7F4;
+    --line:#D5DED8;
+    --text:#26342D;
 
-    --red:#B42318;
-    --amber:#A16207;
-    --green:#047857;
+    --red:#A64B43;
+    --amber:#9A702F;
+    --green:#39705A;
 }
 
 
 /* =========================================
-   BEŻOWO-GRAFITOWY — ELEGANCKI
+   BEŻOWO-TERAKOTOWY — CIEPŁY
 ========================================= */
 
 body.theme-elegant{
-    --navy:#41444B;
-    --blue:#6B6F73;
-    --bg:#F5F3EE;
-    --line:#D8D3C8;
-    --text:#303236;
+    --navy:#5A463A;
+    --blue:#A07862;
+    --bg:#F8F4EE;
+    --line:#DED3C7;
+    --text:#3A322D;
 
-    --red:#B42318;
-    --amber:#A16207;
-    --green:#287A5A;
+    --red:#A94C43;
+    --amber:#A47735;
+    --green:#52715C;
 }
 
 
 /* =========================================
-   JASNY — MINIMALISTYCZNY
+   JASNY — NEUTRALNY / MINIMALISTYCZNY
 ========================================= */
 
 body.theme-minimal{
-    --navy:#2E383F;
-    --blue:#07617D;
-    --bg:#F8FAFC;
-    --line:#D9E0E5;
-    --text:#26343D;
+    --navy:#46505A;
+    --blue:#78838C;
+    --bg:#FAFAF8;
+    --line:#E2E3E0;
+    --text:#293038;
 
-    --red:#B42318;
-    --amber:#A16207;
-    --green:#047857;
+    --red:#B34D45;
+    --amber:#A47732;
+    --green:#4E775F;
 }
 
 
 /* =========================================
-   CIEMNY — FIRMOWY DARK MODE
+   CIEMNY — GRAFITOWY DARK MODE
 ========================================= */
 
 body.theme-dark{
-    --navy:#1F2933;
-    --blue:#3E7C9A;
-    --bg:#111820;
-    --line:#35424D;
-    --text:#E5E7EB;
+    --navy:#1C2328;
+    --blue:#79A6B5;
+    --bg:#0F1417;
+    --line:#38434A;
+    --text:#F1F4F5;
 
-    --red:#F87171;
-    --amber:#FBBF24;
-    --green:#4ADE80;
+    --red:#FF8B83;
+    --amber:#F2C56D;
+    --green:#79D0A0;
 }
-
 
     *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:var(--text,#172033)}
     .top{background:var(--navy);color:#fff;padding:22px max(24px,calc((100% - 1300px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:4px solid var(--blue);}.top h1{margin:0;font-size:26px}.top p{margin:4px 0 0;color:#dbeafe}
@@ -390,25 +388,27 @@ body.theme-dark{
 
 
 <div class="theme-options">
+
     <button type="button" data-theme="default">
-        🔵 Granatowy — domyślny
+        Granatowy
     </button>
 
     <button type="button" data-theme="corporate">
-        ⚫ Grafitowo-niebieski — firmowy
+        Zielony
     </button>
 
     <button type="button" data-theme="elegant">
-        🟤 Beżowo-grafitowy — elegancki
+        Beżowo-terakotowy
     </button>
 
     <button type="button" data-theme="minimal">
-        ⚪ Jasny — minimalistyczny
+        Jasny
     </button>
 
     <button type="button" data-theme="dark">
-        🌑 Ciemny — dark mode
+        Ciemny
     </button>
+
 </div>
   
 <footer>
