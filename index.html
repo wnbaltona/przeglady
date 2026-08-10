@@ -8,7 +8,16 @@
   <script src="supabase-config.js"></script>
   <script src="dane-startowe.js"></script>
   <style>
-    :root{--navy:#12304a;--blue:#075985;--bg:#f1f5f9;--line:#cbd5e1;--text:#172033;--red:#991b1b;--amber:#92400e;--green:#065f46}
+    :root{
+ --navy:#427EA8;
+ --blue:#83A8C3;
+ --bg:#D3D7DA;
+ --line:#818B92;
+ --text:#172033;
+ --red:#991b1b;
+ --amber:#92400e;
+ --green:#065f46;
+}
     
 body.theme-green{
  --navy:#0B1849;
@@ -54,6 +63,18 @@ body.theme-light{
  --blue:#0ea5e9;
  --bg:#f8fafc;
  --line:#cbd5e1;
+}
+    
+body.theme-bluegray{
+    --navy:#636D74;
+    --blue:#427EA8;
+    --bg:#D3D7DA;
+    --line:#818B92;
+    --text:#263238;
+
+    --surface:#F4F5F6;
+    --surface-soft:#E7EAEC;
+    --accent-light:#83A8C3;
 }
 
 body.theme-dark .panel,
@@ -348,25 +369,13 @@ body.theme-dark th{
 
 
 <div class="theme-options">
-<button type="button" data-theme="default">
-🔵 Domyślny granat
-</button>
-
-<button type="button" data-theme="green">
-🌿 Las + złoto
-</button>
-
-<button type="button" data-theme="gold">
-🟡 Złoty elegancki
-</button>
-
-<button type="button" data-theme="beige">
-☕ Ciepły beż
-</button>
-
-<button type="button" data-theme="dark">
-🌑 Ciemny premium
-</button>
+    <button type="button" data-theme="default">🔵 Granatowy (domyślny)</button>
+    <button type="button" data-theme="bluegray">🔷 Niebiesko-szary</button>
+    <button type="button" data-theme="green">🟢 Zielony</button>
+    <button type="button" data-theme="gold">🟡 Zielono-złoty</button>
+    <button type="button" data-theme="beige">🟠 Beżowo-pomarańczowy</button>
+    <button type="button" data-theme="dark">⚫ Ciemny</button>
+    <button type="button" data-theme="light">⚪ Jasny</button>
 </div>
 
 <footer>
@@ -414,11 +423,12 @@ document.querySelectorAll('[data-theme]').forEach(btn=>{
         // usuwamy stare motywy
         document.body.classList.remove(
             'theme-green',
-            'theme-gold',
-            'theme-beige',
+            'theme-dark',
             'theme-purple',
             'theme-light',
-            'theme-dark'
+            'theme-bluegray',
+            'theme-gold',
+            'theme-beige'
         );
 
         // dodajemy nowy
