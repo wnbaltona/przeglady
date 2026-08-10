@@ -9,110 +9,111 @@
   <script src="dane-startowe.js"></script>
  <style>
 
-    /* =========================================
-       DOMYŚLNY — GRANATOWY
-    ========================================= */
+/* =========================================
+   GŁÓWNY — GRANATOWY
+========================================= */
 
-    :root{
-        --navy:#12304A;
-        --blue:#075985;
-        --bg:#F1F5F9;
-        --line:#CBD5E1;
-        --text:#172033;
-        --red:#991B1B;
-        --amber:#92400E;
-       --green:#065F46;
+:root{
+    --navy:#12304A;
+    --blue:#075985;
+    --bg:#F1F5F9;
+    --line:#CBD5E1;
+    --text:#172033;
+
+    --red:#991B1B;
+    --amber:#92400E;
+    --green:#065F46;
 }
 
 
-    /* =========================================
-       ZIELONO-ZŁOTY — elegancki
-    ========================================= */
+/* =========================================
+   GRANATOWY — PROFESJONALNY
+   Główny motyw aplikacji
+========================================= */
 
-    body.theme-gold{
-        --navy:#28483A;
-        --blue:#B88A32;
-        --bg:#F7F5EE;
-        --line:#DDD7C5;
-        --text:#303A35;
+body.theme-blue{
+    --navy:#12304A;
+    --blue:#075985;
+    --bg:#F1F5F9;
+    --line:#CBD5E1;
+    --text:#172033;
 
-        --red:#B42318;
-        --amber:#A87920;
-        --green:#287A5A;
-    }
-
-
-    /* =========================================
-       BEŻOWY — ciepły i delikatny
-    ========================================= */
-
-    body.theme-beige{
-        --navy:#705A4A;
-        --blue:#D38B67;
-        --bg:#FBF5EE;
-        --line:#E5D7CA;
-        --text:#40362F;
-
-        --red:#B64A3A;
-        --amber:#B77A35;
-        --green:#4F8068;
-    }
+    --red:#991B1B;
+    --amber:#92400E;
+    --green:#065F46;
+}
 
 
-    /* =========================================
-       CIEMNY — elegancki dark mode
-    ========================================= */
+/* =========================================
+   SZARO-NIEBIESKI — FIRMOWY
+========================================= */
 
-    body.theme-dark{
-        --navy:#172536;
-        --blue:#5D91B8;
-        --bg:#111A23;
-        --line:#344553;
-        --text:#E6EDF2;
+body.theme-corporate{
+    --navy:#41444B;
+    --blue:#52575D;
+    --bg:#F3F4F6;
+    --line:#D1D5DB;
+    --text:#1F2937;
 
-        --red:#F07068;
-        --amber:#E2B45C;
-        --green:#62B892;
-    }
-
-
-    /* =========================================
-       JASNY — bardzo jasny, czysty
-    ========================================= */
-
-    body.theme-light{
-        --navy:#526779;
-        --blue:#5791B8;
-        --bg:#F8FAFB;
-        --line:#DCE4E9;
-        --text:#263746;
-
-        --red:#B42318;
-        --amber:#B7791F;
-        --green:#287A5A;
-    }
+    --red:#B42318;
+    --amber:#A16207;
+    --green:#047857;
+}
 
 
-    /* =========================================
-       CIEMNY MOTYW — elementy dodatkowe
-    ========================================= */
+/* =========================================
+   BEŻOWO-GRAFITOWY — ELEGANCKI
+========================================= */
 
-    body.theme-dark .panel,
-    body.theme-dark .card,
-    body.theme-dark .notice,
-    body.theme-dark .city-table{
-        background:#1D2A36;
-        color:#E6EDF2;
-    }
+body.theme-elegant{
+    --navy:#41444B;
+    --blue:#6B6F73;
+    --bg:#F5F3EE;
+    --line:#D8D3C8;
+    --text:#303236;
 
-    body.theme-dark th{
-        background:#293B49;
-        color:#F2F6F8;
-    }
+    --red:#B42318;
+    --amber:#A16207;
+    --green:#287A5A;
+}
+
+
+/* =========================================
+   JASNY — MINIMALISTYCZNY
+========================================= */
+
+body.theme-minimal{
+    --navy:#2E383F;
+    --blue:#07617D;
+    --bg:#F8FAFC;
+    --line:#D9E0E5;
+    --text:#26343D;
+
+    --red:#B42318;
+    --amber:#A16207;
+    --green:#047857;
+}
+
+
+/* =========================================
+   CIEMNY — FIRMOWY DARK MODE
+========================================= */
+
+body.theme-dark{
+    --navy:#1F2933;
+    --blue:#3E7C9A;
+    --bg:#111820;
+    --line:#35424D;
+    --text:#E5E7EB;
+
+    --red:#F87171;
+    --amber:#FBBF24;
+    --green:#4ADE80;
+}
 
 
     *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:var(--text,#172033)}
-    .top{background:var(--navy);color:#fff;padding:22px max(24px,calc((100% - 1300px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:4px solid #38BDF8}.top h1{margin:0;font-size:26px}.top p{margin:4px 0 0;color:#dbeafe}
+    .top{background:var(--navy);color:#fff;padding:22px max(24px,calc((100% - 1300px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:4px solid var(--blue);}.top h1{margin:0;font-size:26px}.top p{margin:4px 0 0;color:#dbeafe}
     .wrap{max-width:1300px;width:100%;margin:24px auto;padding:0 18px}.panel,.card,.notice{background:#fff;border:1px solid var(--line);border-radius:12px}.panel{padding:16px;margin-bottom:16px}.notice{padding:15px 17px;margin-bottom:16px;background:#e0f2fe;color:#123e5c;border-left:4px solid var(--blue)}
     .tools,.filters,.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.filters{margin-top:14px}.filters input,.filters select{flex:1;min-width:155px}.user-menu{position:relative}.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:10;min-width:250px;padding:12px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px #0f172a33}.menu-panel button{display:block;width:100%;margin-top:6px;text-align:left}.menu-user{padding:4px 6px 10px;color:#334155;border-bottom:1px solid #e2e8f0;word-break:break-word}
     button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:#e2e8f0;color:#172033}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
