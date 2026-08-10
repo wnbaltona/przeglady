@@ -390,13 +390,27 @@ body.theme-dark{
 
 
 <div class="theme-options">
-    <button type="button" data-theme="default">🔵 Granatowy (domyślny)</button>
-    <button type="button" data-theme="gold">🟡 Zielono-złoty</button>
-    <button type="button" data-theme="beige">🟠 Beżowo-pomarańczowy</button>
-    <button type="button" data-theme="dark">⚫ Ciemny</button>
-    <button type="button" data-theme="light">⚪ Jasny</button>
-</div>
+    <button type="button" data-theme="default">
+        🔵 Granatowy — domyślny
+    </button>
 
+    <button type="button" data-theme="corporate">
+        ⚫ Grafitowo-niebieski — firmowy
+    </button>
+
+    <button type="button" data-theme="elegant">
+        🟤 Beżowo-grafitowy — elegancki
+    </button>
+
+    <button type="button" data-theme="minimal">
+        ⚪ Jasny — minimalistyczny
+    </button>
+
+    <button type="button" data-theme="dark">
+        🌑 Ciemny — dark mode
+    </button>
+</div>
+  
 <footer>
 <button type="button" id="closeTheme" class="secondary">Zamknij</button>
 </footer>
@@ -441,11 +455,11 @@ document.querySelectorAll('[data-theme]').forEach(btn=>{
 
         // usuwamy stare motywy
         document.body.classList.remove(
-            'theme-gold',
-            'theme-beige',
-            'theme-dark',
-            'theme-light',
-            'theme-bluegray'
+            'theme-blue',
+            'theme-corporate',
+            'theme-elegant',
+            'theme-minimal',
+            'theme-dark'
 );
         // dodajemy nowy
         if(theme !== 'default'){
