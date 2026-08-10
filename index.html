@@ -7,88 +7,165 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="dane-startowe.js"></script>
-  <style>
+ <style>
+
+    /* =========================================
+       DOMYŚLNY — GRANATOWY
+    ========================================= */
+
     :root{
- --navy:#427EA8;
- --blue:#83A8C3;
- --bg:#D3D7DA;
- --line:#818B92;
- --text:#172033;
- --red:#991b1b;
- --amber:#92400e;
- --green:#065f46;
-}
-    
-body.theme-green{
- --navy:#0B1849;
- --blue:#124D1C;
- --bg:#EBEDE3;
- --line:#E4B028;
- --text:#172033;
-}
-    
-body.theme-gold{
- --navy:#124D1C;
- --blue:#E4B028;
- --bg:#EBEDE3;
- --line:#124D1C;
- --text:#0B1849;
-}
+        --navy:#427EA8;
+        --blue:#83A8C3;
+        --bg:#D3D7DA;
+        --line:#D5DEE5;
+        --text:#172033;
+        --red:#991b1b;
+        --amber:#92400e;
+        --green:#065f46;
+    }
 
-body.theme-beige{
- --navy:#827148;
- --blue:#E8A07C;
- --bg:#FFEED6;
- --line:#A5AF79;
- --text:#3b3324;
-}
 
-body.theme-purple{
- --navy:#3b0764;
- --blue:#7e22ce;
- --bg:#faf5ff;
- --line:#e9d5ff;
-}
+    /* =========================================
+       ZIELONY — spokojny, naturalny
+    ========================================= */
 
-body.theme-dark{
- --navy:#0B1849;
- --blue:#E4B028;
- --bg:#121212;
- --line:#827148;
- --text:#EBEDE3;
-}
-    
-body.theme-light{
- --navy:#64748b;
- --blue:#0ea5e9;
- --bg:#f8fafc;
- --line:#cbd5e1;
-}
-    
-body.theme-bluegray{
-    --navy:#636D74;
-    --blue:#427EA8;
-    --bg:#D3D7DA;
-    --line:#818B92;
-    --text:#263238;
+    body.theme-green{
+        --navy:#214D3B;
+        --blue:#3F8066;
+        --bg:#F2F7F4;
+        --line:#D1E1D8;
+        --text:#263A32;
 
-    --surface:#F4F5F6;
-    --surface-soft:#E7EAEC;
-    --accent-light:#83A8C3;
-}
+        --red:#B42318;
+        --amber:#B7791F;
+        --green:#287A5A;
+    }
 
-body.theme-dark .panel,
-body.theme-dark .card,
-body.theme-dark .notice,
-body.theme-dark .city-table{
- background:#1e293b;
- color:#e2e8f0;
-}
 
-body.theme-dark th{
- background:#334155;
- color:white;
-}
+    /* =========================================
+       ZIELONO-ZŁOTY — elegancki
+    ========================================= */
+
+    body.theme-gold{
+        --navy:#28483A;
+        --blue:#B88A32;
+        --bg:#F7F5EE;
+        --line:#DDD7C5;
+        --text:#303A35;
+
+        --red:#B42318;
+        --amber:#A87920;
+        --green:#287A5A;
+    }
+
+
+    /* =========================================
+       BEŻOWY — ciepły i delikatny
+    ========================================= */
+
+    body.theme-beige{
+        --navy:#705A4A;
+        --blue:#D38B67;
+        --bg:#FBF5EE;
+        --line:#E5D7CA;
+        --text:#40362F;
+
+        --red:#B64A3A;
+        --amber:#B77A35;
+        --green:#4F8068;
+    }
+
+
+    /* =========================================
+       FIOLETOWY — nowoczesny, ale spokojny
+    ========================================= */
+
+    body.theme-purple{
+        --navy:#49345F;
+        --blue:#8064A2;
+        --bg:#F7F4FA;
+        --line:#DDD4E7;
+        --text:#342C3C;
+
+        --red:#B42318;
+        --amber:#A56B19;
+        --green:#35745D;
+    }
+
+
+    /* =========================================
+       CIEMNY — elegancki dark mode
+    ========================================= */
+
+    body.theme-dark{
+        --navy:#172536;
+        --blue:#5D91B8;
+        --bg:#111A23;
+        --line:#344553;
+        --text:#E6EDF2;
+
+        --red:#F07068;
+        --amber:#E2B45C;
+        --green:#62B892;
+    }
+
+
+    /* =========================================
+       JASNY — bardzo jasny, czysty
+    ========================================= */
+
+    body.theme-light{
+        --navy:#526779;
+        --blue:#5791B8;
+        --bg:#F8FAFB;
+        --line:#DCE4E9;
+        --text:#263746;
+
+        --red:#B42318;
+        --amber:#B7791F;
+        --green:#287A5A;
+    }
+
+
+    /* =========================================
+       NIEBIESKO-SZARY — Twój główny nowy motyw
+    ========================================= */
+
+    body.theme-bluegray{
+        --navy:#526D82;
+        --blue:#6F9BB8;
+        --bg:#EEF2F5;
+        --line:#CCD6DD;
+        --text:#2F3E49;
+
+        --surface:#F8FAFB;
+        --surface-soft:#E5EBEF;
+        --accent-light:#A8C1D2;
+
+        --red:#B84A43;
+        --amber:#B78332;
+        --green:#39765F;
+    }
+
+
+    /* =========================================
+       CIEMNY MOTYW — elementy dodatkowe
+    ========================================= */
+
+    body.theme-dark .panel,
+    body.theme-dark .card,
+    body.theme-dark .notice,
+    body.theme-dark .city-table{
+        background:#1D2A36;
+        color:#E6EDF2;
+    }
+
+    body.theme-dark th{
+        background:#293B49;
+        color:#F2F6F8;
+    }
+
+</style>
 
 
     *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:var(--text,#172033)}
