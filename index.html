@@ -647,7 +647,21 @@ body.theme-dark a{
 <header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
-  <section class="panel"><div class="tools"><button id="export" class="secondary">Eksportuj CSV</button><span id="syncInfo" class="muted"></span></div><div class="filters"><input id="search" placeholder="Szukaj: miasto, lokal, rodzaj…"><select id="city"><option value="">Wszystkie miasta</option></select><select id="status"><option value="">Wszystkie statusy</option><option>PO TERMINIE</option><option>DO WYKONANIA</option><option>OK</option></select><select id="protocol"><option value="">Wszystkie protokoły</option><option value="DODANY">Dodany</option><option value="BRAK PROTOKOŁU">Brak protokołu</option></select></div></section>
+  <section class="panel"><div class="tools"><button id="export" class="secondary">Eksportuj CSV</button><span id="syncInfo" class="muted"></span></div><div class="filters"><input id="search" placeholder="Szukaj: miasto, lokal, rodzaj…"><select id="city"><option value="">Wszystkie miasta</option></select><select id="status"><option value="">Wszystkie statusy</option><option>PO TERMINIE</option><option>DO WYKONANIA</option><option>OK</option></select><select id="protocol">
+    <option value="">Wszystkie protokoły</option>
+    <option value="DODANY">Dodany</option>
+    <option value="BRAK PROTOKOŁU">Brak protokołu</option>
+</select>
+
+<select id="sort">
+    <option value="date-asc">Najbliższy termin</option>
+    <option value="date-desc">Najdalszy termin</option>
+    <option value="city-asc">Miasto A–Z</option>
+    <option value="city-desc">Miasto Z–A</option>
+    <option value="local-asc">Lokal A–Z</option>
+    <option value="local-desc">Lokal Z–A</option>
+    <option value="added-desc">Ostatnio dodane</option>
+</select></div></section>
   <section class="stats"><button type="button" class="card stat overdue" data-quick-status="PO TERMINIE">Po terminie<b id="overdue">0</b></button><button type="button" class="card stat due" data-quick-status="DO WYKONANIA">Do wykonania (14 dni)<b id="due">0</b></button><button type="button" class="card stat ok" data-quick-status="OK">Aktualne<b id="ok">0</b></button><button type="button" class="card stat total" data-quick-status="">Wszystkie wpisy<b id="all">0</b></button></section>
   <section id="cityGroups" class="city-groups"></section>
 </main>
@@ -708,7 +722,78 @@ function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split
 function refreshLists(){const selected=$('#city').value,types=typeCatalogAvailable?inspectionTypes:fallbackTypes,cities=[...new Set([...data.map(x=>x.city),...locations.map(x=>x.city)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');$('#city').value=selected;$('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');$('#types').innerHTML=[...new Set(types)].sort((a,b)=>a.localeCompare(b,'pl')).map(x=>`<option value="${esc(x)}">`).join('')}
 function refreshLocals(){const city=norm($('#editForm').elements.city.value),source=[...locations,...data.map(r=>({city:r.city,local:r.local}))],names=[...new Set(source.filter(r=>!city||norm(r.city)===city).map(r=>String(r.local||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#locals').innerHTML=names.map(x=>`<option value="${esc(x)}">`).join('')}
 function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);return`<tr><td><b>${esc(r.local)}</b></td><td>${esc(r.type)}</td><td>${fmt(r.done)}</td><td>${fmt(nextDate(r.done,r.months))}</td><td class="status-cell">${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td><td class="protocol-cell"><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span>${r.protocolPath?` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions"><button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button><button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button><button type="button" class="secondary" data-action="history" data-id="${esc(r.id)}">Historia</button></div></td></tr>`}).join('')}
-function render(){refreshLists();const q=$('#search').value.toLowerCase(),city=$('#city').value,st=$('#status').value,pr=$('#protocol').value,shown=data.filter(r=>(!q||Object.values(r).join(' ').toLowerCase().includes(q))&&(!city||r.city===city)&&(!st||state(r)===st)&&(!pr||protocol(r)===pr)).sort((a,b)=>(nextDate(a.done,a.months)||'9999').localeCompare(nextDate(b.done,b.months)||'9999'));for(const[id,s]of[['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;$('#all').textContent=data.length;document.querySelectorAll('[data-quick-status]').forEach(b=>b.classList.toggle('active',b.dataset.quickStatus===st));const expanded=new Set([...document.querySelectorAll('#cityGroups details[open]')].map(x=>x.dataset.city));const cities=[...new Set(shown.map(r=>r.city||'Bez miasta'))].sort((a,b)=>a.localeCompare(b,'pl'));$('#cityGroups').innerHTML=cities.length?cities.map(name=>{const rs=shown.filter(r=>(r.city||'Bez miasta')===name),o=rs.filter(r=>state(r)==='PO TERMINIE').length,d=rs.filter(r=>state(r)==='DO WYKONANIA').length;return`<details class="card city-group" data-city="${esc(name)}"${expanded.has(name)?' open':''}><summary class="city-summary"><span class="city-summary-main"><strong>${esc(name)}</strong><span class="city-summary-count">${countLabel(rs.length)}</span></span><span class="city-summary-stats">${o?`<span class="badge PO">Po terminie: ${o}</span>`:''}${d?`<span class="badge DO">Do wykonania: ${d}</span>`:''}</span></summary><div class="city-table tablebox"><table><thead><tr><th>Lokal</th><th>Rodzaj</th><th>Wykonano</th><th>Następny termin</th><th>Status</th><th>Protokół</th><th>Uwagi</th><th>Akcje</th></tr></thead><tbody>${rows(rs)}</tbody></table></div></details>`}).join(''):'<div class="notice">Brak przeglądów spełniających wybrane kryteria.</div>'}
+function render(){refreshLists();const q=norm($('#search').value);
+const city=$('#city').value;
+const st=$('#status').value;
+const pr=$('#protocol').value;
+const sort=$('#sort').value;
+
+const shown=data.filter(r=>{
+
+    const cityText=norm(r.city);
+    const localText=norm(r.local);
+    const typeText=norm(r.type);
+    const notesText=norm(r.notes);
+
+    const matchesSearch=
+        !q ||
+        cityText.includes(q) ||
+        localText.includes(q) ||
+        typeText.includes(q) ||
+        notesText.includes(q);
+
+    return (
+        matchesSearch &&
+        (!city || r.city===city) &&
+        (!st || state(r)===st) &&
+        (!pr || protocol(r)===pr)
+    );
+
+}).sort((a,b)=>{
+
+    const dateA=nextDate(a.done,a.months)||'9999-12-31';
+    const dateB=nextDate(b.done,b.months)||'9999-12-31';
+
+    switch(sort){
+
+        case 'date-desc':
+            return dateB.localeCompare(dateA);
+
+        case 'city-asc':
+            return String(a.city||'').localeCompare(
+                String(b.city||''),
+                'pl'
+            );
+
+        case 'city-desc':
+            return String(b.city||'').localeCompare(
+                String(a.city||''),
+                'pl'
+            );
+
+        case 'local-asc':
+            return String(a.local||'').localeCompare(
+                String(b.local||''),
+                'pl'
+            );
+
+        case 'local-desc':
+            return String(b.local||'').localeCompare(
+                String(a.local||''),
+                'pl'
+            );
+
+        case 'added-desc':
+            return String(b.id||'').localeCompare(
+                String(a.id||'')
+            );
+
+        case 'date-asc':
+        default:
+            return dateA.localeCompare(dateB);
+    }
+
+});for(const[id,s]of[['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;$('#all').textContent=data.length;document.querySelectorAll('[data-quick-status]').forEach(b=>b.classList.toggle('active',b.dataset.quickStatus===st));const expanded=new Set([...document.querySelectorAll('#cityGroups details[open]')].map(x=>x.dataset.city));const cities=[...new Set(shown.map(r=>r.city||'Bez miasta'))].sort((a,b)=>a.localeCompare(b,'pl'));$('#cityGroups').innerHTML=cities.length?cities.map(name=>{const rs=shown.filter(r=>(r.city||'Bez miasta')===name),o=rs.filter(r=>state(r)==='PO TERMINIE').length,d=rs.filter(r=>state(r)==='DO WYKONANIA').length;return`<details class="card city-group" data-city="${esc(name)}"${expanded.has(name)?' open':''}><summary class="city-summary"><span class="city-summary-main"><strong>${esc(name)}</strong><span class="city-summary-count">${countLabel(rs.length)}</span></span><span class="city-summary-stats">${o?`<span class="badge PO">Po terminie: ${o}</span>`:''}${d?`<span class="badge DO">Do wykonania: ${d}</span>`:''}</span></summary><div class="city-table tablebox"><table><thead><tr><th>Lokal</th><th>Rodzaj</th><th>Wykonano</th><th>Następny termin</th><th>Status</th><th>Protokół</th><th>Uwagi</th><th>Akcje</th></tr></thead><tbody>${rows(rs)}</tbody></table></div></details>`}).join(''):'<div class="notice">Brak przeglądów spełniających wybrane kryteria.</div>'}
 function showError(msg){$('#notice').hidden=false;$('#notice').textContent='Nie można połączyć się z rejestrem: '+msg}
 async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`}
 async function applySession(s){$('#user').textContent=s?.user?.email||'Niezalogowano';$('#logout').hidden=!s?.user;$('#loginModal').classList.toggle('open',!s?.user);if(s?.user)await load()}async function start(){if(!ready){showError('Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js.');$('#add').disabled=true;return}const{data:{session}}=await sb.auth.getSession();await applySession(session);sb.auth.onAuthStateChange((_e,s)=>applySession(s));sb.channel('live').on('postgres_changes',{event:'*',schema:'public',table:'inspections'},load).on('postgres_changes',{event:'*',schema:'public',table:'inspection_types'},load).on('postgres_changes',{event:'*',schema:'public',table:'locations'},load).subscribe()}
@@ -751,7 +836,12 @@ function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;co
 $('#editForm').elements.city.addEventListener('input',refreshLocals);function setDefaultMonths(){if(editing)return;const m=monthsByType[norm($('#editForm').elements.type.value)];if(m)$('#editForm').elements.months.value=m}$('#editForm').elements.type.addEventListener('input',setDefaultMonths);$('#editForm').elements.type.addEventListener('change',setDefaultMonths);
 $('#editForm').onsubmit=async e=>{e.preventDefault();const submit=e.submitter;let uploadedPath=null;try{const f=new FormData(e.target),file=f.get('file'),city=String(f.get('city')||'').trim(),local=String(f.get('local')||'').trim(),type=String(f.get('type')||'').trim(),months=Number(f.get('months'));if(!city||!local||!type)throw new Error('Uzupełnij miasto, lokal i rodzaj przeglądu.');if(!Number.isInteger(months)||months<1||months>120)throw new Error('Okres ważności musi wynosić od 1 do 120 miesięcy.');if(data.some(r=>String(r.id)!==String(editing)&&norm(r.city)===norm(city)&&norm(r.local)===norm(local)&&norm(r.type)===norm(type)))throw new Error('Taki przegląd dla tego lokalu już istnieje.');if(file&&file.size){if(file.size>MAX_PROTOCOL_SIZE)throw new Error('Plik protokołu może mieć maksymalnie 10 MB.');if(!ALLOWED_PROTOCOL_TYPES.has(file.type))throw new Error('Niedozwolony typ pliku protokołu.');const ext=file.name.split('.').pop().toLowerCase(),path=`${Date.now()}_${crypto.randomUUID()}.${ext}`,{error}=await sb.storage.from('protocols').upload(path,file,{contentType:file.type});if(error)throw error;uploadedPath=path}if(submit)submit.disabled=true;const old=data.find(x=>String(x.id)===String(editing)),payload={id:editing||`custom-${Date.now()}`,city,local,type,done:f.get('done')||null,months,protocolDate:f.get('protocolDate')||null,notes:f.get('notes')||''};if(uploadedPath){payload.protocolFileName=file.name;payload.protocolPath=uploadedPath}else if(old){payload.protocolFileName=old.protocolFileName;payload.protocolPath=old.protocolPath}let saveError;if(editing){const{data:changed,error}=await sb.from('inspections').update(toDb(payload)).eq('id',editing).eq('version',editingVersion).is('deleted_at',null).select('id');saveError=error;if(!saveError&&!changed?.length)throw new Error('Ten wpis został zmieniony lub przeniesiony do kosza przez inną osobę. Odśwież dane i spróbuj ponownie.')}else{const{error}=await sb.from('inspections').insert(toDb(payload));saveError=error}if(saveError)throw saveError;const{error:typeError}=await sb.from('inspection_types').upsert({name:type,active:true},{onConflict:'name'});if(typeError)throw typeError;const{error:locationError}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(locationError)throw locationError;if(uploadedPath&&old?.protocolPath&&old.protocolPath!==uploadedPath){const{error:removeError}=await sb.storage.from('protocols').remove([old.protocolPath]);if(removeError)console.warn('Nie udało się usunąć poprzedniego pliku:',removeError.message)}$('#editModal').classList.remove('open');await load()}catch(err){if(uploadedPath)await sb.storage.from('protocols').remove([uploadedPath]);alert('Błąd podczas zapisywania: '+err.message)}finally{if(submit)submit.disabled=false}};
 async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
-$('#cityGroups').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;if(b.dataset.action==='edit')await editRow(b.dataset.id);if(b.dataset.action==='delete')await deleteRow(b.dataset.id);if(b.dataset.action==='open')await openFile(b.dataset.id);if(b.dataset.action==='history')await showHistory(b.dataset.id)});['search','city','status','protocol'].forEach(x=>$('#'+x).addEventListener(x==='search'?'input':'change',render));document.querySelectorAll('[data-quick-status]').forEach(b=>b.onclick=()=>{$('#status').value=b.dataset.quickStatus&&$('#status').value===b.dataset.quickStatus?'':b.dataset.quickStatus;render()});
+$('#cityGroups').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;if(b.dataset.action==='edit')await editRow(b.dataset.id);if(b.dataset.action==='delete')await deleteRow(b.dataset.id);if(b.dataset.action==='open')await openFile(b.dataset.id);if(b.dataset.action==='history')await showHistory(b.dataset.id)});['search','city','status','protocol','sort'].forEach(x=>
+    $('#'+x).addEventListener(
+        x==='search'?'input':'change',
+        render
+    )
+);document.querySelectorAll('[data-quick-status]').forEach(b=>b.onclick=()=>{$('#status').value=b.dataset.quickStatus&&$('#status').value===b.dataset.quickStatus?'':b.dataset.quickStatus;render()});
 function renderTypeList(){$('#typeList').innerHTML=inspectionTypes.length?inspectionTypes.sort((a,b)=>a.localeCompare(b,'pl')).map(n=>`<li><span>${esc(n)}</span><button type="button" class="danger" data-name="${esc(n)}">Usuń</button></li>`).join(''):'<li class="muted">Brak aktywnych rodzajów.</li>'}$('#manageTypes').onclick=()=>{renderTypeList();$('#userMenu').hidden=true;$('#typesModal').classList.add('open')};$('#closeTypes').onclick=()=>$('#typesModal').classList.remove('open');$('#addType').onclick=async()=>{const name=$('#newType').value.trim();if(!name)return;const{error}=await sb.from('inspection_types').upsert({name,active:true},{onConflict:'name'});if(error)return alert(error.message);$('#newType').value='';await load();renderTypeList()};$('#typeList').onclick=async e=>{const b=e.target.closest('button[data-name]');if(!b||!confirm(`Usunąć „${b.dataset.name}” z listy?`))return;const{error}=await sb.from('inspection_types').update({active:false}).eq('name',b.dataset.name);if(error)return alert(error.message);await load();renderTypeList()};
 $('#addLocal').onclick=()=>{$('#localForm').reset();$('#userMenu').hidden=true;$('#localModal').classList.add('open')};$('#cancelLocal').onclick=()=>$('#localModal').classList.remove('open');$('#localForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),city=String(f.get('city')).trim(),mpk=String(f.get('mpk')).trim(),name=String(f.get('name')).trim(),local=`${mpk} (${name})`,{error}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(error)return alert('Nie udało się dodać lokalu: '+error.message);$('#localModal').classList.remove('open');await load()};
 function renderLocationList(){$('#locationList').innerHTML=locations.length?locations.sort((a,b)=>a.city.localeCompare(b.city,'pl')||a.local.localeCompare(b.local,'pl')).map(row=>`<li><span><b>${esc(row.city)}</b> — ${esc(row.local)}</span><button type="button" class="danger" data-city="${esc(row.city)}" data-local="${esc(row.local)}">Usuń</button></li>`).join(''):'<li class="muted">Brak lokali na liście.</li>'}$('#manageLocations').onclick=()=>{renderLocationList();$('#userMenu').hidden=true;$('#locationsModal').classList.add('open')};$('#closeLocations').onclick=()=>$('#locationsModal').classList.remove('open');$('#locationList').onclick=async e=>{const button=e.target.closest('button[data-city][data-local]');if(!button)return;const city=button.dataset.city,local=button.dataset.local;if(!confirm(`Usunąć lokal „${local}” z miasta ${city}?`))return;const{error}=await sb.from('locations').delete().eq('city',city).eq('local',local);if(error)return alert('Nie udało się usunąć lokalu: '+error.message);await load();renderLocationList()};
