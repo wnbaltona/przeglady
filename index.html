@@ -1227,9 +1227,9 @@ $('#cityGroups').addEventListener('click',async e=>{
 });
 
 
-['search','city','protocol','sort'].forEach(x=>
+['search','city','protocol'].forEach(x =>
     $('#'+x).addEventListener(
-        x==='search'?'input':'change',
+        x === 'search' ? 'input' : 'change',
         render
     )
 );
