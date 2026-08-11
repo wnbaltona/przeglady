@@ -656,10 +656,6 @@ body.theme-dark a{
 <select id="sort">
     <option value="date-asc">Najbliższy termin</option>
     <option value="date-desc">Najdalszy termin</option>
-    <option value="city-asc">Miasto A–Z</option>
-    <option value="city-desc">Miasto Z–A</option>
-    <option value="local-asc">Lokal A–Z</option>
-    <option value="local-desc">Lokal Z–A</option>
     <option value="added-desc">Ostatnio dodane</option>
 </select></div></section>
   <section class="stats"><button type="button" class="card stat overdue" data-quick-status="PO TERMINIE">Po terminie<b id="overdue">0</b></button><button type="button" class="card stat due" data-quick-status="DO WYKONANIA">Do wykonania (14 dni)<b id="due">0</b></button><button type="button" class="card stat ok" data-quick-status="OK">Aktualne<b id="ok">0</b></button><button type="button" class="card stat total" data-quick-status="">Wszystkie wpisy<b id="all">0</b></button></section>
@@ -730,17 +726,12 @@ const sort=$('#sort').value;
 
 const shown=data.filter(r=>{
 
-    const cityText=norm(r.city);
-    const localText=norm(r.local);
-    const typeText=norm(r.type);
-    const notesText=norm(r.notes);
-
-    const matchesSearch=
+    const matchesSearch =
         !q ||
-        cityText.includes(q) ||
-        localText.includes(q) ||
-        typeText.includes(q) ||
-        notesText.includes(q);
+        norm(r.city).includes(q) ||
+        norm(r.local).includes(q) ||
+        norm(r.type).includes(q) ||
+        norm(r.notes).includes(q);
 
     return (
         matchesSearch &&
@@ -749,47 +740,40 @@ const shown=data.filter(r=>{
         (!pr || protocol(r)===pr)
     );
 
-}).sort((a,b)=>{
+});
 
-    const dateA=nextDate(a.done,a.months)||'9999-12-31';
-    const dateB=nextDate(b.done,b.months)||'9999-12-31';
+shown.sort((a,b)=>{
+
+    const dateA=nextDate(a.done,a.months);
+    const dateB=nextDate(b.done,b.months);
 
     switch(sort){
 
         case 'date-desc':
+
+            if(!dateA && !dateB) return 0;
+            if(!dateA) return 1;
+            if(!dateB) return -1;
+
             return dateB.localeCompare(dateA);
 
-        case 'city-asc':
-            return String(a.city||'').localeCompare(
-                String(b.city||''),
-                'pl'
-            );
-
-        case 'city-desc':
-            return String(b.city||'').localeCompare(
-                String(a.city||''),
-                'pl'
-            );
-
-        case 'local-asc':
-            return String(a.local||'').localeCompare(
-                String(b.local||''),
-                'pl'
-            );
-
-        case 'local-desc':
-            return String(b.local||'').localeCompare(
-                String(a.local||''),
-                'pl'
-            );
 
         case 'added-desc':
+
             return String(b.id||'').localeCompare(
-                String(a.id||'')
+                String(a.id||''),
+                undefined,
+                {numeric:true}
             );
+
 
         case 'date-asc':
         default:
+
+            if(!dateA && !dateB) return 0;
+            if(!dateA) return 1;
+            if(!dateB) return -1;
+
             return dateA.localeCompare(dateB);
     }
 
