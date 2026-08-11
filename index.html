@@ -876,7 +876,7 @@ function tableHeaders(){
         ['done','Wykonano'],
         ['nextDate','Następny termin'],
         ['status','Status'],
-        ['protocol','Protokół'],
+        ['protocol','Protokół']
     ];
 
     return headers.map(([key,label])=>{
@@ -898,6 +898,7 @@ function tableHeaders(){
         `;
 
     }).join('')+`
+        <th>Uwagi</th>
         <th>Akcje</th>
     `;
 }
