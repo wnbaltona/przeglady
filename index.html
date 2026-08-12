@@ -497,6 +497,44 @@ body.theme-dark .filter-count{
     button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:#e2e8f0;color:#172033}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
     input,select,textarea{width:100%;border:1px solid #94a3b8;border-radius:8px;padding:9px;background:#fff;font:inherit}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:#fff;color:#172033;text-align:left}.stat:hover,.stat.active{box-shadow:0 0 0 3px #38bdf866,0 8px 18px #0f172a18;transform:translateY(-1px)}.stat b{display:block;font-size:27px;margin-top:4px}.overdue{border-left-color:#ef4444}.due{border-left-color:#f59e0b}.ok{border-left-color:#10b981}.total{border-left-color:#075985}
     .city-groups{display:grid;gap:12px}.city-group{overflow:hidden}.city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none}.city-summary::-webkit-details-marker{display:none}.city-summary::after{content:'›';font-size:25px;line-height:1;color:var(--blue);margin-left:4px;transition:transform .18s}.city-group[open] .city-summary::after{transform:rotate(90deg)}.city-summary-main{display:flex;gap:10px;align-items:baseline}.city-summary strong{font-size:17px}.city-summary-count,.muted{color:#475569}.city-summary-stats{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:#f8fafc;overflow:hidden;}.tablebox{overflow:auto;max-height:62vh}table{border-collapse:collapse;width:100%;table-layout:auto;}th:nth-child(1),td:nth-child(1){width:14%;}th:nth-child(2),td:nth-child(2){width:18%;}th:nth-child(3),td:nth-child(3){width:11%;}th:nth-child(4),td:nth-child(4){width:12%;}th:nth-child(5),td:nth-child(5){width:8%;text-align:center;}th:nth-child(6),td:nth-child(6){width:13%}th:nth-child(7),td:nth-child(7){width:12%;max-width:180px;}th:nth-child(8),td:nth-child(8){width:15%;text-align:center}th,td{padding:10px 11px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:middle;font-size:14px;line-height:1.3;}th{position:sticky;top:0;background:#eaf0f6;color:#334155;font-size:13px;font-weight:700}
+    /* ============================
+       ROZWIJANIE LOKALU
+    ============================ */
+
+    const localButton = e.target.closest(
+        'button[data-local-toggle]'
+    );
+
+    if(localButton){
+
+        const city = localButton.dataset.city;
+        const local = localButton.dataset.local;
+
+        const wrapper = localButton.closest('.local-wrapper');
+
+        const inspections =
+            wrapper.querySelector('.local-inspections');
+
+        const arrow =
+            localButton.querySelector('.local-arrow');
+
+        if(inspections.classList.contains('open')){
+
+            inspections.classList.remove('open');
+
+            arrow.textContent = '›';
+
+        }else{
+
+            inspections.classList.add('open');
+
+            arrow.textContent = '⌄';
+
+        }
+
+        return;
+    }  
+   
    /* ============================
    SORTOWANIE TABELI
 ============================ */
@@ -844,6 +882,194 @@ body.theme-dark th.sortable.active.desc .sort-arrow::after{
     }
 
 }
+
+/* =========================================
+   MIASTO → LOKALE → PRZEGLĄDY
+========================================= */
+
+.city-group{
+    overflow:hidden;
+}
+
+.city-summary{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px 16px 13px;
+    cursor:pointer;
+    list-style:none;
+}
+
+.city-summary::-webkit-details-marker{
+    display:none;
+}
+
+.city-summary::after{
+    content:'›';
+    font-size:25px;
+    line-height:1;
+    color:var(--blue);
+    margin-left:4px;
+    transition:transform .18s;
+}
+
+.city-group[open] .city-summary::after{
+    transform:rotate(90deg);
+}
+
+.city-summary-main{
+    display:flex;
+    gap:10px;
+    align-items:baseline;
+}
+
+.city-summary strong{
+    font-size:17px;
+}
+
+.city-summary-count{
+    color:#475569;
+}
+
+.city-summary-stats{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    margin-left:auto;
+}
+
+/* Lista lokali */
+
+.local-list{
+    border-top:1px solid var(--line);
+    background:var(--bg);
+    padding:10px;
+    display:grid;
+    gap:7px;
+}
+
+.local-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    background:#fff;
+    color:var(--text);
+    cursor:pointer;
+    text-align:left;
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        transform .1s ease;
+}
+
+.local-item:hover{
+    background:#f8fafc;
+    border-color:var(--blue);
+    transform:translateX(2px);
+}
+
+.local-arrow{
+    font-size:20px;
+    color:var(--blue);
+    width:18px;
+    flex:none;
+}
+
+.local-main{
+    flex:1;
+    min-width:0;
+}
+
+.local-name{
+    font-weight:700;
+    font-size:14px;
+}
+
+.local-count{
+    margin-left:8px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:500;
+}
+
+.local-stats{
+    display:flex;
+    gap:5px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+/* Rozwinięte przeglądy lokalu */
+
+.local-inspections{
+    display:none;
+    margin:0 0 6px 30px;
+    padding:10px;
+    border-left:3px solid var(--blue);
+    background:#f8fafc;
+    overflow-x:auto;
+}
+
+.local-inspections.open{
+    display:block;
+}
+
+/* Ciemny motyw */
+
+body.theme-dark .local-list{
+    background:#151C21;
+}
+
+body.theme-dark .local-item{
+    background:var(--surface);
+    border-color:var(--line);
+    color:var(--text);
+}
+
+body.theme-dark .local-item:hover{
+    background:#26323A;
+    border-color:var(--blue);
+}
+
+body.theme-dark .local-count{
+    color:var(--text-muted);
+}
+
+body.theme-dark .local-inspections{
+    background:#151C21;
+}
+
+/* Telefon */
+
+@media (max-width:480px){
+
+    .local-item{
+        padding:11px;
+    }
+
+    .local-main{
+        display:flex;
+        flex-direction:column;
+        gap:3px;
+    }
+
+    .local-count{
+        margin-left:0;
+    }
+
+    .local-stats{
+        margin-left:auto;
+    }
+
+    .local-inspections{
+        margin-left:12px;
+    }
+
+}
   
   </style>
 </head>
@@ -1093,6 +1319,36 @@ function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);ret
         ↺ <span>Historia</span>
     </button>
 </div></td></tr>`}).join('')}
+function renderLocalInspections(local, city){
+
+    const records = data.filter(r =>
+        r.city === city &&
+        r.local === local
+    );
+
+    if(!records.length){
+        return `
+            <div class="muted">
+                Brak przeglądów dla tego lokalu.
+            </div>
+        `;
+    }
+
+    return `
+        <div class="local-inspections-table tablebox">
+            <table>
+                <thead>
+                    <tr>
+                        ${tableHeaders()}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows(sortRows(records))}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
 function render(){refreshLists();const q=norm($('#search').value);
 const city=$('#city').value;
 const pr=$('#protocol').value;
@@ -1126,11 +1382,186 @@ const shown=data.filter(r=>{
     );
 
 });
-for(const[id,s]of[['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;$('#all').textContent=data.length;const expanded=new Set([...document.querySelectorAll('#cityGroups details[open]')].map(x=>x.dataset.city));const cities=[...new Set(shown.map(r=>r.city||'Bez miasta'))].sort((a,b)=>a.localeCompare(b,'pl'));$('#cityGroups').innerHTML=cities.length?cities.map(name=>{const rs=shown.filter(r=>(r.city||'Bez miasta')===name),o=rs.filter(r=>state(r)==='PO TERMINIE').length,d=rs.filter(r=>state(r)==='DO WYKONANIA').length;return`<details class="card city-group" data-city="${esc(name)}"${expanded.has(name)?' open':''}><summary class="city-summary"><span class="city-summary-main"><strong>${esc(name)}</strong><span class="city-summary-count">${countLabel(rs.length)}</span></span><span class="city-summary-stats">${o?`<span class="badge PO">Po terminie: ${o}</span>`:''}${d?`<span class="badge DO">Do wykonania: ${d}</span>`:''}</span></summary><div class="city-table tablebox"><table><thead>
-    <tr>
-        ${tableHeaders()}
-    </tr>
-</thead><tbody>${rows(sortRows(rs))}</tbody></table></div></details>`}).join(''):'<div class="notice">Brak przeglądów spełniających wybrane kryteria.</div>'}
+for(const[id,s]of[['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;$('#all').textContent=data.length;const expandedCities = new Set(
+    [...document.querySelectorAll('#cityGroups details.city-group[open]')]
+        .map(x => x.dataset.city)
+);
+
+const expandedLocals = new Set(
+    [...document.querySelectorAll('.local-inspections.open')]
+        .map(x => `${x.dataset.city}|||${x.dataset.local}`)
+);
+
+const cities = [
+    ...new Set(
+        shown
+            .map(r => r.city || 'Bez miasta')
+    )
+].sort((a,b) => a.localeCompare(b,'pl'));
+
+$('#cityGroups').innerHTML = cities.length
+    ? cities.map(cityName => {
+
+        const cityRows = shown.filter(
+            r => (r.city || 'Bez miasta') === cityName
+        );
+
+        const cityLocals = [
+            ...new Set(
+                cityRows.map(r => r.local).filter(Boolean)
+            )
+        ].sort((a,b) => a.localeCompare(b,'pl'));
+
+        const overdue = cityRows.filter(
+            r => state(r) === 'PO TERMINIE'
+        ).length;
+
+        const due = cityRows.filter(
+            r => state(r) === 'DO WYKONANIA'
+        ).length;
+
+        return `
+            <details
+                class="card city-group"
+                data-city="${esc(cityName)}"
+                ${expandedCities.has(cityName) ? 'open' : ''}
+            >
+
+                <summary class="city-summary">
+
+                    <span class="city-summary-main">
+
+                        <strong>
+                            ${esc(cityName)}
+                        </strong>
+
+                        <span class="city-summary-count">
+                            ${cityLocals.length}
+                            ${cityLocals.length === 1 ? 'lokal' :
+                              cityLocals.length >= 2 && cityLocals.length <= 4 ? 'lokale' :
+                              'lokali'}
+                        </span>
+
+                    </span>
+
+                    <span class="city-summary-stats">
+
+                        ${overdue
+                            ? `<span class="badge PO">
+                                Po terminie: ${overdue}
+                               </span>`
+                            : ''
+                        }
+
+                        ${due
+                            ? `<span class="badge DO">
+                                Do wykonania: ${due}
+                               </span>`
+                            : ''
+                        }
+
+                    </span>
+
+                </summary>
+
+                <div class="local-list">
+
+                    ${cityLocals.map(local => {
+
+                        const localRows = cityRows.filter(
+                            r => r.local === local
+                        );
+
+                        const localKey =
+                            `${cityName}|||${local}`;
+
+                        const localOverdue =
+                            localRows.filter(
+                                r => state(r) === 'PO TERMINIE'
+                            ).length;
+
+                        const localDue =
+                            localRows.filter(
+                                r => state(r) === 'DO WYKONANIA'
+                            ).length;
+
+                        const isOpen =
+                            expandedLocals.has(localKey);
+
+                        return `
+
+                            <div class="local-wrapper">
+
+                                <button
+                                    type="button"
+                                    class="local-item"
+                                    data-local-toggle="1"
+                                    data-city="${esc(cityName)}"
+                                    data-local="${esc(local)}"
+                                >
+
+                                    <span class="local-arrow">
+                                        ${isOpen ? '⌄' : '›'}
+                                    </span>
+
+                                    <span class="local-main">
+
+                                        <span class="local-name">
+                                            ${esc(local)}
+                                        </span>
+
+                                        <span class="local-count">
+                                            ${countLabel(localRows.length)}
+                                        </span>
+
+                                    </span>
+
+                                    <span class="local-stats">
+
+                                        ${localOverdue
+                                            ? `<span class="badge PO">
+                                                ${localOverdue} po terminie
+                                               </span>`
+                                            : ''
+                                        }
+
+                                        ${localDue
+                                            ? `<span class="badge DO">
+                                                ${localDue} do wykonania
+                                               </span>`
+                                            : ''
+                                        }
+
+                                    </span>
+
+                                </button>
+
+                                <div
+                                    class="local-inspections ${isOpen ? 'open' : ''}"
+                                    data-city="${esc(cityName)}"
+                                    data-local="${esc(local)}"
+                                >
+
+                                    ${renderLocalInspections(
+                                        local,
+                                        cityName
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }).join('')}
+
+                </div>
+
+            </details>
+        `;
+
+    }).join('')
+    : '<div class="notice">Brak przeglądów spełniających wybrane kryteria.</div>';
 function showError(msg){$('#notice').hidden=false;$('#notice').textContent='Nie można połączyć się z rejestrem: '+msg}
 async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`}
 async function applySession(s){$('#user').textContent=s?.user?.email||'Niezalogowano';$('#logout').hidden=!s?.user;$('#loginModal').classList.toggle('open',!s?.user);if(s?.user)await load()}async function start(){if(!ready){showError('Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js.');$('#add').disabled=true;return}const{data:{session}}=await sb.auth.getSession();await applySession(session);sb.auth.onAuthStateChange((_e,s)=>applySession(s));sb.channel('live').on('postgres_changes',{event:'*',schema:'public',table:'inspections'},load).on('postgres_changes',{event:'*',schema:'public',table:'inspection_types'},load).on('postgres_changes',{event:'*',schema:'public',table:'locations'},load).subscribe()}
