@@ -1632,7 +1632,7 @@ function render(){
                                     <span class="local-stats">
 
                                         ${
-                                            localOverdue
+                                            localOverdue > 0
                                                 ? `
                                                     <span class="badge PO">
                                                         Po terminie: ${localOverdue}
@@ -1642,7 +1642,7 @@ function render(){
                                         }
 
                                         ${
-                                            localDue
+                                            localDue > 0
                                                 ? `
                                                     <span class="badge DO">
                                                         Do wykonania: ${localDue}
