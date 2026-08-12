@@ -962,6 +962,7 @@ body.theme-dark th.sortable.active.desc .sort-arrow::after{
     color:var(--text);
     cursor:pointer;
     text-align:left;
+    position:relative;
     transition:
         background .15s ease,
         border-color .15s ease,
@@ -975,14 +976,19 @@ body.theme-dark th.sortable.active.desc .sort-arrow::after{
 }
 
 .local-arrow{
-    font-size:25px;
-    line-height:1;
-    color:var(--blue);
+    display:flex;
+    align-items:center;
+    justify-content:center;
     width:18px;
-    flex:none;
+    height:25px;
+    flex:0 0 18px;
+    font-size:25px;
+    line-height:25px;
+    color:var(--blue);
+    transform-origin:center center;
     transition:transform .18s;
 }
-
+              
 .local-item.open .local-arrow{
     transform:rotate(90deg);
 }
