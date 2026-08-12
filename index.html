@@ -1349,68 +1349,143 @@ function renderLocalInspections(local, city){
         </div>
     `;
 }
-function render(){refreshLists();const q=norm($('#search').value);
-const city=$('#city').value;
-const pr=$('#protocol').value;
-const status=window.activeStatus||'';
+function render(){
 
-const activeFilters = [
-    q,
-    city,
-    pr,
-    status
-].filter(Boolean).length;
+    refreshLists();
 
-$('#filterCountNumber').textContent=activeFilters;
-$('#filterCount').hidden=activeFilters===0;
-$('#clearFilters').hidden=false;
+    const q = norm($('#search').value);
+    const city = $('#city').value;
+    const pr = $('#protocol').value;
+    const status = window.activeStatus || '';
 
-const shown=data.filter(r=>{
+    const activeFilters = [
+        q,
+        city,
+        pr,
+        status
+    ].filter(Boolean).length;
 
-    const matchesSearch =
-        !q ||
-        norm(r.city).includes(q) ||
-        norm(r.local).includes(q) ||
-        norm(r.type).includes(q) ||
-        norm(r.notes).includes(q);
+    $('#filterCountNumber').textContent = activeFilters;
+    $('#filterCount').hidden = activeFilters === 0;
 
-    return (
-        matchesSearch &&
-        (!city || r.city===city) &&
-        (!pr || protocol(r)===pr) &&
-        (!status || state(r)===status)
+    // Przycisk zawsze widoczny
+    $('#clearFilters').hidden = false;
+    $('#clearFilters').disabled = activeFilters === 0;
+
+    const shown = data.filter(r => {
+
+        const matchesSearch =
+            !q ||
+            norm(r.city).includes(q) ||
+            norm(r.local).includes(q) ||
+            norm(r.type).includes(q) ||
+            norm(r.notes).includes(q);
+
+        return (
+            matchesSearch &&
+            (!city || r.city === city) &&
+            (!pr || protocol(r) === pr) &&
+            (!status || state(r) === status)
+        );
+
+    });
+
+    // Statystyki
+    for(const [id, s] of [
+        ['overdue', 'PO TERMINIE'],
+        ['due', 'DO WYKONANIA'],
+        ['ok', 'OK']
+    ]){
+
+        $('#' + id).textContent =
+            data.filter(r => state(r) === s).length;
+
+    }
+
+    $('#all').textContent = data.length;
+
+
+    /*
+       Zapamiętujemy rozwinięte miasta
+    */
+
+    const expandedCities = new Set(
+        [...document.querySelectorAll(
+            '#cityGroups details.city-group[open]'
+        )].map(x => x.dataset.city)
     );
 
-});
-for(const[id,s]of[['overdue','PO TERMINIE'],['due','DO WYKONANIA'],['ok','OK']])$('#'+id).textContent=data.filter(r=>state(r)===s).length;$('#all').textContent=data.length;const expandedCities = new Set(
-    [...document.querySelectorAll('#cityGroups details.city-group[open]')]
-        .map(x => x.dataset.city)
-);
 
-const expandedLocals = new Set(
-    [...document.querySelectorAll('.local-inspections.open')]
-        .map(x => `${x.dataset.city}|||${x.dataset.local}`)
-);
+    /*
+       Zapamiętujemy rozwinięte lokale
+    */
 
-const cities = [
-    ...new Set(
-        shown
-            .map(r => r.city || 'Bez miasta')
-    )
-].sort((a,b) => a.localeCompare(b,'pl'));
+    const expandedLocals = new Set(
+        [...document.querySelectorAll(
+            '.local-inspections.open'
+        )].map(x =>
+            `${x.dataset.city}|||${x.dataset.local}`
+        )
+    );
 
-$('#cityGroups').innerHTML = cities.length
-    ? cities.map(cityName => {
+
+    /*
+       Lista miast
+    */
+
+    const cities = [
+        ...new Set(
+            shown.map(r => r.city || 'Bez miasta')
+        )
+    ].sort((a, b) =>
+        a.localeCompare(b, 'pl')
+    );
+
+
+    /*
+       Brak wyników
+    */
+
+    if(!cities.length){
+
+        $('#cityGroups').innerHTML =
+            '<div class="notice">' +
+            'Brak przeglądów spełniających wybrane kryteria.' +
+            '</div>';
+
+        return;
+    }
+
+
+    /*
+       Generowanie miast
+    */
+
+    $('#cityGroups').innerHTML = cities.map(cityName => {
 
         const cityRows = shown.filter(
             r => (r.city || 'Bez miasta') === cityName
         );
 
+
+        /*
+           Lokale w mieście
+        */
+
         const cityLocals = [
             ...new Set(
-                cityRows.map(r => r.local).filter(Boolean)
+                cityRows
+                    .map(r => r.local)
+                    .filter(Boolean)
             )
-        ].sort((a,b) => a.localeCompare(b,'pl'));
+        ].sort((a, b) =>
+            a.localeCompare(b, 'pl')
+        );
+
+
+        /*
+           Statystyki miasta
+        */
 
         const overdue = cityRows.filter(
             r => state(r) === 'PO TERMINIE'
@@ -1419,6 +1494,18 @@ $('#cityGroups').innerHTML = cities.length
         const due = cityRows.filter(
             r => state(r) === 'DO WYKONANIA'
         ).length;
+
+
+        const localCountText =
+            cityLocals.length === 1
+                ? '1 lokal'
+                : (
+                    cityLocals.length >= 2 &&
+                    cityLocals.length <= 4
+                )
+                    ? `${cityLocals.length} lokale`
+                    : `${cityLocals.length} lokali`;
+
 
         return `
             <details
@@ -1436,60 +1523,70 @@ $('#cityGroups').innerHTML = cities.length
                         </strong>
 
                         <span class="city-summary-count">
-                            ${cityLocals.length}
-                            ${cityLocals.length === 1 ? 'lokal' :
-                              cityLocals.length >= 2 && cityLocals.length <= 4 ? 'lokale' :
-                              'lokali'}
+                            ${localCountText}
                         </span>
 
                     </span>
 
+
                     <span class="city-summary-stats">
 
-                        ${overdue
-                            ? `<span class="badge PO">
-                                Po terminie: ${overdue}
-                               </span>`
-                            : ''
+                        ${
+                            overdue
+                                ? `
+                                    <span class="badge PO">
+                                        Po terminie: ${overdue}
+                                    </span>
+                                  `
+                                : ''
                         }
 
-                        ${due
-                            ? `<span class="badge DO">
-                                Do wykonania: ${due}
-                               </span>`
-                            : ''
+                        ${
+                            due
+                                ? `
+                                    <span class="badge DO">
+                                        Do wykonania: ${due}
+                                    </span>
+                                  `
+                                : ''
                         }
 
                     </span>
 
                 </summary>
 
+
                 <div class="local-list">
 
                     ${cityLocals.map(local => {
 
-                        const localRows = cityRows.filter(
-                            r => r.local === local
-                        );
+                        const localRows =
+                            cityRows.filter(
+                                r => r.local === local
+                            );
+
 
                         const localKey =
                             `${cityName}|||${local}`;
+
+
+                        const isOpen =
+                            expandedLocals.has(localKey);
+
 
                         const localOverdue =
                             localRows.filter(
                                 r => state(r) === 'PO TERMINIE'
                             ).length;
 
+
                         const localDue =
                             localRows.filter(
                                 r => state(r) === 'DO WYKONANIA'
                             ).length;
 
-                        const isOpen =
-                            expandedLocals.has(localKey);
 
                         return `
-
                             <div class="local-wrapper">
 
                                 <button
@@ -1504,6 +1601,7 @@ $('#cityGroups').innerHTML = cities.length
                                         ${isOpen ? '⌄' : '›'}
                                     </span>
 
+
                                     <span class="local-main">
 
                                         <span class="local-name">
@@ -1516,41 +1614,73 @@ $('#cityGroups').innerHTML = cities.length
 
                                     </span>
 
+
                                     <span class="local-stats">
 
-                                        ${localOverdue
-                                            ? `<span class="badge PO">
-                                                ${localOverdue} po terminie
-                                               </span>`
-                                            : ''
+                                        ${
+                                            localOverdue
+                                                ? `
+                                                    <span class="badge PO">
+                                                        ${localOverdue} po terminie
+                                                    </span>
+                                                  `
+                                                : ''
                                         }
 
-                                        ${localDue
-                                            ? `<span class="badge DO">
-                                                ${localDue} do wykonania
-                                               </span>`
-                                            : ''
+                                        ${
+                                            localDue
+                                                ? `
+                                                    <span class="badge DO">
+                                                        ${localDue} do wykonania
+                                                    </span>
+                                                  `
+                                                : ''
                                         }
 
                                     </span>
 
                                 </button>
 
+
                                 <div
-                                    class="local-inspections ${isOpen ? 'open' : ''}"
+                                    class="local-inspections ${
+                                        isOpen ? 'open' : ''
+                                    }"
                                     data-city="${esc(cityName)}"
                                     data-local="${esc(local)}"
                                 >
 
-                                    ${renderLocalInspections(
-                                        local,
-                                        cityName
-                                    )}
+                                    ${
+                                        localRows.length
+                                            ? `
+                                                <div class="tablebox">
+                                                    <table>
+
+                                                        <thead>
+                                                            <tr>
+                                                                ${tableHeaders()}
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            ${rows(
+                                                                sortRows(localRows)
+                                                            )}
+                                                        </tbody>
+
+                                                    </table>
+                                                </div>
+                                              `
+                                            : `
+                                                <div class="muted">
+                                                    Brak przeglądów dla tego lokalu.
+                                                </div>
+                                              `
+                                    }
 
                                 </div>
 
                             </div>
-
                         `;
 
                     }).join('')}
@@ -1560,8 +1690,8 @@ $('#cityGroups').innerHTML = cities.length
             </details>
         `;
 
-    }).join('')
-    : '<div class="notice">Brak przeglądów spełniających wybrane kryteria.</div>';
+    }).join('');
+}
 function showError(msg){$('#notice').hidden=false;$('#notice').textContent='Nie można połączyć się z rejestrem: '+msg}
 async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`}
 async function applySession(s){$('#user').textContent=s?.user?.email||'Niezalogowano';$('#logout').hidden=!s?.user;$('#loginModal').classList.toggle('open',!s?.user);if(s?.user)await load()}async function start(){if(!ready){showError('Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js.');$('#add').disabled=true;return}const{data:{session}}=await sb.auth.getSession();await applySession(session);sb.auth.onAuthStateChange((_e,s)=>applySession(s));sb.channel('live').on('postgres_changes',{event:'*',schema:'public',table:'inspections'},load).on('postgres_changes',{event:'*',schema:'public',table:'inspection_types'},load).on('postgres_changes',{event:'*',schema:'public',table:'locations'},load).subscribe()}
@@ -1604,94 +1734,107 @@ function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;co
 $('#editForm').elements.city.addEventListener('input',refreshLocals);function setDefaultMonths(){if(editing)return;const m=monthsByType[norm($('#editForm').elements.type.value)];if(m)$('#editForm').elements.months.value=m}$('#editForm').elements.type.addEventListener('input',setDefaultMonths);$('#editForm').elements.type.addEventListener('change',setDefaultMonths);
 $('#editForm').onsubmit=async e=>{e.preventDefault();const submit=e.submitter;let uploadedPath=null;try{const f=new FormData(e.target),file=f.get('file'),city=String(f.get('city')||'').trim(),local=String(f.get('local')||'').trim(),type=String(f.get('type')||'').trim(),months=Number(f.get('months'));if(!city||!local||!type)throw new Error('Uzupełnij miasto, lokal i rodzaj przeglądu.');if(!Number.isInteger(months)||months<1||months>120)throw new Error('Okres ważności musi wynosić od 1 do 120 miesięcy.');if(data.some(r=>String(r.id)!==String(editing)&&norm(r.city)===norm(city)&&norm(r.local)===norm(local)&&norm(r.type)===norm(type)))throw new Error('Taki przegląd dla tego lokalu już istnieje.');if(file&&file.size){if(file.size>MAX_PROTOCOL_SIZE)throw new Error('Plik protokołu może mieć maksymalnie 10 MB.');if(!ALLOWED_PROTOCOL_TYPES.has(file.type))throw new Error('Niedozwolony typ pliku protokołu.');const ext=file.name.split('.').pop().toLowerCase(),path=`${Date.now()}_${crypto.randomUUID()}.${ext}`,{error}=await sb.storage.from('protocols').upload(path,file,{contentType:file.type});if(error)throw error;uploadedPath=path}if(submit)submit.disabled=true;const old=data.find(x=>String(x.id)===String(editing)),payload={id:editing||`custom-${Date.now()}`,city,local,type,done:f.get('done')||null,months,protocolDate:f.get('protocolDate')||null,notes:f.get('notes')||''};if(uploadedPath){payload.protocolFileName=file.name;payload.protocolPath=uploadedPath}else if(old){payload.protocolFileName=old.protocolFileName;payload.protocolPath=old.protocolPath}let saveError;if(editing){const{data:changed,error}=await sb.from('inspections').update(toDb(payload)).eq('id',editing).eq('version',editingVersion).is('deleted_at',null).select('id');saveError=error;if(!saveError&&!changed?.length)throw new Error('Ten wpis został zmieniony lub przeniesiony do kosza przez inną osobę. Odśwież dane i spróbuj ponownie.')}else{const{error}=await sb.from('inspections').insert(toDb(payload));saveError=error}if(saveError)throw saveError;const{error:typeError}=await sb.from('inspection_types').upsert({name:type,active:true},{onConflict:'name'});if(typeError)throw typeError;const{error:locationError}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(locationError)throw locationError;if(uploadedPath&&old?.protocolPath&&old.protocolPath!==uploadedPath){const{error:removeError}=await sb.storage.from('protocols').remove([old.protocolPath]);if(removeError)console.warn('Nie udało się usunąć poprzedniego pliku:',removeError.message)}$('#editModal').classList.remove('open');await load()}catch(err){if(uploadedPath)await sb.storage.from('protocols').remove([uploadedPath]);alert('Błąd podczas zapisywania: '+err.message)}finally{if(submit)submit.disabled=false}};
 async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
-$('#cityGroups').addEventListener('click',async e=>{
+$('#cityGroups').addEventListener('click', async e => {
 
-    /* ============================
-       SORTOWANIE PO NAGŁÓWKU
-    ============================ */
+    /*
+       Kliknięcie w lokal
+    */
 
-    const th=e.target.closest('th.sortable');
+    const localButton =
+        e.target.closest('button[data-local-toggle]');
+
+    if(localButton){
+
+        const wrapper =
+            localButton.closest('.local-wrapper');
+
+        const inspections =
+            wrapper.querySelector('.local-inspections');
+
+        const arrow =
+            localButton.querySelector('.local-arrow');
+
+
+        if(inspections.classList.contains('open')){
+
+            inspections.classList.remove('open');
+            arrow.textContent = '›';
+
+        }else{
+
+            inspections.classList.add('open');
+            arrow.textContent = '⌄';
+
+        }
+
+        return;
+    }
+
+
+    /*
+       Sortowanie tabeli
+    */
+
+    const th =
+        e.target.closest('th.sortable');
 
     if(th){
 
-        const key=th.dataset.sortKey;
+        const key =
+            th.dataset.sortKey;
 
-        if(tableSortKey===key){
 
-            tableSortDirection=
-                tableSortDirection==='asc'
+        if(tableSortKey === key){
+
+            tableSortDirection =
+                tableSortDirection === 'asc'
                     ? 'desc'
                     : 'asc';
 
         }else{
 
-            tableSortKey=key;
-            tableSortDirection='asc';
+            tableSortKey = key;
+            tableSortDirection = 'asc';
 
         }
 
         render();
+
         return;
     }
 
 
-    /* ============================
-       AKCJE W WIERSZU
-    ============================ */
+    /*
+       Akcje wiersza
+    */
 
-    const b=e.target.closest('button[data-action]');
+    const b =
+        e.target.closest('button[data-action]');
 
-    if(!b)return;
+    if(!b){
+        return;
+    }
 
-    if(b.dataset.action==='edit')
+
+    if(b.dataset.action === 'edit'){
         await editRow(b.dataset.id);
+    }
 
-    if(b.dataset.action==='delete')
+
+    if(b.dataset.action === 'delete'){
         await deleteRow(b.dataset.id);
+    }
 
-    if(b.dataset.action==='open')
+
+    if(b.dataset.action === 'open'){
         await openFile(b.dataset.id);
+    }
 
-    if(b.dataset.action==='history')
+
+    if(b.dataset.action === 'history'){
         await showHistory(b.dataset.id);
+    }
 
-});
-
-
-['search','city','protocol'].forEach(x =>
-    $('#'+x).addEventListener(
-        x === 'search' ? 'input' : 'change',
-        render
-    )
-);
-$('#clearFilters').onclick=()=>{
-    $('#search').value='';
-    $('#city').value='';
-    $('#protocol').value='';
-    window.activeStatus='';
-
-    document.querySelectorAll('[data-quick-status]').forEach(b=>{
-        b.classList.remove('active');
-    });
-
-    render();
-};document.querySelectorAll('[data-quick-status]').forEach(b=>{
-    b.onclick=()=>{
-        const status=b.dataset.quickStatus;
-
-        document.querySelectorAll('[data-quick-status]').forEach(x=>{
-            x.classList.remove('active');
-        });
-
-        if(window.activeStatus===status){
-            window.activeStatus='';
-        }else{
-            window.activeStatus=status;
-            b.classList.add('active');
-        }
-
-        render();
-    };
 });
 function renderTypeList(){$('#typeList').innerHTML=inspectionTypes.length?inspectionTypes.sort((a,b)=>a.localeCompare(b,'pl')).map(n=>`<li><span>${esc(n)}</span><button type="button" class="danger" data-name="${esc(n)}">Usuń</button></li>`).join(''):'<li class="muted">Brak aktywnych rodzajów.</li>'}$('#manageTypes').onclick=()=>{renderTypeList();$('#userMenu').hidden=true;$('#typesModal').classList.add('open')};$('#closeTypes').onclick=()=>$('#typesModal').classList.remove('open');$('#addType').onclick=async()=>{const name=$('#newType').value.trim();if(!name)return;const{error}=await sb.from('inspection_types').upsert({name,active:true},{onConflict:'name'});if(error)return alert(error.message);$('#newType').value='';await load();renderTypeList()};$('#typeList').onclick=async e=>{const b=e.target.closest('button[data-name]');if(!b||!confirm(`Usunąć „${b.dataset.name}” z listy?`))return;const{error}=await sb.from('inspection_types').update({active:false}).eq('name',b.dataset.name);if(error)return alert(error.message);await load();renderTypeList()};
 $('#addLocal').onclick=()=>{$('#localForm').reset();$('#userMenu').hidden=true;$('#localModal').classList.add('open')};$('#cancelLocal').onclick=()=>$('#localModal').classList.remove('open');$('#localForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),city=String(f.get('city')).trim(),mpk=String(f.get('mpk')).trim(),name=String(f.get('name')).trim(),local=`${mpk} (${name})`,{error}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(error)return alert('Nie udało się dodać lokalu: '+error.message);$('#localModal').classList.remove('open');await load()};
