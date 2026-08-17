@@ -1289,7 +1289,6 @@ function sortRows(records){
 function tableHeaders(){
 
     const headers=[
-        ['local','Lokal'],
         ['type','Rodzaj'],
         ['done','Wykonano'],
         ['nextDate','Następny termin'],
@@ -1298,7 +1297,6 @@ function tableHeaders(){
     ];
 
     return headers.map(([key,label])=>{
-
         const active=tableSortKey===key;
         const direction=active?tableSortDirection:'';
 
@@ -1314,7 +1312,6 @@ function tableHeaders(){
                 </span>
             </th>
         `;
-
     }).join('')+`
         <th>Uwagi</th>
         <th>Akcje</th>
@@ -1322,7 +1319,7 @@ function tableHeaders(){
 }
 function refreshLists(){const selected=$('#city').value,types=typeCatalogAvailable?inspectionTypes:fallbackTypes,cities=[...new Set([...data.map(x=>x.city),...locations.map(x=>x.city)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');$('#city').value=selected;$('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');$('#types').innerHTML=[...new Set(types)].sort((a,b)=>a.localeCompare(b,'pl')).map(x=>`<option value="${esc(x)}">`).join('')}
 function refreshLocals(){const city=norm($('#editForm').elements.city.value),source=[...locations,...data.map(r=>({city:r.city,local:r.local}))],names=[...new Set(source.filter(r=>!city||norm(r.city)===city).map(r=>String(r.local||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#locals').innerHTML=names.map(x=>`<option value="${esc(x)}">`).join('')}
-function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);return`<tr><td><b>${esc(r.local)}</b></td><td>${esc(r.type)}</td><td>${fmt(r.done)}</td><td>${fmt(nextDate(r.done,r.months))}</td><td class="status-cell">${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td><td class="protocol-cell"><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span>${r.protocolPath?` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
+function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);return`<tr><td>${esc(r.type)}</td><td>${fmt(r.done)}</td><td>${fmt(nextDate(r.done,r.months))}</td><td class="status-cell">${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td><td class="protocol-cell"><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span>${r.protocolPath?` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
     <button type="button" class="secondary action-edit" data-action="edit" data-id="${esc(r.id)}" title="Edytuj">
         ✎ <span>Edytuj</span>
     </button>
