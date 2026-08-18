@@ -1180,7 +1180,7 @@ body.theme-dark .local-inspections{
     </div>
 
 </section>
-  <section class="stats"><button type="button" class="card stat overdue" data-quick-status="PO TERMINIE">Po terminie<b id="overdue">0</b></button><button type="button" class="card stat due" data-quick-status="DO WYKONANIA">Do wykonania (14 dni)<b id="due">0</b></button><button type="button" class="card stat ok" data-quick-status="OK">Aktualne<b id="ok">0</b></button><button type="button" class="card stat total" data-quick-status="">Wszystkie wpisy<b id="all">0</b></button></section>
+  <section class="stats"><button type="button" class="card stat overdue" data-quick-status="PO TERMINIE">Po terminie<b id="overdue">0</b></button><button type="button" class="card stat due" data-quick-status="DO WYKONANIA">Do wykonania <b id="due">0</b></button><button type="button" class="card stat ok" data-quick-status="OK">Aktualne<b id="ok">0</b></button><button type="button" class="card stat total" data-quick-status="">Wszystkie wpisy<b id="all">0</b></button></section>
   <section id="cityGroups" class="city-groups"></section>
 </main>
 <div class="modal" id="loginModal"><form class="dialog" id="loginForm"><h2>Dostęp do rejestru</h2><p>Logowanie jest wymagane, aby dane były wspólne i chronione.</p><div class="form"><label class="wide">E-mail<input required type="email" name="email"></label><label class="wide">Hasło<input required type="password" name="password"></label></div><p id="loginMessage" class="muted"></p><footer><button type="button" id="register" class="secondary">Utwórz konto</button><button>Zaloguj</button></footer></form></div>
@@ -1756,7 +1756,7 @@ const localDue30 =
     ${
         localOverdue > 0
             ? `
-                <span class="badge PO">
+                <span class="badge POBLACK">
                     Po terminie: ${localOverdue}
                 </span>
               `
