@@ -605,7 +605,48 @@ body.theme-dark .sort-arrow{
 body.theme-dark th.sortable.active.asc .sort-arrow::before,
 body.theme-dark th.sortable.active.desc .sort-arrow::after{
     color:var(--blue);
-}.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap}.PO{background:#fee2e2;color:var(--red)}.DO{background:#fef3c7;color:var(--amber)}.OK{background:#d1fae5;color:var(--green)}.BRAK{background:#ede9fe;color:#5b21b6}
+}.badge{
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.PO{
+    background:#fee2e2;
+    color:var(--red);
+}
+
+.DO{
+    background:#fef3c7;
+    color:var(--amber);
+}
+
+.DO30{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.DO14{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.POBLACK{
+    background:#1f2937;
+    color:#fff;
+}
+
+.OK{
+    background:#d1fae5;
+    color:var(--green);
+}
+
+.BRAK{
+    background:#ede9fe;
+    color:#5b21b6;
+}
     .modal{display:none;position:fixed;inset:0;background:#17203388;place-items:center;padding:18px;z-index:5}.modal.open{display:grid}.dialog{background:#fff;border-radius:14px;padding:24px;width:min(720px,100%);max-height:90vh;overflow:auto}.form{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.form label{display:grid;gap:5px;font-weight:650}.wide{grid-column:1/-1}.dialog footer{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}.type-add{display:flex;gap:8px}.type-add input{flex:1}.type-list{list-style:none;padding:0;margin:16px 0;display:grid;gap:7px;max-height:48vh;overflow:auto}.type-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc}.trash-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.trash-actions button{padding:7px 10px;font-size:12px}.trash-actions .permanent-delete{background:#fee2e2;color:var(--red)}.trash-actions .permanent-delete:hover{filter:brightness(.97)}body.theme-dark .trash-actions .permanent-delete{background:#432629;color:#FFB0AA;border-color:#6B3839}
     .theme-options{
     display:grid;
@@ -1204,7 +1245,47 @@ const fallbackTypes=['Elektryczny (roczny)','Elektryczny (5-cio letni)','Systemy
 const monthsByType={'elektryczny (5-cio letni)':60,'elektryczny (roczny)':12,'klimatyzacja':3,'mycie jednostek klimatyzacji':36,'wentylacja':12,'rolety':12,'rolety sklepowe':12,'gasnice':12,'oswietlenie':1,'sprawdzenie pompy odplywowej':2};
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));const iso=v=>v?String(v).slice(0,10):'';const fmt=v=>v?new Date(v+'T12:00:00').toLocaleDateString('pl-PL'):'—';const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 const fromDb=r=>({id:r.id,city:r.city,local:r.local,type:r.type,done:iso(r.done),months:r.months,protocolDate:iso(r.protocol_date),protocolFileName:r.protocol_file_name,protocolPath:r.protocol_path,notes:r.notes||'',version:r.version,deletedAt:r.deleted_at});const toDb=r=>({id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''});
-function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function state(r){const n=nextDate(r.done,r.months);if(!n)return'';const days=Math.ceil((new Date(n+'T12:00:00')-new Date())/86400000);return days<0?'PO TERMINIE':days<=14?'DO WYKONANIA':'OK'}function protocol(r){return r.protocolFileName||r.protocolDate?'DODANY':'BRAK PROTOKOŁU'}function countLabel(n){return n===1?'1 przegląd':(n%100<12||n%100>14)&&n%10>=2&&n%10<=4?`${n} przeglądy`:`${n} przeglądów`}function sortValue(r,key){
+function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function state(r){
+    const n = nextDate(r.done, r.months);
+    if(!n) return '';
+
+    const days = Math.ceil(
+        (new Date(n + 'T12:00:00') - new Date()) / 86400000
+    );
+
+    if(days < 0) return 'PO TERMINIE';
+    if(days <= 14) return 'DO WYKONANIA';
+    if(days <= 30) return 'DO WYKONANIA';
+    return 'OK';
+}
+
+function statusClass(r){
+    const n = nextDate(r.done, r.months);
+    if(!n) return '';
+
+    const days = Math.ceil(
+        (new Date(n + 'T12:00:00') - new Date()) / 86400000
+    );
+
+    if(days < 0) return 'POBLACK';
+    if(days <= 14) return 'DO14';
+    if(days <= 30) return 'DO30';
+    return 'OK';
+}
+
+function statusLabel(r){
+    const n = nextDate(r.done, r.months);
+    if(!n) return '—';
+
+    const days = Math.ceil(
+        (new Date(n + 'T12:00:00') - new Date()) / 86400000
+    );
+
+    if(days < 0) return 'Po terminie';
+    if(days <= 14) return 'Do wykonania – 14 dni';
+    if(days <= 30) return 'Do wykonania – 30 dni';
+    return 'OK';
+}function protocol(r){return r.protocolFileName||r.protocolDate?'DODANY':'BRAK PROTOKOŁU'}function countLabel(n){return n===1?'1 przegląd':(n%100<12||n%100>14)&&n%10>=2&&n%10<=4?`${n} przeglądy`:`${n} przeglądów`}function sortValue(r,key){
 
     switch(key){
 
@@ -1319,7 +1400,11 @@ function tableHeaders(){
 }
 function refreshLists(){const selected=$('#city').value,types=typeCatalogAvailable?inspectionTypes:fallbackTypes,cities=[...new Set([...data.map(x=>x.city),...locations.map(x=>x.city)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');$('#city').value=selected;$('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');$('#types').innerHTML=[...new Set(types)].sort((a,b)=>a.localeCompare(b,'pl')).map(x=>`<option value="${esc(x)}">`).join('')}
 function refreshLocals(){const city=norm($('#editForm').elements.city.value),source=[...locations,...data.map(r=>({city:r.city,local:r.local}))],names=[...new Set(source.filter(r=>!city||norm(r.city)===city).map(r=>String(r.local||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#locals').innerHTML=names.map(x=>`<option value="${esc(x)}">`).join('')}
-function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);return`<tr><td>${esc(r.type)}</td><td>${fmt(r.done)}</td><td>${fmt(nextDate(r.done,r.months))}</td><td class="status-cell">${s?`<span class="badge ${s.startsWith('PO')?'PO':s.startsWith('DO')?'DO':'OK'}">${s}</span>`:'—'}</td><td class="protocol-cell"><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span>${r.protocolPath?` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
+function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);return`<tr><td>${esc(r.type)}</td><td>${fmt(r.done)}</td><td>${fmt(nextDate(r.done,r.months))}</td><td class="status-cell">
+    <span class="badge ${statusClass(r)}">
+        ${statusLabel(r)}
+    </span>
+</td><td class="protocol-cell"><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span>${r.protocolPath?` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
     <button type="button" class="secondary action-edit" data-action="edit" data-id="${esc(r.id)}" title="Edytuj">
         ✎ <span>Edytuj</span>
     </button>
