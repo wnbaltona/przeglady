@@ -614,8 +614,8 @@ body.theme-dark th.sortable.active.desc .sort-arrow::after{
 }
 
 .PO{
-    background:#fee2e2;
-    color:var(--red);
+    background:#1f2937;
+    color:#fff;
 }
 
 .DO{
@@ -1671,15 +1671,35 @@ function render(){
 
 
                         const localOverdue =
-                            localRows.filter(
-                                r => state(r) === 'PO TERMINIE'
-                            ).length;
+    localRows.filter(
+        r => state(r) === 'PO TERMINIE'
+    ).length;
 
 
-                        const localDue =
-                            localRows.filter(
-                                r => state(r) === 'DO WYKONANIA'
-                            ).length;
+const localDue14 =
+    localRows.filter(r => {
+        const n = nextDate(r.done, r.months);
+        if (!n) return false;
+
+        const days = Math.ceil(
+            (new Date(n + 'T12:00:00') - new Date()) / 86400000
+        );
+
+        return days >= 0 && days <= 14;
+    }).length;
+
+
+const localDue30 =
+    localRows.filter(r => {
+        const n = nextDate(r.done, r.months);
+        if (!n) return false;
+
+        const days = Math.ceil(
+            (new Date(n + 'T12:00:00') - new Date()) / 86400000
+        );
+
+        return days > 14 && days <= 30;
+    }).length;
 
 
                         return `
@@ -1713,27 +1733,37 @@ function render(){
 
                                     <span class="local-stats">
 
-                                        ${
-                                            localOverdue > 0
-                                                ? `
-                                                    <span class="badge PO">
-                                                        Po terminie: ${localOverdue}
-                                                    </span>
-                                                  `
-                                                : ''
-                                        }
+    ${
+        localDue30 > 0
+            ? `
+                <span class="badge DO30">
+                    Do wykonania – 30 dni: ${localDue30}
+                </span>
+              `
+            : ''
+    }
 
-                                        ${
-                                            localDue > 0
-                                                ? `
-                                                    <span class="badge DO">
-                                                        Do wykonania: ${localDue}
-                                                    </span>
-                                                  `
-                                                : ''
-                                        }
+    ${
+        localDue14 > 0
+            ? `
+                <span class="badge DO14">
+                    Do wykonania – 14 dni: ${localDue14}
+                </span>
+              `
+            : ''
+    }
 
-                                    </span>
+    ${
+        localOverdue > 0
+            ? `
+                <span class="badge PO">
+                    Po terminie: ${localOverdue}
+                </span>
+              `
+            : ''
+    }
+
+</span>
 
                                 </button>
 
