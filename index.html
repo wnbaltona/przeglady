@@ -1227,13 +1227,32 @@ body.theme-dark .local-inspections{
 @media (max-width:480px){
 
     .local-item{
+        display:grid;
+        grid-template-columns:18px minmax(0,1fr);
+        grid-template-areas:
+            "arrow main"
+            "arrow stats";
+        align-items:center;
+        column-gap:10px;
+        row-gap:8px;
         padding:11px;
     }
 
+    .local-arrow{
+        grid-area:arrow;
+        align-self:center;
+    }
+
     .local-main{
+        grid-area:main;
         display:flex;
         flex-direction:column;
         gap:3px;
+    }
+
+    .local-name{
+        display:block;
+        overflow-wrap:anywhere;
     }
 
     .local-count{
@@ -1241,7 +1260,16 @@ body.theme-dark .local-inspections{
     }
 
     .local-stats{
-        margin-left:auto;
+        grid-area:stats;
+        width:100%;
+        margin-left:0;
+        justify-content:flex-start;
+    }
+
+    .local-stats .badge{
+        display:inline-flex;
+        align-items:center;
+        min-height:22px;
     }
 
     .local-inspections{
