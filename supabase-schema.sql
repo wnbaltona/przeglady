@@ -122,6 +122,7 @@ create policy "Zalogowani usuwają lokale" on public.locations for delete to aut
 
 drop policy if exists "Zalogowani odczytują stan aplikacji" on public.app_state;
 drop policy if exists "Zalogowani zapisują stan aplikacji" on public.app_state;
+drop policy if exists "Zalogowani aktualizują stan aplikacji" on public.app_state;
 create policy "Zalogowani odczytują stan aplikacji" on public.app_state for select to authenticated using (true);
 create policy "Zalogowani zapisują stan aplikacji" on public.app_state for insert to authenticated with check (true);
 create policy "Zalogowani aktualizują stan aplikacji" on public.app_state for update to authenticated using (true) with check (true);
