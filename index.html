@@ -2102,9 +2102,10 @@ $('#removeAttachment').onclick=async()=>{
     const button=$('#removeAttachment');
     button.disabled=true;
     try{
-        const {data:changed,error}=await sb.from('inspections').update({protocol_file_name:null,protocol_path:null}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');
+        const {data:changed,error}=await sb.from('inspections').update({protocol_file_name:null,protocol_path:null}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id,version');
         if(error)throw error;
         if(!changed?.length)throw new Error('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');
+        editingVersion=changed[0].version;
         const {error:removeError}=await sb.storage.from('protocols').remove([r.protocolPath]);
         if(removeError)throw new Error(`Załącznik odłączono od wpisu, ale nie udało się usunąć pliku: ${removeError.message}`);
         $('#fileInfo').textContent='Opcjonalnie: PDF, dokument lub zdjęcie.';
