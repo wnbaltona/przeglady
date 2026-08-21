@@ -1161,18 +1161,27 @@ body.theme-dark :where(button,input,select,textarea,summary):focus-visible{
 .local-main{
     flex:1;
     min-width:0;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
 }
 
 .local-name{
     font-weight:700;
     font-size:14px;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
 .local-count{
-    margin-left:8px;
+    margin-left:0;
     color:var(--text-muted);
     font-size:12px;
     font-weight:500;
+    flex:0 0 auto;
+    white-space:nowrap;
 }
 
 .local-stats{
@@ -1246,17 +1255,22 @@ body.theme-dark .local-inspections{
     .local-main{
         grid-area:main;
         display:flex;
-        flex-direction:column;
-        gap:3px;
+        flex-direction:row;
+        align-items:baseline;
+        gap:8px;
     }
 
     .local-name{
-        display:block;
-        overflow-wrap:anywhere;
+        min-width:0;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
     }
 
     .local-count{
         margin-left:0;
+        flex:0 0 auto;
+        white-space:nowrap;
     }
 
     .local-stats{
