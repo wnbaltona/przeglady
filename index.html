@@ -2109,6 +2109,20 @@ document.querySelectorAll('[data-theme]').forEach(btn=>{
 });
 function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;const f=$('#editForm');f.reset();const v=r||{months:12};['city','local','type','done','months','protocolDate','notes'].forEach(n=>f.elements[n].value=v[n]??'');refreshLocals();const edit=Boolean(r);['city','local'].forEach(n=>f.elements[n].readOnly=edit);$('#formTitle').textContent=edit?'Edytuj przegląd':'Dodaj przegląd';$('#fileInfo').textContent=r?.protocolFileName?`Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`:'Opcjonalnie: PDF, dokument lub zdjęcie.';$('#removeAttachment').hidden=!r?.protocolPath;$('#editModal').classList.add('open')}
 $('#editForm').elements.city.addEventListener('input',refreshLocals);function setDefaultMonths(){if(editing)return;const m=monthsByType[norm($('#editForm').elements.type.value)];if(m)$('#editForm').elements.months.value=m}$('#editForm').elements.type.addEventListener('input',setDefaultMonths);$('#editForm').elements.type.addEventListener('change',setDefaultMonths);
+function fillCityFromLocal(){
+    if(editing)return;
+    const form=$('#editForm');
+    const local=norm(form.elements.local.value);
+    if(!local)return;
+    const source=[...locations,...data.map(r=>({city:r.city,local:r.local}))];
+    const cities=[...new Set(source.filter(row=>norm(row.local)===local).map(row=>String(row.city||'').trim()).filter(Boolean))];
+    if(cities.length===1){
+        form.elements.city.value=cities[0];
+        refreshLocals();
+    }
+}
+$('#editForm').elements.local.addEventListener('input',fillCityFromLocal);
+$('#editForm').elements.local.addEventListener('change',fillCityFromLocal);
 $('#removeAttachment').onclick=async()=>{
     const r=data.find(x=>String(x.id)===String(editing));
     if(!r?.protocolPath)return;
