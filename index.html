@@ -1346,7 +1346,7 @@ body.theme-dark .local-inspections{
   <section id="cityGroups" class="city-groups"></section>
 </main>
 <div class="modal" id="loginModal"><form class="dialog" id="loginForm"><h2>Dostęp do rejestru</h2><p>Logowanie jest wymagane, aby dane były wspólne i chronione.</p><div class="form"><label class="wide">E-mail<input required type="email" name="email"></label><label class="wide">Hasło<input required type="password" name="password"></label></div><p id="loginMessage" class="muted"></p><footer><button type="button" id="themeOpenLogin" class="secondary">Zmień motyw</button><button type="button" id="register" class="secondary">Utwórz konto</button><button>Zaloguj</button></footer></form></div>
-<div class="modal" id="editModal"><form class="dialog" id="editForm"><h2 id="formTitle">Dodaj przegląd</h2><div class="form"><label>Miasto<input required name="city" list="cities"></label><label>Nr lokalu<input required name="local" list="locals"></label><label>Rodzaj przeglądu<input required name="type" list="types"></label><label>Data wykonania<input required type="date" name="done"></label><label>Ważny przez (mies.)<input required min="1" type="number" name="months" value="12"></label><label>Data dodania protokołu<input type="date" name="protocolDate"></label><label class="wide">Plik protokołu<input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"><small id="fileInfo" class="muted">Opcjonalnie: PDF, dokument lub zdjęcie.</small></label><label class="wide">Uwagi<textarea name="notes" rows="3"></textarea></label></div><footer><button type="button" id="cancel" class="secondary">Anuluj</button><button>Zapisz</button></footer></form></div>
+<div class="modal" id="editModal"><form class="dialog" id="editForm"><h2 id="formTitle">Dodaj przegląd</h2><div class="form"><label>Miasto<input required name="city" list="cities"></label><label>Nr lokalu<input required name="local" list="locals"></label><label>Rodzaj przeglądu<input required name="type" list="types"></label><label>Data wykonania<input required type="date" name="done"></label><label>Ważny przez (mies.)<input required min="1" type="number" name="months" value="12"></label><label>Data dodania protokołu<input type="date" name="protocolDate"></label><label class="wide">Plik protokołu<input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"><small id="fileInfo" class="muted">Opcjonalnie: PDF, dokument lub zdjęcie.</small><button type="button" id="removeAttachment" class="danger" hidden>Usuń załącznik</button></label><label class="wide">Uwagi<textarea name="notes" rows="3"></textarea></label></div><footer><button type="button" id="cancel" class="secondary">Anuluj</button><button>Zapisz</button></footer></form></div>
 <div class="modal" id="typesModal"><section class="dialog"><h2>Rodzaje przeglądów</h2><p class="muted">Usunięta nazwa znika z podpowiedzi. Istniejące przeglądy pozostają bez zmian.</p><div class="type-add"><input id="newType" placeholder="Nowy rodzaj przeglądu"><button type="button" id="addType">Dodaj</button></div><ul id="typeList" class="type-list"></ul><footer><button type="button" id="closeTypes" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="localModal"><form class="dialog" id="localForm"><h2>Dodaj lokal</h2><p class="muted">Lokal pojawi się na liście po wybraniu wskazanego miasta.</p><div class="form"><label>Miasto<input required name="city" list="cities"></label><label>MPK<input required name="mpk" placeholder="np. B52 lub 208"></label><label class="wide">Nazwa lokalu<input required name="name" placeholder="np. Multistore"></label></div><footer><button type="button" id="cancelLocal" class="secondary">Anuluj</button><button>Zapisz lokal</button></footer></form></div>
 <div class="modal" id="locationsModal"><section class="dialog"><h2>Usuń lokal</h2><p class="muted">Usunięcie chowa lokal z podpowiedzi, ale nie kasuje istniejących przeglądów.</p><ul id="locationList" class="type-list"></ul><footer><button type="button" id="closeLocations" class="secondary">Zamknij</button></footer></section></div>
@@ -2093,8 +2093,26 @@ document.querySelectorAll('[data-theme]').forEach(btn=>{
         closeThemeModal();
     }
 });
-function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;const f=$('#editForm');f.reset();const v=r||{months:12};['city','local','type','done','months','protocolDate','notes'].forEach(n=>f.elements[n].value=v[n]??'');refreshLocals();const edit=Boolean(r);['city','local'].forEach(n=>f.elements[n].readOnly=edit);$('#formTitle').textContent=edit?'Edytuj przegląd':'Dodaj przegląd';$('#fileInfo').textContent=r?.protocolFileName?`Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`:'Opcjonalnie: PDF, dokument lub zdjęcie.';$('#editModal').classList.add('open')}
+function openForm(r=null){editing=r?.id||null;editingVersion=r?.version??null;const f=$('#editForm');f.reset();const v=r||{months:12};['city','local','type','done','months','protocolDate','notes'].forEach(n=>f.elements[n].value=v[n]??'');refreshLocals();const edit=Boolean(r);['city','local'].forEach(n=>f.elements[n].readOnly=edit);$('#formTitle').textContent=edit?'Edytuj przegląd':'Dodaj przegląd';$('#fileInfo').textContent=r?.protocolFileName?`Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`:'Opcjonalnie: PDF, dokument lub zdjęcie.';$('#removeAttachment').hidden=!r?.protocolPath;$('#editModal').classList.add('open')}
 $('#editForm').elements.city.addEventListener('input',refreshLocals);function setDefaultMonths(){if(editing)return;const m=monthsByType[norm($('#editForm').elements.type.value)];if(m)$('#editForm').elements.months.value=m}$('#editForm').elements.type.addEventListener('input',setDefaultMonths);$('#editForm').elements.type.addEventListener('change',setDefaultMonths);
+$('#removeAttachment').onclick=async()=>{
+    const r=data.find(x=>String(x.id)===String(editing));
+    if(!r?.protocolPath)return;
+    if(!confirm(`Usunąć załącznik „${r.protocolFileName||'plik'}”?`))return;
+    const button=$('#removeAttachment');
+    button.disabled=true;
+    try{
+        const {data:changed,error}=await sb.from('inspections').update({protocol_file_name:null,protocol_path:null}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');
+        if(error)throw error;
+        if(!changed?.length)throw new Error('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');
+        const {error:removeError}=await sb.storage.from('protocols').remove([r.protocolPath]);
+        if(removeError)throw new Error(`Załącznik odłączono od wpisu, ale nie udało się usunąć pliku: ${removeError.message}`);
+        $('#fileInfo').textContent='Opcjonalnie: PDF, dokument lub zdjęcie.';
+        button.hidden=true;
+        await load();
+        alert('Załącznik został usunięty.');
+    }catch(err){alert('Nie udało się usunąć załącznika: '+err.message)}finally{button.disabled=false}
+};
 $('#editForm').onsubmit=async e=>{
     e.preventDefault();
     const submit=e.submitter;
