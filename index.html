@@ -1360,8 +1360,10 @@ body.theme-dark .local-inspections{
     #add{grid-column:1/-1}
     .top .user-menu{width:100%}
     .top .user-menu #menuToggle{width:100%}
-    .menu-panel{position:fixed;inset:auto 10px 10px;max-height:72dvh;overflow:auto;min-width:0;padding:12px;z-index:1100}
+    .menu-backdrop{display:block;position:fixed;inset:0;background:#0f172a80;backdrop-filter:blur(2px);z-index:1090}
+    .menu-panel{position:fixed;inset:auto 10px 10px;max-height:72dvh;overflow:auto;min-width:0;padding:12px;z-index:1100;box-shadow:0 18px 48px #0f172a66}
     .menu-panel button{min-height:42px}
+    body.menu-open{overflow:hidden}
 
     .wrap{margin:14px auto 24px;padding:0 10px}
     .panel,.notice{border-radius:10px}
@@ -1410,19 +1412,22 @@ body.theme-dark .local-inspections{
     .badge{padding:4px 7px;font-size:10px}
 
     .local-list{padding:8px;gap:6px}
-    .local-inspections{margin:0 0 6px;padding:7px;border-left:0}
+    .local-inspections{margin:0 0 6px;padding:7px;border-left:0;width:100%;max-width:100%;min-width:0;overflow:hidden}
     .tablebox{
-        max-height:56dvh;
-        overflow-x:scroll;
-        overflow-y:auto;
+        display:block;
+        width:100%;
+        max-width:100%;
+        max-height:none;
+        overflow-x:scroll !important;
+        overflow-y:hidden;
         -webkit-overflow-scrolling:touch;
-        overscroll-behavior-x:contain;
+        overscroll-behavior:auto;
         scrollbar-width:auto;
         padding-bottom:5px;
         border:1px solid var(--line);
         border-radius:8px;
-        /* Przesuwanie w poziomie obsługuje gest palcem; pion pozostaje naturalnym przewijaniem strony. */
-        touch-action:pan-y;
+        /* Przeglądarka obsługuje naturalne gesty w obu kierunkach. */
+        touch-action:auto;
     }
     .inspections-table{min-width:880px}
     th,td{padding:8px 9px;font-size:12px}
@@ -1456,7 +1461,8 @@ body.theme-dark .local-inspections{
   </style>
 </head>
 <body>
-<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+<div id="menuBackdrop" class="menu-backdrop" hidden></div>
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
   <section class="panel">
@@ -2234,16 +2240,32 @@ function renderCalendar(){
     $('#calendarGrid').onclick=e=>{const day=e.target.closest('[data-calendar-date]');if(!day)return;calendarSelectedDate=day.dataset.calendarDate;renderCalendar();renderCalendarDetails(calendarSelectedDate,events[calendarSelectedDate])};
     if(calendarSelectedDate)renderCalendarDetails(calendarSelectedDate,events[calendarSelectedDate]);else $('#calendarDetails').textContent='Wybierz dzień z terminem, aby zobaczyć szczegóły lub zaktualizować przegląd.';
 }
-$('#showCalendar').onclick=()=>{calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);calendarSelectedDate='';$('#userMenu').hidden=true;renderCalendar();$('#calendarModal').classList.add('open')};
+$('#showCalendar').onclick=()=>{calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);calendarSelectedDate='';closeUserMenu();renderCalendar();$('#calendarModal').classList.add('open')};
 $('#closeCalendar').onclick=()=>$('#calendarModal').classList.remove('open');
 $('#calendarAdd').onclick=()=>{$('#calendarModal').classList.remove('open');openForm(null,true);if(calendarSelectedDate)$('#editForm').elements.done.value=calendarSelectedDate};
 $('#calendarPrevious').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);renderCalendar()};
 $('#calendarNext').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);renderCalendar()};
 $('#calendarDetails').onclick=e=>{const button=e.target.closest('button[data-calendar-edit]');if(!button)return;const record=data.find(row=>String(row.id)===String(button.dataset.calendarEdit));if(!record)return;$('#calendarModal').classList.remove('open');openForm(record,true)};
-$('#menuToggle').onclick=()=>{const open=$('#userMenu').hidden;$('#userMenu').hidden=!open;$('#menuToggle').setAttribute('aria-expanded',String(open))};document.addEventListener('click',e=>{if(!e.target.closest('.user-menu')){$('#userMenu').hidden=true;$('#menuToggle').setAttribute('aria-expanded','false')}});
+function setUserMenu(open){
+    const isMobile=window.matchMedia('(max-width: 600px)').matches;
+    $('#userMenu').hidden=!open;
+    $('#menuToggle').setAttribute('aria-expanded',String(open));
+    $('#menuBackdrop').hidden=!(open&&isMobile);
+    document.body.classList.toggle('menu-open',open&&isMobile);
+}
+function closeUserMenu(){setUserMenu(false)}
+new MutationObserver(()=>{
+    if($('#userMenu').hidden){
+        $('#menuBackdrop').hidden=true;
+        document.body.classList.remove('menu-open');
+    }
+}).observe($('#userMenu'),{attributes:true,attributeFilter:['hidden']});
+$('#menuToggle').onclick=()=>setUserMenu($('#userMenu').hidden);
+$('#menuBackdrop').onclick=closeUserMenu;
+document.addEventListener('click',e=>{if(!e.target.closest('.user-menu'))closeUserMenu()});
 function openThemeModal(fromLogin=false){
     themeOpenedFromLogin=fromLogin;
-    $('#userMenu').hidden=true;
+    closeUserMenu();
     if(fromLogin)$('#loginModal').classList.remove('open');
     $('#themeModal').classList.add('open');
 }
@@ -2398,44 +2420,6 @@ $('#editForm').onsubmit=async e=>{
     }
 };
 async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
-
-/* Telefon: przeciąganie palcem po tabeli przesuwa jej zawartość w poziomie. */
-let mobileTableDrag = null;
-
-document.addEventListener('pointerdown', event => {
-    if (!window.matchMedia('(max-width: 600px)').matches || event.pointerType === 'mouse') return;
-    if (event.target.closest('button, a, input, select, textarea')) return;
-
-    const tableBox = event.target.closest('.tablebox');
-    if (!tableBox || tableBox.scrollWidth <= tableBox.clientWidth) return;
-
-    mobileTableDrag = {
-        tableBox,
-        pointerId: event.pointerId,
-        startX: event.clientX,
-        startScrollLeft: tableBox.scrollLeft
-    };
-    tableBox.setPointerCapture?.(event.pointerId);
-});
-
-document.addEventListener('pointermove', event => {
-    if (!mobileTableDrag || event.pointerId !== mobileTableDrag.pointerId) return;
-
-    const deltaX = event.clientX - mobileTableDrag.startX;
-    if (Math.abs(deltaX) < 3) return;
-
-    mobileTableDrag.tableBox.scrollLeft = mobileTableDrag.startScrollLeft - deltaX;
-    event.preventDefault();
-}, { passive: false });
-
-function endMobileTableDrag(event) {
-    if (!mobileTableDrag || event.pointerId !== mobileTableDrag.pointerId) return;
-    mobileTableDrag.tableBox.releasePointerCapture?.(event.pointerId);
-    mobileTableDrag = null;
-}
-
-document.addEventListener('pointerup', endMobileTableDrag);
-document.addEventListener('pointercancel', endMobileTableDrag);
 
 $('#cityGroups').addEventListener('click', async e => {
 
