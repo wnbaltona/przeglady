@@ -8,9 +8,9 @@
 create extension if not exists pg_cron;
 create extension if not exists pg_net;
 
-select vault.create_secret('WPISZ_PROJECT_URL', 'push_project_url');
-select vault.create_secret('WPISZ_PUBLISHABLE_KEY', 'push_publishable_key');
-select vault.create_secret('WPISZ_CRON_SECRET', 'push_cron_secret');
+select vault.create_secret('https://bsisclhysmvzqgggnpna.supabase.co/rest/v1/', 'push_project_url');
+select vault.create_secret('sb_publishable_v_o5EHrYB43tIKEhBG7Kdg_erymhXpM', 'push_publishable_key');
+select vault.create_secret('_mJP7VvK-3PI58FjCMN1viaVzD0yXeNkd8dVWxvwd4U', 'push_cron_secret');
 
 select cron.unschedule(jobid)
 from cron.job
