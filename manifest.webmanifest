@@ -3,6 +3,7 @@
   "short_name": "Przeglądy",
   "description": "Rejestr terminów i dokumentacji przeglądów.",
   "lang": "pl",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -801,9 +801,10 @@ body.theme-dark :where(button,input,select,textarea,summary):focus-visible{
 .theme-options button[data-theme="elegant"]{--swatch-1:#593F32;--swatch-2:#8C5F47}
 .theme-options button[data-theme="minimal"]{--swatch-1:#303A43;--swatch-2:#D7DDE2}
 .theme-options button[data-theme="dark"]{--swatch-1:#121B21;--swatch-2:#397C93}
-.row-actions{display:flex;gap:4px;align-items:center;justify-content:center;flex-wrap:nowrap;white-space:nowrap}.row-actions button{display:inline-flex;justify-content:center;min-width:30px;padding:6px 8px;font-size:14px;line-height:1.2;align-items:center;gap:4px;}.row-actions button span{display:none}.action-edit{
+.row-actions{display:flex;gap:4px;align-items:center;justify-content:center;flex-wrap:nowrap;white-space:nowrap}.row-actions button{display:inline-flex;justify-content:center;min-width:30px;padding:6px 8px;font-size:14px;line-height:1.2;align-items:center;gap:4px;}.row-actions button span{display:none}.row-actions button .pencil-icon{display:inline-block}.action-edit{
     background:var(--secondary-bg);
 }
+.pencil-icon{display:inline-block;transform:scaleX(-1);transform-origin:center}
 
 .action-delete{
     background:#fee2e2;
@@ -1319,11 +1320,18 @@ body.theme-dark .local-inspections{
     }
 }
 
-/* Kalendarz ma stałą wysokość niezależnie od długości miesiąca. */
-.calendar-dialog{height:auto;max-height:none;overflow:visible}
-.calendar-grid{grid-template-rows:repeat(6,60px)}
-.calendar-day{min-height:60px}
-.calendar-details{height:auto;min-height:0;overflow:visible}
+/* Kalendarz zawsze mieści się w oknie. Na komputerze miesiąc i szczegóły są
+   obok siebie, a na węższych ekranach układają się jeden pod drugim. */
+#calendarModal{overflow:hidden}
+.calendar-dialog{
+    width:min(880px,calc(100vw - 36px));
+    max-height:calc(100dvh - 36px);
+    overflow:auto;
+    overscroll-behavior:contain;
+}
+.calendar-grid{grid-template-rows:repeat(6,minmax(60px,1fr))}
+.calendar-day{min-width:0;min-height:60px}
+.calendar-details{height:auto;min-height:96px;max-height:260px;overflow:auto;scrollbar-gutter:stable}
 .calendar-day.today{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 12%,var(--surface));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--blue) 55%,transparent)}
 .calendar-day.selected{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 18%,var(--surface));box-shadow:inset 0 0 0 2px var(--blue)}
 .calendar-dot.reminder-dot{background:#f59e0b}
@@ -1342,6 +1350,37 @@ body.theme-dark .local-inspections{
 .calendar-event-place{font-weight:750;overflow-wrap:anywhere}
 .calendar-event-type{margin-top:3px;color:var(--text-muted);overflow-wrap:anywhere}
 .calendar-event-card button{margin:8px 0 0}
+.calendar-dialog footer{align-items:center}
+#calendarToday{margin-right:auto}
+@media (min-width:900px){
+    .calendar-dialog{
+        display:grid;
+        grid-template-columns:minmax(500px,1.55fr) minmax(300px,.85fr);
+        grid-template-rows:auto auto auto minmax(0,1fr) auto auto;
+        grid-template-areas:
+            "title title"
+            "toolbar details"
+            "weekdays details"
+            "grid details"
+            "legend details"
+            "footer footer";
+        gap:8px 16px;
+        width:min(1120px,calc(100vw - 36px));
+        height:min(780px,calc(100dvh - 36px));
+        max-height:calc(100dvh - 36px);
+        padding:20px;
+        overflow:hidden;
+    }
+    .calendar-dialog>h2{grid-area:title;margin:0}
+    .calendar-toolbar{grid-area:toolbar;margin:0}
+    .calendar-weekdays{grid-area:weekdays;margin:0}
+    .calendar-grid{grid-area:grid;min-height:0;height:100%;grid-template-rows:repeat(6,minmax(48px,1fr))}
+    .calendar-legend{grid-area:legend;margin:0}
+    .calendar-details{grid-area:details;height:100%;min-height:0;max-height:none;overflow:auto;padding:14px}
+    .calendar-details-heading{position:sticky;top:-14px;z-index:2;margin:-2px -2px 10px;padding:2px 2px 10px;background:var(--surface-soft);border-bottom:1px solid var(--line)}
+    .calendar-dialog>footer{grid-area:footer;margin:2px 0 0}
+    .calendar-event-card button{width:100%;margin-top:10px}
+}
 @media (max-width:600px){.calendar-dialog{padding:16px}.calendar-grid{grid-template-rows:repeat(6,52px)}.calendar-day{min-height:52px}}
 
 /* Telefon: czytelny układ bez ścisku i z wygodnymi strefami dotyku. */
@@ -1588,14 +1627,15 @@ body.theme-dark .local-inspections{
     .calendar-event-place{font-size:12px}
     .calendar-event-type{font-size:11px}
     .calendar-event-card button{width:100%;min-height:34px;margin:7px 0 0;padding:5px 8px}
-    .calendar-dialog footer{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0}
-    .calendar-dialog footer button{width:100%;min-height:42px}
+    .calendar-dialog footer{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0}
+    .calendar-dialog footer button{width:100%;min-height:42px;padding:7px 5px;font-size:11px}
+    #calendarToday{margin-right:0}
 }
   
   </style>
 </head>
 <body>
-<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-user-row"><div id="user" class="menu-user">Niezalogowano</div><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-user-row"><div id="user" class="menu-user">Niezalogowano</div><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="pushToggle" class="secondary" type="button" hidden>Włącz powiadomienia</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
 <div id="menuBackdrop" class="menu-backdrop" hidden></div>
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
@@ -1657,7 +1697,7 @@ body.theme-dark .local-inspections{
 <div class="modal" id="locationsModal"><section class="dialog"><h2>Usuń lokal</h2><p class="muted">Usunięcie chowa lokal z podpowiedzi, ale nie kasuje istniejących przeglądów.</p><ul id="locationList" class="type-list"></ul><footer><button type="button" id="closeLocations" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="trashModal"><section class="dialog"><h2>Kosz</h2><p class="muted">Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.</p><ul id="trashList" class="type-list"></ul><footer><button type="button" id="closeTrash" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="historyModal"><section class="dialog"><h2>Historia wpisu</h2><ul id="historyList" class="type-list"></ul><footer><button type="button" id="closeHistory" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="calendarModal"><section class="dialog calendar-dialog"><h2>Kalendarz terminów przeglądów</h2><div class="calendar-toolbar"><button type="button" id="calendarPrevious" class="secondary" aria-label="Poprzedni miesiąc">‹</button><strong id="calendarTitle"></strong><button type="button" id="calendarNext" class="secondary" aria-label="Następny miesiąc">›</button></div><div class="calendar-weekdays"><span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sob</span><span>Nie</span></div><div id="calendarGrid" class="calendar-grid"></div><div class="calendar-legend"><span class="calendar-legend-item"><span class="calendar-dot reminder-dot"></span><span>14 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot expiry-dot"></span><span>Utrata ważności</span></span></div><div id="calendarDetails" class="calendar-details muted">Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować przegląd.</div><footer><button type="button" id="calendarAdd">+ Dodaj przegląd</button><button type="button" id="closeCalendar" class="secondary">Zamknij</button></footer></section></div>
+<div class="modal" id="calendarModal"><section class="dialog calendar-dialog"><h2>Kalendarz terminów przeglądów</h2><div class="calendar-toolbar"><button type="button" id="calendarPrevious" class="secondary" aria-label="Poprzedni miesiąc">‹</button><strong id="calendarTitle"></strong><button type="button" id="calendarNext" class="secondary" aria-label="Następny miesiąc">›</button></div><div class="calendar-weekdays"><span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sob</span><span>Nie</span></div><div id="calendarGrid" class="calendar-grid"></div><div class="calendar-legend"><span class="calendar-legend-item"><span class="calendar-dot reminder-dot"></span><span>14 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot expiry-dot"></span><span>Utrata ważności</span></span></div><div id="calendarDetails" class="calendar-details muted">Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować przegląd.</div><footer><button type="button" id="calendarToday" class="secondary">Dzisiaj</button><button type="button" id="calendarAdd">+ Dodaj przegląd</button><button type="button" id="closeCalendar" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="themeModal">
 <section class="dialog">
 <h2>Zmień motyw</h2>
@@ -1702,6 +1742,7 @@ const INACTIVITY_HOURS=Math.max(1,Number(config.inactivityHours)||24);
 const INACTIVITY_LIMIT_MS=INACTIVITY_HOURS*60*60*1000;
 const ACTIVITY_STORAGE_PREFIX='przeglady:last-activity:';
 const ACTIVITY_WRITE_INTERVAL_MS=60*1000;
+const PUSH_PUBLIC_KEY=String(config.pushVapidPublicKey||'').trim();
 let activeSession=null,inactivityTimer=null,inactivityLogoutInProgress=false,lastActivityWrite=0;
 let data=[],
     inspectionTypes=[],
@@ -1895,7 +1936,7 @@ function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);ret
     </span>
 </td><td class="protocol-cell"><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span>${r.protocolPath?` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
     <button type="button" class="secondary action-edit" data-action="edit" data-id="${esc(r.id)}" title="Edytuj" aria-label="Edytuj">
-        ✎ <span>Edytuj</span>
+        <span class="pencil-icon" aria-hidden="true">✎</span> <span>Edytuj</span>
     </button>
     <button type="button" class="danger action-delete" data-action="delete" data-id="${esc(r.id)}" title="Usuń" aria-label="Usuń">
         🗑 <span>Usuń</span>
@@ -1933,7 +1974,7 @@ function mobileInspectionCard(r){
             </dl>
             <div class="inspection-detail-actions">
                 ${r.protocolPath?`<button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz protokół</button>`:''}
-                <button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}">✎ Edytuj</button>
+                <button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}"><span class="pencil-icon" aria-hidden="true">✎</span> Edytuj</button>
                 <button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">🗑 Usuń</button>
                 <button type="button" class="secondary" data-action="history" data-id="${esc(r.id)}">↺ Historia</button>
             </div>
@@ -2430,6 +2471,131 @@ $('#clearFilters').addEventListener('click', () => {
     render();
 });
 async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`}
+function pushSupported(){return location.protocol==='https:'&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window}
+function isIosDevice(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
+function isStandalonePwa(){return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}
+function base64UrlToUint8Array(value){
+    const padding='='.repeat((4-value.length%4)%4);
+    const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');
+    const raw=atob(base64);
+    return Uint8Array.from(raw,character=>character.charCodeAt(0));
+}
+function pushKeysMatch(subscription,expectedKey){
+    const current=subscription?.options?.applicationServerKey;
+    if(!current)return false;
+    const a=new Uint8Array(current),b=expectedKey;
+    return a.length===b.length&&a.every((value,index)=>value===b[index]);
+}
+async function getServiceWorkerRegistration(){
+    if(!pushSupported())throw new Error('Ta przeglądarka nie obsługuje powiadomień aplikacji.');
+    await navigator.serviceWorker.register('./service-worker.js',{scope:'./'});
+    return navigator.serviceWorker.ready;
+}
+async function savePushSubscription(subscription){
+    if(!activeSession?.user)throw new Error('Najpierw zaloguj się do aplikacji.');
+    const json=subscription.toJSON(),keys=json.keys||{};
+    if(!keys.p256dh||!keys.auth)throw new Error('Przeglądarka nie przekazała kluczy subskrypcji.');
+    const{error}=await sb.from('push_subscriptions').upsert({
+        user_id:activeSession.user.id,
+        endpoint:subscription.endpoint,
+        p256dh:keys.p256dh,
+        auth:keys.auth,
+        user_agent:String(navigator.userAgent||'').slice(0,500),
+        enabled:true,
+        last_seen_at:new Date().toISOString()
+    },{onConflict:'user_id,endpoint'});
+    if(error)throw error;
+}
+async function currentPushSubscription(){
+    if(!pushSupported())return null;
+    const registration=await getServiceWorkerRegistration();
+    return registration.pushManager.getSubscription();
+}
+async function updatePushButton(){
+    const button=$('#pushToggle');
+    if(!button)return;
+    button.hidden=!activeSession?.user;
+    if(button.hidden)return;
+    if(!PUSH_PUBLIC_KEY){
+        button.disabled=true;
+        button.textContent='Powiadomienia — dokończ konfigurację';
+        button.title='Brakuje publicznego klucza VAPID w supabase-config.js';
+        return;
+    }
+    if(isIosDevice()&&!isStandalonePwa()){
+        button.disabled=false;
+        button.textContent='Powiadomienia — dodaj aplikację do ekranu';
+        button.title='Na iPhonie i iPadzie powiadomienia działają po dodaniu aplikacji do ekranu początkowego.';
+        return;
+    }
+    if(!pushSupported()){
+        button.disabled=true;
+        button.textContent='Powiadomienia niedostępne';
+        button.title='Ta przeglądarka lub sposób otwarcia aplikacji nie obsługuje Web Push.';
+        return;
+    }
+    if(Notification.permission==='denied'){
+        button.disabled=false;
+        button.textContent='Powiadomienia zablokowane';
+        button.title='Odblokuj powiadomienia w ustawieniach telefonu lub przeglądarki.';
+        return;
+    }
+    button.disabled=false;
+    button.title='';
+    const subscription=await currentPushSubscription();
+    button.textContent=subscription?'Wyłącz powiadomienia':'Włącz powiadomienia';
+}
+async function syncExistingPushSubscription(){
+    if(!activeSession?.user||!PUSH_PUBLIC_KEY||!pushSupported()||Notification.permission!=='granted')return;
+    try{
+        const subscription=await currentPushSubscription();
+        if(subscription)await savePushSubscription(subscription);
+    }catch(error){console.warn('Nie udało się odświeżyć subskrypcji push:',error)}
+}
+async function enablePushNotifications(){
+    if(!activeSession?.user)return alert('Najpierw zaloguj się do aplikacji.');
+    if(!PUSH_PUBLIC_KEY)return alert('Konfiguracja powiadomień nie została jeszcze zakończona.');
+    if(isIosDevice()&&!isStandalonePwa())return alert('Na iPhonie lub iPadzie najpierw dodaj aplikację do ekranu początkowego, otwórz ją z ikony i ponownie wybierz „Włącz powiadomienia”.');
+    if(!pushSupported())return alert('Ta przeglądarka nie obsługuje powiadomień aplikacji.');
+    try{
+        const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();
+        if(permission!=='granted'){
+            await updatePushButton();
+            return alert('Powiadomienia nie zostały włączone. Zgodę można zmienić w ustawieniach telefonu lub przeglądarki.');
+        }
+        const registration=await getServiceWorkerRegistration();
+        const applicationServerKey=base64UrlToUint8Array(PUSH_PUBLIC_KEY);
+        let subscription=await registration.pushManager.getSubscription();
+        if(subscription&&!pushKeysMatch(subscription,applicationServerKey)){
+            await subscription.unsubscribe();
+            subscription=null;
+        }
+        if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey});
+        await savePushSubscription(subscription);
+        await registration.showNotification('Powiadomienia zostały włączone',{body:'Telefon będzie przypominał o przeglądach wymagających uwagi.',icon:'./icons/pwa-icon-192.png',badge:'./icons/pwa-icon-192.png',tag:'push-enabled',data:{url:'./'}});
+        await updatePushButton();
+    }catch(error){
+        alert('Nie udało się włączyć powiadomień: '+(error?.message||error));
+        await updatePushButton();
+    }
+}
+async function disablePushNotifications(){
+    try{
+        const subscription=await currentPushSubscription();
+        if(subscription){
+            const{error}=await sb.from('push_subscriptions').delete().eq('user_id',activeSession.user.id).eq('endpoint',subscription.endpoint);
+            if(error)throw error;
+            await subscription.unsubscribe();
+        }
+        await updatePushButton();
+        alert('Powiadomienia na tym urządzeniu zostały wyłączone.');
+    }catch(error){alert('Nie udało się wyłączyć powiadomień: '+(error?.message||error))}
+}
+$('#pushToggle').onclick=async()=>{
+    const subscription=await currentPushSubscription().catch(()=>null);
+    if(subscription)await disablePushNotifications();
+    else await enablePushNotifications();
+};
 function activityStorageKey(session=activeSession){return session?.user?.id?`${ACTIVITY_STORAGE_PREFIX}${session.user.id}`:''}
 function readLastActivity(session=activeSession){
     const key=activityStorageKey(session);
@@ -2513,9 +2679,11 @@ async function applySession(s){
         if(previousUserId!==s.user.id||!readLastActivity(s))saveActivity(s);
         else scheduleInactivityCheck();
         await load();
+        void syncExistingPushSubscription().finally(()=>updatePushButton());
     }else{
         clearTimeout(inactivityTimer);
         inactivityTimer=null;
+        void updatePushButton();
     }
 }
 async function start(){
@@ -2535,34 +2703,57 @@ $('#loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.tar
 function calendarDateKey(year,month,day){return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`}
 function dateShift(date,days){const value=new Date(date+'T12:00:00');value.setDate(value.getDate()+days);return calendarDateKey(value.getFullYear(),value.getMonth(),value.getDate())}
 function calendarEventClass(event){return event.kind==='reminder'?'reminder-dot':'expiry-dot'}
+function calendarCountLabel(count){return count===1?'1 termin':`${count} terminów`}
+function calendarEventCard(event,showDate=false){
+    const reminder=event.kind==='reminder';
+    return `
+        <article class="calendar-event-card ${reminder?'reminder':'expiry'}">
+            <div class="calendar-event-kind">
+                <span class="calendar-dot ${reminder?'reminder-dot':'expiry-dot'}"></span>
+                ${showDate?`${fmt(event.date)} · `:''}${reminder?'Do wykonania — termin za 14 dni':'Termin ważności przeglądu'}
+            </div>
+            <div class="calendar-event-place">${esc(event.record.city)} — ${esc(event.record.local)}</div>
+            <div class="calendar-event-type">${esc(event.record.type)}</div>
+            <button type="button" class="secondary" data-calendar-edit="${esc(event.record.id)}">Edytuj przegląd</button>
+        </article>
+    `;
+}
 function renderCalendarDetails(date,events){
     const details=$('#calendarDetails');
     if(!events?.length){
+        details.classList.add('muted');
         details.textContent='Brak terminów w tym dniu.';
         return;
     }
-
+    details.classList.remove('muted');
     details.innerHTML=`
         <div class="calendar-details-heading">
             <strong>${fmt(date)}</strong>
-            <span class="calendar-details-count">${countLabel(events.length)}</span>
+            <span class="calendar-details-count">${calendarCountLabel(events.length)}</span>
         </div>
         <div class="calendar-event-list">
-            ${events.map(event=>{
-                const reminder=event.kind==='reminder';
-                return `
-                    <article class="calendar-event-card ${reminder?'reminder':'expiry'}">
-                        <div class="calendar-event-kind">
-                            <span class="calendar-dot ${reminder?'reminder-dot':'expiry-dot'}"></span>
-                            ${reminder?'Do wykonania — termin za 14 dni':'Termin ważności przeglądu'}
-                        </div>
-                        <div class="calendar-event-place">${esc(event.record.city)} — ${esc(event.record.local)}</div>
-                        <div class="calendar-event-type">${esc(event.record.type)}</div>
-                        <button type="button" class="secondary" data-calendar-edit="${esc(event.record.id)}">Edytuj przegląd</button>
-                    </article>
-                `;
-            }).join('')}
+            ${events.map(event=>calendarEventCard(event)).join('')}
         </div>
+    `;
+}
+function renderCalendarOverview(events,year,month){
+    const details=$('#calendarDetails'),prefix=`${year}-${String(month+1).padStart(2,'0')}-`;
+    const monthEvents=Object.entries(events)
+        .filter(([date])=>date.startsWith(prefix))
+        .flatMap(([date,items])=>items.map(event=>({...event,date})))
+        .sort((a,b)=>a.date.localeCompare(b.date)||a.record.city.localeCompare(b.record.city,'pl')||a.record.local.localeCompare(b.record.local,'pl'));
+    if(!monthEvents.length){
+        details.classList.add('muted');
+        details.textContent='W tym miesiącu nie ma oznaczonych terminów.';
+        return;
+    }
+    details.classList.remove('muted');
+    details.innerHTML=`
+        <div class="calendar-details-heading">
+            <strong>Terminy w tym miesiącu</strong>
+            <span class="calendar-details-count">${calendarCountLabel(monthEvents.length)}</span>
+        </div>
+        <div class="calendar-event-list">${monthEvents.map(event=>calendarEventCard(event,true)).join('')}</div>
     `;
 }
 function renderCalendar(){
@@ -2574,19 +2765,21 @@ function renderCalendar(){
     let html='';
     for(let index=0;index<firstWeekday;index++)html+='<span class="calendar-day empty" aria-hidden="true"></span>';
     for(let day=1;day<=days;day++){
-        const key=calendarDateKey(year,month,day),dayEvents=events[key]||[],dots=dayEvents.slice(0,5).map(event=>`<span class="calendar-dot ${calendarEventClass(event)}"></span>`).join('');
-        html+=`<button type="button" class="calendar-day ${dayEvents.length?'has-events':''} ${key===todayKey?'today':''} ${key===calendarSelectedDate?'selected':''}" data-calendar-date="${key}"><span class="calendar-date">${day}</span>${dayEvents.length?`<span class="calendar-events">${dots}${dayEvents.length>5?`<small>+${dayEvents.length-5}</small>`:''}</span>`:''}</button>`;
+        const key=calendarDateKey(year,month,day),dayEvents=events[key]||[],dots=dayEvents.slice(0,5).map(event=>`<span class="calendar-dot ${calendarEventClass(event)}" aria-hidden="true"></span>`).join('');
+        const dayLabel=new Date(year,month,day).toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),eventLabel=dayEvents.length?`, ${calendarCountLabel(dayEvents.length)}`:', brak terminów';
+        html+=`<button type="button" class="calendar-day ${dayEvents.length?'has-events':''} ${key===todayKey?'today':''} ${key===calendarSelectedDate?'selected':''}" data-calendar-date="${key}" aria-label="${esc(dayLabel+eventLabel)}" aria-pressed="${key===calendarSelectedDate}"><span class="calendar-date">${day}</span>${dayEvents.length?`<span class="calendar-events">${dots}${dayEvents.length>5?`<small>+${dayEvents.length-5}</small>`:''}</span>`:''}</button>`;
     }
     for(let index=firstWeekday+days;index<42;index++)html+='<span class="calendar-day empty" aria-hidden="true"></span>';
     $('#calendarGrid').innerHTML=html;
-    $('#calendarGrid').onclick=e=>{const day=e.target.closest('[data-calendar-date]');if(!day)return;calendarSelectedDate=day.dataset.calendarDate;renderCalendar();renderCalendarDetails(calendarSelectedDate,events[calendarSelectedDate])};
-    if(calendarSelectedDate)renderCalendarDetails(calendarSelectedDate,events[calendarSelectedDate]);else $('#calendarDetails').textContent='Wybierz dzień z terminem, aby zobaczyć szczegóły lub zaktualizować przegląd.';
+    $('#calendarGrid').onclick=e=>{const day=e.target.closest('[data-calendar-date]');if(!day)return;calendarSelectedDate=day.dataset.calendarDate;renderCalendar()};
+    if(calendarSelectedDate)renderCalendarDetails(calendarSelectedDate,events[calendarSelectedDate]);else renderCalendarOverview(events,year,month);
 }
 $('#showCalendar').onclick=()=>{calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);calendarSelectedDate='';closeUserMenu();renderCalendar();$('#calendarModal').classList.add('open')};
 $('#closeCalendar').onclick=()=>$('#calendarModal').classList.remove('open');
 $('#calendarAdd').onclick=()=>{$('#calendarModal').classList.remove('open');openForm(null,true);if(calendarSelectedDate)$('#editForm').elements.done.value=calendarSelectedDate};
-$('#calendarPrevious').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);renderCalendar()};
-$('#calendarNext').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);renderCalendar()};
+$('#calendarToday').onclick=()=>{const today=new Date();calendarMonth=new Date(today.getFullYear(),today.getMonth(),1);calendarSelectedDate=calendarDateKey(today.getFullYear(),today.getMonth(),today.getDate());renderCalendar()};
+$('#calendarPrevious').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);calendarSelectedDate='';renderCalendar()};
+$('#calendarNext').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);calendarSelectedDate='';renderCalendar()};
 $('#calendarDetails').onclick=e=>{const button=e.target.closest('button[data-calendar-edit]');if(!button)return;const record=data.find(row=>String(row.id)===String(button.dataset.calendarEdit));if(!record)return;$('#calendarModal').classList.remove('open');openForm(record,true)};
 function setUserMenu(open){
     const isMobile=window.matchMedia('(max-width: 600px)').matches;
@@ -2763,8 +2956,14 @@ $('#editForm').onsubmit=async e=>{
             if(removeError)console.warn('Nie udało się usunąć poprzedniego pliku:',removeError.message);
         }
 
+        const backToCalendar=returnToCalendar;
+        returnToCalendar=false;
         $('#editModal').classList.remove('open');
         await load();
+        if(backToCalendar){
+            renderCalendar();
+            $('#calendarModal').classList.add('open');
+        }
     }catch(err){
         // Nowy plik usuwamy tylko wtedy, gdy wpis nie został zapisany w bazie.
         if(uploadedPath&&!inspectionSaved)await sb.storage.from('protocols').remove([uploadedPath]);
