@@ -1421,7 +1421,8 @@ body.theme-dark .local-inspections{
         padding-bottom:5px;
         border:1px solid var(--line);
         border-radius:8px;
-        touch-action:pan-x pan-y;
+        /* Przesuwanie w poziomie obsługuje gest palcem; pion pozostaje naturalnym przewijaniem strony. */
+        touch-action:pan-y;
     }
     .inspections-table{min-width:880px}
     th,td{padding:8px 9px;font-size:12px}
@@ -2397,6 +2398,45 @@ $('#editForm').onsubmit=async e=>{
     }
 };
 async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
+
+/* Telefon: przeciąganie palcem po tabeli przesuwa jej zawartość w poziomie. */
+let mobileTableDrag = null;
+
+document.addEventListener('pointerdown', event => {
+    if (!window.matchMedia('(max-width: 600px)').matches || event.pointerType === 'mouse') return;
+    if (event.target.closest('button, a, input, select, textarea')) return;
+
+    const tableBox = event.target.closest('.tablebox');
+    if (!tableBox || tableBox.scrollWidth <= tableBox.clientWidth) return;
+
+    mobileTableDrag = {
+        tableBox,
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startScrollLeft: tableBox.scrollLeft
+    };
+    tableBox.setPointerCapture?.(event.pointerId);
+});
+
+document.addEventListener('pointermove', event => {
+    if (!mobileTableDrag || event.pointerId !== mobileTableDrag.pointerId) return;
+
+    const deltaX = event.clientX - mobileTableDrag.startX;
+    if (Math.abs(deltaX) < 3) return;
+
+    mobileTableDrag.tableBox.scrollLeft = mobileTableDrag.startScrollLeft - deltaX;
+    event.preventDefault();
+}, { passive: false });
+
+function endMobileTableDrag(event) {
+    if (!mobileTableDrag || event.pointerId !== mobileTableDrag.pointerId) return;
+    mobileTableDrag.tableBox.releasePointerCapture?.(event.pointerId);
+    mobileTableDrag = null;
+}
+
+document.addEventListener('pointerup', endMobileTableDrag);
+document.addEventListener('pointercancel', endMobileTableDrag);
+
 $('#cityGroups').addEventListener('click', async e => {
 
     /*
