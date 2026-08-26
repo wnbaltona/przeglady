@@ -1,0 +1,26 @@
+{
+  "name": "Rejestr Przeglądów",
+  "short_name": "Przeglądy",
+  "description": "Rejestr terminów i dokumentacji przeglądów.",
+  "lang": "pl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3F6FA",
+  "theme_color": "#16324F",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icons/pwa-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

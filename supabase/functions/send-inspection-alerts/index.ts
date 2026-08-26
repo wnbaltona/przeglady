@@ -33,14 +33,13 @@ Deno.serve(async (request) => {
 
   const url = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-  const sender = Deno.env.get("ALERT_FROM");
+  const powerAutomateUrl = Deno.env.get("POWER_AUTOMATE_WEBHOOK_URL");
   const recipients = (Deno.env.get("ALERT_RECIPIENTS") || "weronika.niziolek11@gmail.com")
     .split(",")
     .map((email) => email.trim())
     .filter(Boolean);
 
-  if (!url || !serviceRoleKey || !resendKey || !sender || !recipients.length) {
+  if (!url || !serviceRoleKey || !powerAutomateUrl || !recipients.length) {
     return Response.json({ error: "Missing required Edge Function secrets." }, { status: 500 });
   }
 
@@ -88,19 +87,20 @@ Deno.serve(async (request) => {
       <td>${alert.daysUntilExpiry === 0 ? "dzisiaj" : `za ${alert.daysUntilExpiry} dni`}</td>
     </tr>`).join("");
 
-  const response = await fetch("https://api.resend.com/emails", {
+  const subject = `Przeglądy: ${pending.length} termin(y/ów) wymaga(ją) uwagi`;
+  const html = `<h2>Alerty przeglądów</h2><p>Poniższe przeglądy tracą ważność w ciągu 30 dni.</p><table border="1" cellpadding="8" cellspacing="0"><thead><tr><th>Miasto</th><th>Lokal</th><th>Rodzaj</th><th>Data utraty ważności</th><th>Pozostało</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const response = await fetch(powerAutomateUrl, {
     method: "POST",
-    headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: sender,
-      to: recipients,
-      subject: `Przeglądy: ${pending.length} termin(y/ów) wymaga(ją) uwagi`,
-      html: `<h2>Alerty przeglądów</h2><p>Poniższe przeglądy tracą ważność w ciągu 30 dni.</p><table border="1" cellpadding="8" cellspacing="0"><thead><tr><th>Miasto</th><th>Lokal</th><th>Rodzaj</th><th>Data utraty ważności</th><th>Pozostało</th></tr></thead><tbody>${rows}</tbody></table>`,
+      to: recipients.join(";"),
+      subject,
+      html,
     }),
   });
 
   if (!response.ok) {
-    return Response.json({ error: `Email provider error: ${await response.text()}` }, { status: 502 });
+    return Response.json({ error: `Power Automate error: ${await response.text()}` }, { status: 502 });
   }
 
   const { error: logWriteError } = await supabase.from("inspection_alert_log").insert(
