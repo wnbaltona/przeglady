@@ -580,7 +580,7 @@ body.theme-dark .filter-count{
     button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:var(--secondary-bg);color:var(--secondary-text)}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
     .calendar-dialog{width:min(760px,96vw)}.calendar-toolbar{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:10px;margin:14px 0;text-align:center}.calendar-toolbar button{width:44px;height:40px;padding:0;font-size:24px;line-height:1;justify-self:center}.calendar-toolbar strong{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.calendar-weekdays{margin-bottom:5px;color:var(--text-muted);font-size:12px;font-weight:700;text-align:center}.calendar-day{min-height:78px;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);text-align:left;vertical-align:top}.calendar-day.empty{visibility:hidden}.calendar-day.has-events{cursor:pointer}.calendar-day.has-events:hover{border-color:var(--blue);background:var(--surface-hover)}.calendar-date{display:block;font-size:12px;font-weight:700}.calendar-events{display:flex;gap:3px;flex-wrap:wrap;margin-top:5px}.calendar-dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle}.expiry-dot{background:var(--blue)}.calendar-legend{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px 9px;margin:14px 0;color:var(--text-muted);font-size:12px}.calendar-details{min-height:44px;padding:10px 12px;border-radius:8px;background:var(--surface-soft);font-size:13px}.calendar-details ul{margin:5px 0 0;padding-left:18px}.calendar-details li{margin:6px 0}.calendar-details button{margin-left:8px;padding:4px 8px;font-size:11px}
     input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;background:var(--input-bg);color:var(--text);font:inherit}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:var(--surface);color:var(--text);text-align:left}.stat:hover,.stat.active{box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 35%,transparent),0 8px 18px #0f172a18;transform:translateY(-1px)}.stat b{display:block;font-size:27px;margin-top:4px}.overdue{border-left-color:#ef4444}.due{border-left-color:#f59e0b}.ok{border-left-color:#10b981}.total{border-left-color:var(--blue)}
-    .city-groups{display:grid;gap:12px}.city-group{overflow:hidden}.city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none}.city-summary::-webkit-details-marker{display:none}.city-summary::after{content:'›';font-size:25px;line-height:1;color:var(--blue);margin-left:4px;transition:transform .18s}.city-group[open] .city-summary::after{transform:rotate(90deg)}.city-summary-main{display:flex;gap:10px;align-items:baseline}.city-summary strong{font-size:17px}.city-summary-count,.muted{color:var(--text-muted)}.city-summary-stats{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:var(--surface-soft);overflow:hidden;}.tablebox{overflow:auto;max-height:62vh;scrollbar-gutter:stable;overscroll-behavior:contain}table{border-collapse:collapse;width:100%;}th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;font-size:14px;line-height:1.3;}th{position:sticky;top:0;z-index:1;background:var(--table-head);color:var(--table-head-text);font-size:13px;font-weight:700}
+.city-groups{display:grid;gap:12px}.city-group{overflow:hidden}.city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none}.city-summary::-webkit-details-marker{display:none}.city-summary::after{content:'›';font-size:25px;line-height:1;color:var(--blue);margin-left:4px;transition:transform .18s}.city-group[open] .city-summary::after{transform:rotate(90deg)}.city-summary-main{display:flex;gap:10px;align-items:baseline}.city-summary strong{font-size:17px}.city-summary-count,.muted{color:var(--text-muted)}.city-summary-stats{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:var(--surface-soft);overflow:hidden;}.tablebox{overflow:auto;max-height:62vh;scrollbar-gutter:stable;overscroll-behavior:contain}table{border-collapse:collapse;width:100%;}th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;font-size:14px;line-height:1.3;}th{position:sticky;top:0;z-index:1;background:var(--table-head);color:var(--table-head-text);font-size:13px;font-weight:700}
 
 /* Jeden układ kolumn dla każdej tabeli przeglądów. */
 .inspections-table{
@@ -635,6 +635,7 @@ body.theme-dark .filter-count{
     overflow-wrap:anywhere;
     white-space:normal;
 }
+ .table-scroll-controls{display:none}
    /* ============================
    SORTOWANIE TABELI
 ============================ */
@@ -1411,7 +1412,38 @@ body.theme-dark .local-inspections{
 
     .local-list{padding:8px;gap:6px}
     .local-inspections{margin:0 0 6px;padding:7px;border-left:0}
-    .tablebox{max-height:56dvh;-webkit-overflow-scrolling:touch;border-radius:8px}
+    .table-scroll{min-width:0}
+    .table-scroll-controls{
+        display:grid;
+        grid-template-columns:42px minmax(0,1fr) 42px;
+        align-items:center;
+        gap:6px;
+        margin:0 0 7px;
+        color:var(--text-muted);
+        font-size:11px;
+        font-weight:700;
+        text-align:center;
+    }
+    .table-scroll-button{
+        min-height:38px;
+        padding:0;
+        font-size:25px;
+        line-height:1;
+        background:var(--secondary-bg);
+        color:var(--secondary-text);
+    }
+    .tablebox{
+        max-height:56dvh;
+        overflow-x:scroll;
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch;
+        overscroll-behavior-x:contain;
+        scrollbar-width:auto;
+        padding-bottom:5px;
+        border:1px solid var(--line);
+        border-radius:8px;
+        touch-action:pan-x pan-y;
+    }
     .inspections-table{min-width:880px}
     th,td{padding:8px 9px;font-size:12px}
     th{font-size:11px}
@@ -2112,8 +2144,14 @@ const localDue30 =
                                     ${
                                         localRows.length
                                             ? `
-                                                <div class="tablebox">
-                                                    <table class="inspections-table">
+                                                <div class="table-scroll">
+                                                    <div class="table-scroll-controls" aria-label="Przewijanie tabeli">
+                                                        <button type="button" class="table-scroll-button" data-table-scroll="-1" aria-label="Przewiń tabelę w lewo" title="Przewiń w lewo">‹</button>
+                                                        <span>Przewiń tabelę</span>
+                                                        <button type="button" class="table-scroll-button" data-table-scroll="1" aria-label="Przewiń tabelę w prawo" title="Przewiń w prawo">›</button>
+                                                    </div>
+                                                    <div class="tablebox" tabindex="0" aria-label="Tabela szczegółów przeglądów — przewijaj poziomo">
+                                                        <table class="inspections-table">
                                                         ${tableColumns()}
 
                                                         <thead>
@@ -2128,7 +2166,8 @@ const localDue30 =
                                                             )}
                                                         </tbody>
 
-                                                    </table>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                               `
                                             : `
@@ -2387,6 +2426,25 @@ $('#editForm').onsubmit=async e=>{
 };
 async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
 $('#cityGroups').addEventListener('click', async e => {
+
+    /* Widoczne przyciski przewijania tabeli na telefonie. */
+    const tableScrollButton = e.target.closest('button[data-table-scroll]');
+
+    if(tableScrollButton){
+        const tableBox = tableScrollButton
+            .closest('.table-scroll')
+            ?.querySelector('.tablebox');
+
+        if(tableBox){
+            const direction = Number(tableScrollButton.dataset.tableScroll) || 1;
+            tableBox.scrollBy({
+                left: direction * Math.max(240, tableBox.clientWidth * .78),
+                behavior: 'smooth'
+            });
+        }
+
+        return;
+    }
 
     /*
        Kliknięcie w lokal
