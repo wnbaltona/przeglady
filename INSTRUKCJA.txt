@@ -1,6 +1,8 @@
 PRZEGLĄDY — uruchomienie wspólnego rejestru
 
-1. Załóż projekt na https://supabase.com i w SQL Editor uruchom plik supabase-schema.sql.
+1. Załóż projekt na https://supabase.com. W SQL Editor uruchom najpierw plik
+   supabase-schema.sql, a następnie POLITYKI_BEZPIECZENSTWA.sql. Polityki nie mają
+   podziału na role: dostęp do aplikacji ma każdy użytkownik utworzony w Supabase.
 2. W Authentication > Providers włącz Email. W URL Configuration dodaj adres, pod którym
    będzie opublikowana aplikacja. Konta pracowników utwórz w Authentication > Users albo
    ustaw allowRegistration:true w supabase-config.js tylko na czas rejestracji.

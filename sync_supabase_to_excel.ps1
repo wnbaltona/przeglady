@@ -114,9 +114,12 @@ try {
     # Nie usuwamy tabeli. Power Automate zapamiętuje jej wewnętrzny identyfikator,
     # więc utworzenie jej od nowa zrywa połączenie przepływu z plikiem Excel.
     $table = $null
-    foreach ($listObject in @($sheet.ListObjects)) {
-        if ($listObject.Name -eq 'AlertyPowerAutomate') {
-            $table = $listObject
+    # Kolekcje COM z Excela nie zawsze działają prawidłowo z foreach/@().
+    # Odczyt po indeksie gwarantuje znalezienie istniejącej tabeli.
+    for ($tableIndex = 1; $tableIndex -le $sheet.ListObjects.Count; $tableIndex++) {
+        $existingTable = $sheet.ListObjects.Item($tableIndex)
+        if ($existingTable.Name -eq 'AlertyPowerAutomate') {
+            $table = $existingTable
             break
         }
     }

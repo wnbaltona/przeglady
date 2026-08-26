@@ -55,6 +55,5 @@ create trigger inspections_audit_change after insert or update or delete on publ
 for each row execute function public.audit_inspection_change();
 
 alter table public.inspection_audit enable row level security;
-drop policy if exists "Zalogowani odczytują historię przeglądów" on public.inspection_audit;
-create policy "Zalogowani odczytują historię przeglądów"
-  on public.inspection_audit for select to authenticated using (true);
+-- Bezpieczna polityka odczytu historii znajduje się w
+-- POLITYKI_BEZPIECZENSTWA.sql. Ten plik nie rozszerza już dostępu do historii.

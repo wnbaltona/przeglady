@@ -95,40 +95,8 @@ alter table public.locations enable row level security;
 alter table public.app_state enable row level security;
 alter table public.inspection_audit enable row level security;
 
-drop policy if exists "Zalogowani odczytują przeglądy" on public.inspections;
-drop policy if exists "Zalogowani dodają przeglądy" on public.inspections;
-drop policy if exists "Zalogowani edytują przeglądy" on public.inspections;
-drop policy if exists "Zalogowani usuwają przeglądy" on public.inspections;
-create policy "Zalogowani odczytują przeglądy" on public.inspections for select to authenticated using (true);
-create policy "Zalogowani dodają przeglądy" on public.inspections for insert to authenticated with check (true);
-create policy "Zalogowani edytują przeglądy" on public.inspections for update to authenticated using (true) with check (true);
-create policy "Zalogowani usuwają przeglądy" on public.inspections for delete to authenticated using (true);
-
-drop policy if exists "Zalogowani odczytują rodzaje przeglądów" on public.inspection_types;
-drop policy if exists "Zalogowani dodają rodzaje przeglądów" on public.inspection_types;
-drop policy if exists "Zalogowani edytują rodzaje przeglądów" on public.inspection_types;
-create policy "Zalogowani odczytują rodzaje przeglądów" on public.inspection_types for select to authenticated using (true);
-create policy "Zalogowani dodają rodzaje przeglądów" on public.inspection_types for insert to authenticated with check (true);
-create policy "Zalogowani edytują rodzaje przeglądów" on public.inspection_types for update to authenticated using (true) with check (true);
-
-drop policy if exists "Zalogowani odczytują lokale" on public.locations;
-drop policy if exists "Zalogowani dodają lokale" on public.locations;
-drop policy if exists "Zalogowani edytują lokale" on public.locations;
-drop policy if exists "Zalogowani usuwają lokale" on public.locations;
-create policy "Zalogowani odczytują lokale" on public.locations for select to authenticated using (true);
-create policy "Zalogowani dodają lokale" on public.locations for insert to authenticated with check (true);
-create policy "Zalogowani edytują lokale" on public.locations for update to authenticated using (true) with check (true);
-create policy "Zalogowani usuwają lokale" on public.locations for delete to authenticated using (true);
-
-drop policy if exists "Zalogowani odczytują stan aplikacji" on public.app_state;
-drop policy if exists "Zalogowani zapisują stan aplikacji" on public.app_state;
-drop policy if exists "Zalogowani aktualizują stan aplikacji" on public.app_state;
-create policy "Zalogowani odczytują stan aplikacji" on public.app_state for select to authenticated using (true);
-create policy "Zalogowani zapisują stan aplikacji" on public.app_state for insert to authenticated with check (true);
-create policy "Zalogowani aktualizują stan aplikacji" on public.app_state for update to authenticated using (true) with check (true);
-
-drop policy if exists "Zalogowani odczytują historię przeglądów" on public.inspection_audit;
-create policy "Zalogowani odczytują historię przeglądów" on public.inspection_audit for select to authenticated using (true);
+-- Restrykcyjne polityki RLS bez podziału na role znajdują się w pliku
+-- POLITYKI_BEZPIECZENSTWA.sql. Uruchom go po tym skrypcie.
 
 do $$ begin alter publication supabase_realtime add table public.inspections; exception when duplicate_object then null; end $$;
 do $$ begin alter publication supabase_realtime add table public.inspection_types; exception when duplicate_object then null; end $$;
@@ -140,11 +108,4 @@ update storage.buckets
 set file_size_limit = 10485760,
     allowed_mime_types = array['application/pdf','image/jpeg','image/png','image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 where id = 'protocols';
-drop policy if exists "Zalogowani odczytują protokoły" on storage.objects;
-drop policy if exists "Zalogowani dodają protokoły" on storage.objects;
-drop policy if exists "Zalogowani aktualizują protokoły" on storage.objects;
-drop policy if exists "Zalogowani usuwają protokoły" on storage.objects;
-create policy "Zalogowani odczytują protokoły" on storage.objects for select to authenticated using (bucket_id = 'protocols');
-create policy "Zalogowani dodają protokoły" on storage.objects for insert to authenticated with check (bucket_id = 'protocols');
-create policy "Zalogowani aktualizują protokoły" on storage.objects for update to authenticated using (bucket_id = 'protocols');
-create policy "Zalogowani usuwają protokoły" on storage.objects for delete to authenticated using (bucket_id = 'protocols');
+-- Polityki bucketu są ustawiane w POLITYKI_BEZPIECZENSTWA.sql.
