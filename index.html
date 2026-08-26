@@ -1332,6 +1332,16 @@ body.theme-dark .local-inspections{
 .calendar-grid>:nth-child(7n + 6),.calendar-grid>:nth-child(7n + 7){background:color-mix(in srgb,var(--text-muted) 8%,var(--surface))}
 .calendar-grid>.calendar-day.has-events:nth-child(7n + 6),.calendar-grid>.calendar-day.has-events:nth-child(7n + 7){background:color-mix(in srgb,var(--text-muted) 10%,var(--surface))}
 .calendar-grid>.calendar-day.today:nth-child(7n + 6),.calendar-grid>.calendar-day.today:nth-child(7n + 7){background:color-mix(in srgb,var(--blue) 12%,var(--surface))}
+.calendar-details-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+.calendar-details-count{color:var(--text-muted);font-size:11px;font-weight:600}
+.calendar-event-list{display:grid;gap:8px}
+.calendar-event-card{padding:9px 10px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:8px;background:var(--surface);color:var(--text)}
+.calendar-event-card.reminder{border-left-color:#f59e0b}
+.calendar-event-card.expiry{border-left-color:#ef4444}
+.calendar-event-kind{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px;font-weight:750}
+.calendar-event-place{font-weight:750;overflow-wrap:anywhere}
+.calendar-event-type{margin-top:3px;color:var(--text-muted);overflow-wrap:anywhere}
+.calendar-event-card button{margin:8px 0 0}
 @media (max-width:600px){.calendar-dialog{padding:16px}.calendar-grid{grid-template-rows:repeat(6,52px)}.calendar-day{min-height:52px}}
 
 /* Telefon: czytelny układ bez ścisku i z wygodnymi strefami dotyku. */
@@ -1400,12 +1410,17 @@ body.theme-dark .local-inspections{
     .city-summary{
         display:grid;
         grid-template-columns:20px minmax(0,1fr);
+        grid-template-rows:24px 48px;
         grid-template-areas:
             "arrow main"
             "arrow stats";
         gap:7px 9px;
-        padding:13px 11px;
+        height:104px;
+        min-height:104px;
+        padding:10px 11px;
         align-items:center;
+        align-content:center;
+        overflow:hidden;
     }
     .city-summary::after{display:none}
     .city-summary::before{
@@ -1420,10 +1435,31 @@ body.theme-dark .local-inspections{
     .city-group[open] .city-summary::before{transform:rotate(90deg)}
     .city-summary-main{grid-area:main;gap:7px;align-items:baseline;min-width:0;flex-wrap:wrap}
     .city-summary strong{font-size:15px;overflow-wrap:anywhere}
-    .city-summary-stats{grid-area:stats;margin:0;padding:0;gap:5px;width:100%}
+    .city-summary-stats{grid-area:stats;align-content:center;margin:0;padding:0;gap:5px;width:100%;height:48px;min-height:48px;max-height:48px;overflow:hidden}
+    .city-summary-stats:not(:has(.badge))::before{content:'Brak pilnych terminów';color:var(--text-muted);font-size:11px;font-weight:500}
     .badge{padding:4px 7px;font-size:10px}
 
     .local-list{padding:8px;gap:6px}
+    .local-item{
+        display:grid;
+        grid-template-columns:18px minmax(0,1fr);
+        grid-template-rows:24px 48px;
+        grid-template-areas:"arrow main" "arrow stats";
+        align-content:center;
+        align-items:center;
+        column-gap:10px;
+        row-gap:5px;
+        width:100%;
+        height:100px;
+        min-height:100px;
+        padding:10px 11px;
+        overflow:hidden;
+    }
+    .local-arrow{grid-area:arrow;align-self:center}
+    .local-main{grid-area:main;display:flex;align-items:baseline;gap:8px;min-width:0}
+    .local-stats{grid-area:stats;align-content:center;align-items:center;width:100%;height:48px;min-height:48px;max-height:48px;margin:0;overflow:hidden}
+    .local-stats:not(:has(.badge))::before{content:'Brak pilnych terminów';color:var(--text-muted);font-size:11px;font-weight:500}
+    .local-stats .badge{display:inline-flex;align-items:center;min-height:21px}
     .local-inspections{margin:0 0 6px;padding:7px;border-left:0;width:100%;max-width:100%;min-width:0;overflow:visible}
     .desktop-inspection-table{display:none}
     .mobile-inspection-types{display:grid;gap:7px}
@@ -1462,7 +1498,7 @@ body.theme-dark .local-inspections{
     #calendarModal{align-items:center;padding:6px}
     .calendar-dialog{
         display:grid;
-        grid-template-rows:auto auto auto minmax(264px,1fr) auto minmax(56px,auto) auto;
+        grid-template-rows:auto auto auto minmax(240px,252px) auto minmax(92px,1fr) auto;
         gap:7px;
         width:100%;
         height:min(720px,calc(100dvh - 12px));
@@ -1478,7 +1514,7 @@ body.theme-dark .local-inspections{
     .calendar-weekdays,.calendar-grid{gap:4px}
     .calendar-weekdays{margin:0;font-size:10px;line-height:1}
     .calendar-weekdays span{display:grid;place-items:center;min-height:22px;border-radius:5px;background:var(--surface-soft)}
-    .calendar-grid{min-height:264px;grid-template-rows:repeat(6,minmax(40px,1fr))}
+    .calendar-grid{min-height:240px;grid-template-rows:repeat(6,minmax(36px,1fr))}
     .calendar-day{
         display:flex;
         flex-direction:column;
@@ -1498,12 +1534,14 @@ body.theme-dark .local-inspections{
     .calendar-legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;font-size:10px;line-height:1.25}
     .calendar-legend-item{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface-soft);text-align:left}
     .calendar-legend-item .calendar-dot{flex:0 0 8px;width:8px;height:8px}
-    .calendar-details{min-height:56px;max-height:96px;overflow-y:auto;padding:8px 9px;font-size:11px;line-height:1.35}
-    .calendar-details>strong{display:block;margin-bottom:4px}
-    .calendar-details ul{list-style:none;margin:0;padding:0}
-    .calendar-details li{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;margin:0;padding:6px 0;border-bottom:1px solid var(--line)}
-    .calendar-details li:last-child{border-bottom:0}
-    .calendar-details button{width:100%;min-height:34px;margin:2px 0 0;padding:5px 8px}
+    .calendar-details{height:100%;min-height:92px;max-height:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:9px;font-size:11px;line-height:1.35;scrollbar-gutter:stable}
+    .calendar-details-heading{position:sticky;top:-9px;z-index:1;margin:-1px -1px 7px;padding:2px 1px 7px;background:var(--surface-soft);border-bottom:1px solid var(--line)}
+    .calendar-event-list{gap:7px}
+    .calendar-event-card{padding:8px 9px;background:var(--surface)}
+    .calendar-event-kind{margin-bottom:4px;font-size:10px}
+    .calendar-event-place{font-size:12px}
+    .calendar-event-type{font-size:11px}
+    .calendar-event-card button{width:100%;min-height:34px;margin:7px 0 0;padding:5px 8px}
     .calendar-dialog footer{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0}
     .calendar-dialog footer button{width:100%;min-height:42px}
 }
@@ -2346,7 +2384,36 @@ $('#loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.tar
 function calendarDateKey(year,month,day){return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`}
 function dateShift(date,days){const value=new Date(date+'T12:00:00');value.setDate(value.getDate()+days);return calendarDateKey(value.getFullYear(),value.getMonth(),value.getDate())}
 function calendarEventClass(event){return event.kind==='reminder'?'reminder-dot':'expiry-dot'}
-function renderCalendarDetails(date,events){const details=$('#calendarDetails');if(!events?.length){details.textContent='Brak terminów w tym dniu.';return}details.innerHTML=`<strong>${fmt(date)}</strong><ul>${events.map(event=>`<li><b>${event.kind==='reminder'?'Przypomnienie (14 dni przed terminem)':'Utrata ważności'}</b> — ${esc(event.record.city)}: ${esc(event.record.local)} · ${esc(event.record.type)} <button type="button" class="secondary" data-calendar-edit="${esc(event.record.id)}">Edytuj</button></li>`).join('')}</ul>`}
+function renderCalendarDetails(date,events){
+    const details=$('#calendarDetails');
+    if(!events?.length){
+        details.textContent='Brak terminów w tym dniu.';
+        return;
+    }
+
+    details.innerHTML=`
+        <div class="calendar-details-heading">
+            <strong>${fmt(date)}</strong>
+            <span class="calendar-details-count">${countLabel(events.length)}</span>
+        </div>
+        <div class="calendar-event-list">
+            ${events.map(event=>{
+                const reminder=event.kind==='reminder';
+                return `
+                    <article class="calendar-event-card ${reminder?'reminder':'expiry'}">
+                        <div class="calendar-event-kind">
+                            <span class="calendar-dot ${reminder?'reminder-dot':'expiry-dot'}"></span>
+                            ${reminder?'Do wykonania — termin za 14 dni':'Termin ważności przeglądu'}
+                        </div>
+                        <div class="calendar-event-place">${esc(event.record.city)} — ${esc(event.record.local)}</div>
+                        <div class="calendar-event-type">${esc(event.record.type)}</div>
+                        <button type="button" class="secondary" data-calendar-edit="${esc(event.record.id)}">Edytuj przegląd</button>
+                    </article>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
 function renderCalendar(){
     const year=calendarMonth.getFullYear(),month=calendarMonth.getMonth();
     $('#calendarTitle').textContent=new Date(year,month,1).toLocaleDateString('pl-PL',{month:'long',year:'numeric'});
