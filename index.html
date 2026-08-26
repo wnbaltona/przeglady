@@ -577,6 +577,9 @@ body.theme-dark .filter-count{
     color:#fff;
     font-size:12px;
 }.user-menu{position:relative}.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:100;min-width:250px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px #0f172a33}.menu-panel button{display:block;width:100%;margin-top:6px;text-align:left}.menu-user{padding:4px 6px 10px;color:var(--text-muted);border-bottom:1px solid var(--line);word-break:break-word}
+.menu-panel-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.menu-panel-header strong{font-size:15px}
+.menu-panel .menu-close{display:grid;place-items:center;width:34px;min-height:34px;margin:0 0 4px auto;padding:0;border-radius:50%;font-size:21px;line-height:1;text-align:center;background:var(--surface-soft);color:var(--text);border:1px solid var(--line)}
     button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:var(--secondary-bg);color:var(--secondary-text)}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
     .calendar-dialog{width:min(760px,96vw)}.calendar-toolbar{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:10px;margin:14px 0;text-align:center}.calendar-toolbar button{width:44px;height:40px;padding:0;font-size:24px;line-height:1;justify-self:center}.calendar-toolbar strong{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.calendar-weekdays{margin-bottom:5px;color:var(--text-muted);font-size:12px;font-weight:700;text-align:center}.calendar-day{min-height:78px;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);text-align:left;vertical-align:top}.calendar-day.empty{visibility:hidden}.calendar-day.has-events{cursor:pointer}.calendar-day.has-events:hover{border-color:var(--blue);background:var(--surface-hover)}.calendar-date{display:block;font-size:12px;font-weight:700}.calendar-events{display:flex;gap:3px;flex-wrap:wrap;margin-top:5px}.calendar-dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle}.expiry-dot{background:var(--blue)}.calendar-legend{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px 9px;margin:14px 0;color:var(--text-muted);font-size:12px}.calendar-details{min-height:44px;padding:10px 12px;border-radius:8px;background:var(--surface-soft);font-size:13px}.calendar-details ul{margin:5px 0 0;padding-left:18px}.calendar-details li{margin:6px 0}.calendar-details button{margin-left:8px;padding:4px 8px;font-size:11px}
     input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;background:var(--input-bg);color:var(--text);font:inherit}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:var(--surface);color:var(--text);text-align:left}.stat:hover,.stat.active{box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 35%,transparent),0 8px 18px #0f172a18;transform:translateY(-1px)}.stat b{display:block;font-size:27px;margin-top:4px}.overdue{border-left-color:#ef4444}.due{border-left-color:#f59e0b}.ok{border-left-color:#10b981}.total{border-left-color:var(--blue)}
@@ -1214,6 +1217,12 @@ body.theme-dark :where(button,input,select,textarea,summary):focus-visible{
     display:block;
 }
 
+/* Na komputerze zachowujemy pełną tabelę. Mobilna lista rodzajów
+   jest włączana dopiero w regule dla telefonu. */
+.mobile-inspection-types{
+    display:none;
+}
+
 /* Ciemny motyw */
 
 body.theme-dark .local-list{
@@ -1362,7 +1371,10 @@ body.theme-dark .local-inspections{
     .top .user-menu #menuToggle{width:100%}
     .menu-backdrop[hidden]{display:none !important}
     .menu-backdrop:not([hidden]){display:block;position:fixed;inset:0;background:#0f172a80;backdrop-filter:blur(2px);z-index:1090}
-    .menu-panel{position:fixed;inset:auto 10px 10px;max-height:72dvh;overflow:auto;min-width:0;padding:12px;z-index:1100;box-shadow:0 18px 48px #0f172a66}
+    .menu-panel{position:fixed;top:max(72px,calc(env(safe-area-inset-top) + 58px));right:10px;bottom:auto;left:10px;max-height:calc(100dvh - 92px);overflow:auto;min-width:0;padding:12px;z-index:1100;box-shadow:0 18px 48px #0f172a66}
+    .menu-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;padding:2px 2px 8px;border-bottom:1px solid var(--line)}
+    .menu-panel-header strong{font-size:16px}
+    .menu-panel .menu-close{display:grid;place-items:center;width:42px;min-height:42px;margin:0;padding:0;border-radius:50%;font-size:25px;line-height:1;background:var(--surface-soft);color:var(--text);border:1px solid var(--line)}
     .menu-panel button{min-height:42px}
     body.menu-open{overflow:hidden}
 
@@ -1413,24 +1425,26 @@ body.theme-dark .local-inspections{
     .badge{padding:4px 7px;font-size:10px}
 
     .local-list{padding:8px;gap:6px}
-    .local-inspections{margin:0 0 6px;padding:7px;border-left:0;width:100%;max-width:100%;min-width:0;overflow:hidden}
-    .tablebox{
-        display:block;
-        width:100%;
-        max-width:100%;
-        max-height:none;
-        overflow-x:scroll !important;
-        overflow-y:hidden;
-        -webkit-overflow-scrolling:touch;
-        overscroll-behavior:auto;
-        scrollbar-width:auto;
-        padding-bottom:5px;
-        border:1px solid var(--line);
-        border-radius:8px;
-        /* Przeglądarka obsługuje naturalne gesty w obu kierunkach. */
-        touch-action:auto;
-    }
-    .inspections-table{min-width:880px}
+    .local-inspections{margin:0 0 6px;padding:7px;border-left:0;width:100%;max-width:100%;min-width:0;overflow:visible}
+    .desktop-inspection-table{display:none}
+    .mobile-inspection-types{display:grid;gap:7px}
+    .inspection-type-group{overflow:hidden;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+    .inspection-type-summary{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:8px;align-items:center;padding:11px 10px;cursor:pointer;list-style:none;color:var(--text)}
+    .inspection-type-summary::-webkit-details-marker{display:none}
+    .inspection-type-summary::before{content:'›';color:var(--blue);font-size:22px;line-height:1;transition:transform .18s}
+    .inspection-type-group[open]>.inspection-type-summary::before{transform:rotate(90deg)}
+    .inspection-type-name{font-weight:700;overflow-wrap:anywhere}
+    .inspection-type-count{color:var(--text-muted);font-size:11px;white-space:nowrap}
+    .inspection-detail-list{display:grid;gap:8px;padding:0 8px 8px}
+    .inspection-detail-card{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}
+    .inspection-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin:0}
+    .inspection-detail-grid>div{min-width:0}
+    .inspection-detail-grid .detail-wide{grid-column:1/-1}
+    .inspection-detail-grid dt{margin:0 0 3px;color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+    .inspection-detail-grid dd{margin:0;font-size:13px;overflow-wrap:anywhere}
+    .inspection-detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+    .inspection-detail-actions button{width:100%;min-height:40px;padding:7px 8px}
+    .inspection-detail-actions .open-file{grid-column:1/-1}
     th,td{padding:8px 9px;font-size:12px}
     th{font-size:11px}
 
@@ -1462,7 +1476,7 @@ body.theme-dark .local-inspections{
   </style>
 </head>
 <body>
-<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-panel-header"><strong>Menu</strong><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><div id="user" class="menu-user">Niezalogowano</div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
 <div id="menuBackdrop" class="menu-backdrop" hidden></div>
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
@@ -1766,6 +1780,67 @@ function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);ret
         ↺ <span>Historia</span>
     </button>
 </div></td></tr>`}).join('')}
+
+function mobileInspectionCard(r){
+    const p=protocol(r);
+    return `
+        <article class="inspection-detail-card">
+            <dl class="inspection-detail-grid">
+                <div>
+                    <dt>Wykonano</dt>
+                    <dd>${fmt(r.done)}</dd>
+                </div>
+                <div>
+                    <dt>Następny termin</dt>
+                    <dd>${fmt(nextDate(r.done,r.months))}</dd>
+                </div>
+                <div>
+                    <dt>Status</dt>
+                    <dd><span class="badge ${statusClass(r)}">${statusLabel(r)}</span></dd>
+                </div>
+                <div>
+                    <dt>Protokół</dt>
+                    <dd><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span></dd>
+                </div>
+                <div class="detail-wide">
+                    <dt>Uwagi</dt>
+                    <dd>${esc(r.notes||'—')}</dd>
+                </div>
+            </dl>
+            <div class="inspection-detail-actions">
+                ${r.protocolPath?`<button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz protokół</button>`:''}
+                <button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}">✎ Edytuj</button>
+                <button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">🗑 Usuń</button>
+                <button type="button" class="secondary" data-action="history" data-id="${esc(r.id)}">↺ Historia</button>
+            </div>
+        </article>
+    `;
+}
+
+function mobileInspectionTypes(records,city,local,expandedTypes){
+    const types=[...new Set(records.map(r=>String(r.type||'Bez rodzaju')))]
+        .sort((a,b)=>a.localeCompare(b,'pl'));
+
+    return `
+        <div class="mobile-inspection-types">
+            ${types.map(type=>{
+                const typeRows=sortRows(records.filter(r=>String(r.type||'Bez rodzaju')===type));
+                const typeKey=`${city}|||${local}|||${type}`;
+                return `
+                    <details class="inspection-type-group" data-type-key="${esc(typeKey)}" ${expandedTypes.has(typeKey)?'open':''}>
+                        <summary class="inspection-type-summary">
+                            <span class="inspection-type-name">${esc(type)}</span>
+                            <span class="inspection-type-count">${countLabel(typeRows.length)}</span>
+                        </summary>
+                        <div class="inspection-detail-list">
+                            ${typeRows.map(mobileInspectionCard).join('')}
+                        </div>
+                    </details>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
 function renderLocalInspections(local, city){
 
     const records = data.filter(r =>
@@ -1874,6 +1949,13 @@ function render(){
         )].map(x =>
             `${x.dataset.city}|||${x.dataset.local}`
         )
+    );
+
+    /* Zapamiętujemy rozwinięte rodzaje przeglądów na telefonie. */
+    const expandedTypes = new Set(
+        [...document.querySelectorAll(
+            '.inspection-type-group[open]'
+        )].map(x => x.dataset.typeKey)
     );
 
 
@@ -2131,7 +2213,7 @@ const localDue30 =
                                     ${
                                         localRows.length
                                             ? `
-                                                <div class="tablebox" tabindex="0" aria-label="Tabela szczegółów przeglądów — przewijaj poziomo palcem">
+                                                <div class="tablebox desktop-inspection-table" tabindex="0" aria-label="Tabela szczegółów przeglądów">
                                                     <table class="inspections-table">
                                                         ${tableColumns()}
 
@@ -2149,6 +2231,12 @@ const localDue30 =
 
                                                     </table>
                                                 </div>
+                                                ${mobileInspectionTypes(
+                                                    localRows,
+                                                    cityName,
+                                                    local,
+                                                    expandedTypes
+                                                )}
                                               `
                                             : `
                                                 <div class="muted">
@@ -2262,8 +2350,10 @@ new MutationObserver(()=>{
     }
 }).observe($('#userMenu'),{attributes:true,attributeFilter:['hidden']});
 $('#menuToggle').onclick=()=>setUserMenu($('#userMenu').hidden);
+$('#menuClose').onclick=closeUserMenu;
 $('#menuBackdrop').onclick=closeUserMenu;
 document.addEventListener('click',e=>{if(!e.target.closest('.user-menu'))closeUserMenu()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#userMenu').hidden)closeUserMenu()});
 function openThemeModal(fromLogin=false){
     themeOpenedFromLogin=fromLogin;
     closeUserMenu();
