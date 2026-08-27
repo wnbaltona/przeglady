@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="72 72 384 384" role="img" aria-labelledby="title">
+  <title>Rejestr Przeglądów</title>
+  <path d="M139 109h175l59 59v221c0 20-16 36-36 36H139c-20 0-36-16-36-36V145c0-20 16-36 36-36Z" fill="#fff" stroke="#16324F" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M314 109v59h59" fill="#D7E8F3" stroke="#16324F" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M166 238h180M166 297h180M166 356h108" stroke="#0B6285" stroke-width="25" stroke-linecap="round"/>
+  <circle cx="371" cy="360" r="68" fill="#0B6285"/>
+  <path d="m339 360 22 22 43-48" fill="none" stroke="#fff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
