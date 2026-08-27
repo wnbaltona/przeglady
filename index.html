@@ -1548,6 +1548,7 @@ body.theme-dark .local-inspections{
     .local-stats-desktop{display:none}
     .local-stats-mobile{display:grid;gap:3px;width:100%;min-width:0}
     .local-status-line{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-width:0;line-height:1.15}
+    .local-status-line{cursor:pointer}
     .local-status-type{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:10px;font-weight:650}
     .local-status-line .badge{flex:0 0 auto}
     .local-status-empty{color:var(--text-muted);font-size:11px;font-weight:500}
@@ -3065,6 +3066,15 @@ $('#editForm').onsubmit=async e=>{
 async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
 
 $('#cityGroups').addEventListener('click', async e => {
+
+    const statusLine=e.target.closest('.local-status-line');
+    if(statusLine){
+        e.preventDefault();
+        e.stopPropagation();
+        setAttentionFilter(true);
+        openAttentionTable();
+        return;
+    }
 
     /*
        Kliknięcie w lokal
