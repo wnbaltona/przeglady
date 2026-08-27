@@ -578,6 +578,10 @@ body.theme-dark .filter-count{
     font-size:12px;
 }.user-menu{position:relative}.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:100;min-width:250px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px #0f172a33}.menu-panel button{display:block;width:100%;margin-top:6px;text-align:left}.menu-user{padding:4px 6px 10px;color:var(--text-muted);border-bottom:1px solid var(--line);word-break:break-word}
 .menu-user-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+.menu-section-label{margin:12px 4px 4px;color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.menu-user-row + .menu-section-label{margin-top:8px}
+.menu-panel>button+button{margin-top:5px}
+.menu-panel .menu-section-label+button{margin-top:4px}
 .menu-user-row .menu-user{flex:1;min-width:0;border-bottom:0}
 .menu-panel .menu-close{display:grid;place-items:center;width:30px;height:30px;min-height:30px;flex:0 0 30px;margin:0 2px 6px 0;padding:0;border-radius:5px;font-size:19px;line-height:1;text-align:center;background:var(--surface-soft);color:var(--text);border:1px solid var(--line)}
     button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:var(--secondary-bg);color:var(--secondary-text)}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
@@ -1351,6 +1355,8 @@ body.theme-dark .local-inspections{
 .calendar-event-kind{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px;font-weight:750}
 .calendar-event-place{font-weight:750;overflow-wrap:anywhere}
 .calendar-event-type{margin-top:3px;color:var(--text-muted);overflow-wrap:anywhere}
+.calendar-event-expiry{margin-top:5px;color:var(--text-muted);font-size:12px}
+.calendar-event-expiry strong{color:var(--text);font-weight:750}
 .calendar-event-card button{margin:8px 0 0}
 .calendar-dialog footer{align-items:center}
 #calendarToday{margin-right:auto}
@@ -1637,6 +1643,7 @@ body.theme-dark .local-inspections{
     .calendar-event-kind{margin-bottom:4px;font-size:10px}
     .calendar-event-place{font-size:12px}
     .calendar-event-type{font-size:11px}
+    .calendar-event-expiry{font-size:10px}
     .calendar-event-card button{width:100%;min-height:34px;margin:7px 0 0;padding:5px 8px}
     .calendar-dialog footer{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0}
     .calendar-dialog footer button{width:100%;min-height:42px;padding:7px 5px;font-size:11px}
@@ -1681,7 +1688,7 @@ body.theme-dark .local-inspections{
   </style>
 </head>
 <body>
-<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-user-row"><div id="user" class="menu-user">Niezalogowano</div><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><button id="refreshData" class="secondary" type="button">Odśwież dane</button><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="pushToggle" class="secondary" type="button" hidden>Włącz powiadomienia</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-user-row"><div id="user" class="menu-user">Niezalogowano</div><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><div class="menu-section-label">Dane i przeglądy</div><button id="refreshData" class="secondary" type="button">Odśwież dane</button><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><div class="menu-section-label">Widok i konto</div><button id="showTrash" class="secondary" type="button">Kosz</button><button id="pushToggle" class="secondary" type="button" hidden>Włącz powiadomienia</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
 <div id="menuBackdrop" class="menu-backdrop" hidden></div>
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
@@ -2778,7 +2785,8 @@ function calendarInspectionCount(events){return new Set(events.map(event=>String
 function calendarEventSort(a,b){return String(a.date).localeCompare(String(b.date))||norm(a.record.city).localeCompare(norm(b.record.city),'pl')||norm(a.record.local).localeCompare(norm(b.record.local),'pl')||norm(a.record.type).localeCompare(norm(b.record.type),'pl')}
 function calendarEventCard(event,showDate=false){
     const eventClass=event.kind==='reminder30'?'reminder30':event.kind==='reminder14'?'reminder14':'expiry';
-    const eventText=event.kind==='reminder30'?'Do wykonania — termin za 30 dni':event.kind==='reminder14'?'Do wykonania — termin za 14 dni':'Termin ważności przeglądu';
+    const eventText=event.kind==='reminder30'?'Do wykonania (za 30 dni)':event.kind==='reminder14'?'Do wykonania (za 14 dni)':'Termin ważności przeglądu';
+    const expiry=nextDate(event.record.done,event.record.months);
     return `
         <article class="calendar-event-card ${eventClass}">
             <div class="calendar-event-kind">
@@ -2787,6 +2795,7 @@ function calendarEventCard(event,showDate=false){
             </div>
             <div class="calendar-event-place">${esc(event.record.city)} — ${esc(event.record.local)}</div>
             <div class="calendar-event-type">${esc(event.record.type)}</div>
+            <div class="calendar-event-expiry">Ważność do: <strong>${fmt(expiry)}</strong></div>
             <button type="button" class="secondary" data-calendar-edit="${esc(event.record.id)}">Edytuj przegląd</button>
         </article>
     `;
