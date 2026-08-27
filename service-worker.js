@@ -17,7 +17,7 @@ self.addEventListener('push', event => {
   const title = message.title || 'Przeglądy wymagają uwagi';
   const notificationTag = message.tag || 'inspection-deadlines';
   const requestedUrl = message.url || './';
-  const destinationUrl = notificationTag === 'inspection-deadlines' && requestedUrl === './'
+  const destinationUrl = requestedUrl === './'
     ? './?filter=attention'
     : requestedUrl;
   const options = {
