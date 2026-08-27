@@ -39,8 +39,12 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of windows) {
-      if ('navigate' in client) await client.navigate(destination);
-      return client.focus();
+      try {
+        if ('navigate' in client) await client.navigate(destination);
+        return await client.focus();
+      } catch {
+        // Jeśli istniejąca karta nie może zostać przekierowana, otwieramy nową.
+      }
     }
     return self.clients.openWindow(destination);
   })());
