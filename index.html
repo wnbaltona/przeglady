@@ -1680,7 +1680,7 @@ body.theme-dark .local-inspections{
   </style>
 </head>
 <body>
-<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-user-row"><div id="user" class="menu-user">Niezalogowano</div><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="pushToggle" class="secondary" type="button" hidden>Włącz powiadomienia</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
+<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-user-row"><div id="user" class="menu-user">Niezalogowano</div><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><button id="refreshData" class="secondary" type="button">Odśwież dane</button><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal</button><button id="manageLocations" class="secondary" type="button">Usuń lokal</button><button id="showTrash" class="secondary" type="button">Kosz</button><button id="pushToggle" class="secondary" type="button" hidden>Włącz powiadomienia</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
 <div id="menuBackdrop" class="menu-backdrop" hidden></div>
 <main class="wrap">
   <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
@@ -1815,13 +1815,9 @@ function setAttentionFilter(active){
     else if(url.searchParams.get('filter')==='attention')url.searchParams.delete('filter');
     try{history.replaceState(null,'',`${url.pathname}${url.search}${url.hash}`)}catch{}
 }
-function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function state(r){
-    const n = nextDate(r.done, r.months);
-    if(!n) return '';
-
-    const days = Math.ceil(
-        (new Date(n + 'T12:00:00') - new Date()) / 86400000
-    );
+function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function daysUntilExpiry(r){const expiry=nextDate(r.done,r.months);if(!expiry)return null;const today=new Date();const todayAtNoon=new Date(today.getFullYear(),today.getMonth(),today.getDate(),12);return Math.round((new Date(expiry+'T12:00:00')-todayAtNoon)/86400000)}function state(r){
+    const days=daysUntilExpiry(r);
+    if(days===null) return '';
 
     if(days < 0) return 'PO TERMINIE';
     if(days <= 14) return 'DO WYKONANIA';
@@ -1830,12 +1826,8 @@ function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split
 }
 
 function statusClass(r){
-    const n = nextDate(r.done, r.months);
-    if(!n) return '';
-
-    const days = Math.ceil(
-        (new Date(n + 'T12:00:00') - new Date()) / 86400000
-    );
+    const days=daysUntilExpiry(r);
+    if(days===null) return '';
 
     if(days < 0) return 'POBLACK';
     if(days <= 14) return 'DO14';
@@ -1844,25 +1836,18 @@ function statusClass(r){
 }
 
 function requiresAttention(r){
-    const expiry=nextDate(r.done,r.months);
-    if(!expiry)return false;
-    const today=new Date();
-    const todayAtNoon=new Date(today.getFullYear(),today.getMonth(),today.getDate(),12);
-    const days=Math.round((new Date(expiry+'T12:00:00')-todayAtNoon)/86400000);
-    return days<=14;
+    const days=daysUntilExpiry(r);
+    return days!==null&&days<=14;
 }
 
 function statusLabel(r){
-    const n = nextDate(r.done, r.months);
-    if(!n) return '—';
+    const days=daysUntilExpiry(r);
+    if(days===null) return '—';
 
-    const days = Math.ceil(
-        (new Date(n + 'T12:00:00') - new Date()) / 86400000
-    );
-
-    if(days < 0) return 'Po terminie';
-    if(days <= 14) return 'Do wykonania – 14 dni';
-    if(days <= 30) return 'Do wykonania – 30 dni';
+    if(days < 0) return `Po terminie (${Math.abs(days)} dni)`;
+    if(days === 0) return 'Do wykonania — dzisiaj';
+    if(days <= 14) return `Do wykonania — za ${days} dni`;
+    if(days <= 30) return `Do wykonania — za ${days} dni`;
     return 'OK';
 }function protocol(r){return r.protocolFileName||r.protocolDate?'DODANY':'BRAK PROTOKOŁU'}function countLabel(n){return n===1?'1 przegląd':(n%100<12||n%100>14)&&n%10>=2&&n%10<=4?`${n} przeglądy`:`${n} przeglądów`}function sortValue(r,key){
 
@@ -2048,7 +2033,8 @@ function mobileTypeStatus(r){
     return {className:'OK',label:'AKTUALNY'};
 }
 function localStatusSummary(records){
-    const urgent=records.filter(row=>['POBLACK','DO14','DO30'].includes(statusClass(row)));
+    const urgent=records.filter(row=>['POBLACK','DO14','DO30'].includes(statusClass(row)))
+        .sort((a,b)=>(nextDate(a.done,a.months)||'9999-12-31').localeCompare(nextDate(b.done,b.months)||'9999-12-31'));
     if(!urgent.length)return '<span class="local-status-empty">Brak pilnych terminów</span>';
     return urgent.map(row=>{const info=mobileTypeStatus(row);return `<span class="local-status-line"><span class="local-status-type">${esc(row.type||'Bez rodzaju')}</span><span class="badge ${info.className}">${info.label}</span></span>`}).join('');
 }
@@ -2494,7 +2480,10 @@ function katowiceTerminal(local){
     return 'Pozostałe';
 }
 function attentionRows(){
-    return data.filter(requiresAttention).sort((a,b)=>norm(a.city).localeCompare(norm(b.city),'pl')||norm(a.local).localeCompare(norm(b.local),'pl')||norm(a.type).localeCompare(norm(b.type),'pl'));
+    return data.filter(requiresAttention).sort((a,b)=>{
+        const dateA=nextDate(a.done,a.months)||'9999-12-31',dateB=nextDate(b.done,b.months)||'9999-12-31';
+        return dateA.localeCompare(dateB)||norm(a.city).localeCompare(norm(b.city),'pl')||norm(a.local).localeCompare(norm(b.local),'pl')||norm(a.type).localeCompare(norm(b.type),'pl');
+    });
 }
 function renderAttentionTable(){
     const body=$('#attentionTableBody');
@@ -2551,10 +2540,18 @@ $('#clearFilters').addEventListener('click', () => {
 
     render();
 });
+$('#refreshData').addEventListener('click', async () => {
+    const button=$('#refreshData');
+    if(!activeSession?.user||button.disabled)return;
+    button.disabled=true;
+    const oldText=button.textContent;
+    button.textContent='Odświeżanie…';
+    try{await load()}finally{button.disabled=false;button.textContent=oldText;closeUserMenu()}
+});
 $('#closeAttention').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
 $('#closeAttentionFooter').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
 $('#attentionShowAll').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
-async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`}
+async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleString('pl-PL')} · ${countLabel(data.length)}`}
 function pushSupported(){return location.protocol==='https:'&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window}
 function isIosDevice(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
 function isStandalonePwa(){return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}
