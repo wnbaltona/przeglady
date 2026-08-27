@@ -1548,7 +1548,8 @@ body.theme-dark .local-inspections{
     .local-stats-desktop{display:none}
     .local-stats-mobile{display:grid;gap:3px;width:100%;min-width:0}
     .local-status-line{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-width:0;line-height:1.15}
-    .local-status-line{cursor:pointer}
+    .local-status-line{cursor:default}
+    .local-status-line .badge{cursor:pointer}
     .local-status-type{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:10px;font-weight:650}
     .local-status-line .badge{flex:0 0 auto}
     .local-status-empty{color:var(--text-muted);font-size:11px;font-weight:500}
@@ -1815,7 +1816,7 @@ function setAttentionFilter(active){
     else if(url.searchParams.get('filter')==='attention')url.searchParams.delete('filter');
     try{history.replaceState(null,'',`${url.pathname}${url.search}${url.hash}`)}catch{}
 }
-function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function daysUntilExpiry(r){const expiry=nextDate(r.done,r.months);if(!expiry)return null;const today=new Date();const todayAtNoon=new Date(today.getFullYear(),today.getMonth(),today.getDate(),12);return Math.round((new Date(expiry+'T12:00:00')-todayAtNoon)/86400000)}function state(r){
+function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function daysUntilExpiry(r){const expiry=nextDate(r.done,r.months);if(!expiry)return null;const today=new Date();const todayAtNoon=new Date(today.getFullYear(),today.getMonth(),today.getDate(),12);return Math.round((new Date(expiry+'T12:00:00')-todayAtNoon)/86400000)}function daysWord(value){return Math.abs(Number(value))===1?'dzień':'dni'}function state(r){
     const days=daysUntilExpiry(r);
     if(days===null) return '';
 
@@ -1844,10 +1845,9 @@ function statusLabel(r){
     const days=daysUntilExpiry(r);
     if(days===null) return '—';
 
-    if(days < 0) return `Po terminie (${Math.abs(days)} dni)`;
-    if(days === 0) return 'Do wykonania — dzisiaj';
-    if(days <= 14) return `Do wykonania — za ${days} dni`;
-    if(days <= 30) return `Do wykonania — za ${days} dni`;
+    if(days < 0) return `Po terminie (${Math.abs(days)} ${daysWord(days)})`;
+    if(days === 0) return 'Do wykonania (dzisiaj)';
+    if(days <= 30) return `Do wykonania (za ${days} ${daysWord(days)})`;
     return 'OK';
 }function protocol(r){return r.protocolFileName||r.protocolDate?'DODANY':'BRAK PROTOKOŁU'}function countLabel(n){return n===1?'1 przegląd':(n%100<12||n%100>14)&&n%10>=2&&n%10<=4?`${n} przeglądy`:`${n} przeglądów`}function sortValue(r,key){
 
@@ -2344,27 +2344,15 @@ function render(){
 
 const localDue14 =
     localRows.filter(r => {
-        const n = nextDate(r.done, r.months);
-        if (!n) return false;
-
-        const days = Math.ceil(
-            (new Date(n + 'T12:00:00') - new Date()) / 86400000
-        );
-
-        return days >= 0 && days <= 14;
+        const days=daysUntilExpiry(r);
+        return days!==null && days >= 0 && days <= 14;
     }).length;
 
 
 const localDue30 =
     localRows.filter(r => {
-        const n = nextDate(r.done, r.months);
-        if (!n) return false;
-
-        const days = Math.ceil(
-            (new Date(n + 'T12:00:00') - new Date()) / 86400000
-        );
-
-        return days > 14 && days <= 30;
+        const days=daysUntilExpiry(r);
+        return days!==null && days > 14 && days <= 30;
     }).length;
 
 
@@ -3062,8 +3050,8 @@ async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)
 
 $('#cityGroups').addEventListener('click', async e => {
 
-    const statusLine=e.target.closest('.local-status-line');
-    if(statusLine){
+    const statusBadge=e.target.closest('.local-status-line .badge');
+    if(statusBadge){
         e.preventDefault();
         e.stopPropagation();
         setAttentionFilter(true);
