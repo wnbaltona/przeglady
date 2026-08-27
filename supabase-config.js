@@ -7,5 +7,5 @@ window.APP_CONFIG={
   inactivityHours:24,
   // Wklej tutaj PUBLICZNY klucz VAPID wygenerowany przez GENERUJ_KLUCZE_PUSH.ps1.
   // Klucza prywatnego nigdy nie wpisuj do tego pliku ani do GitHub.
-  pushVapidPublicKey:'BHweLftMDjffV0J0HC7ljaxm_XLgv_S6hhFcAgsuWdzzoZxcPF0aOWXZ7YLnnsqw_M8-94Zn3QN7_nsUce2D3gQ'
+  pushVapidPublicKey:'BKbe2MKbNNAoyKW3WhhkHPw26zZqpbg-cGDzI0L5DwtuNi1qHCuWM3o960-8w1cRGef9n9OD5KvQBpmu2Hb7208'
 };
