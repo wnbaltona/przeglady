@@ -1334,7 +1334,8 @@ body.theme-dark .local-inspections{
 .calendar-details{height:auto;min-height:96px;max-height:260px;overflow:auto;scrollbar-gutter:stable}
 .calendar-day.today{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 12%,var(--surface));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--blue) 55%,transparent)}
 .calendar-day.selected{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 18%,var(--surface));box-shadow:inset 0 0 0 2px var(--blue)}
-.calendar-dot.reminder-dot{background:#f59e0b}
+.calendar-dot.reminder30-dot{background:#22c55e}
+.calendar-dot.reminder14-dot{background:#eab308}
 .calendar-dot.expiry-dot{background:#ef4444}
 .calendar-weekdays span:nth-child(6),.calendar-weekdays span:nth-child(7){color:var(--text-muted);background:var(--surface-soft);border-radius:6px}
 .calendar-grid>:nth-child(7n + 6),.calendar-grid>:nth-child(7n + 7){background:color-mix(in srgb,var(--text-muted) 8%,var(--surface))}
@@ -1344,7 +1345,8 @@ body.theme-dark .local-inspections{
 .calendar-details-count{color:var(--text-muted);font-size:11px;font-weight:600}
 .calendar-event-list{display:grid;gap:8px}
 .calendar-event-card{padding:9px 10px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:8px;background:var(--surface);color:var(--text)}
-.calendar-event-card.reminder{border-left-color:#f59e0b}
+.calendar-event-card.reminder30{border-left-color:#22c55e}
+.calendar-event-card.reminder14{border-left-color:#eab308}
 .calendar-event-card.expiry{border-left-color:#ef4444}
 .calendar-event-kind{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px;font-weight:750}
 .calendar-event-place{font-weight:750;overflow-wrap:anywhere}
@@ -1616,7 +1618,7 @@ body.theme-dark .local-inspections{
     .calendar-events{align-items:center;justify-content:center;gap:2px;margin-top:auto;padding-top:3px}
     .calendar-events small{font-size:8px;line-height:1;color:var(--text-muted)}
     .calendar-dot{width:7px;height:7px;flex:0 0 7px}
-    .calendar-legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;font-size:10px;line-height:1.25}
+    .calendar-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0;font-size:9px;line-height:1.2}
     .calendar-legend-item{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface-soft);text-align:left}
     .calendar-legend-item .calendar-dot{flex:0 0 8px;width:8px;height:8px}
     .calendar-details{height:100%;min-height:92px;max-height:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:9px;font-size:11px;line-height:1.35;scrollbar-gutter:stable}
@@ -1630,6 +1632,31 @@ body.theme-dark .local-inspections{
     .calendar-dialog footer{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0}
     .calendar-dialog footer button{width:100%;min-height:42px;padding:7px 5px;font-size:11px}
     #calendarToday{margin-right:0}
+}
+.terminal-section{display:grid;gap:7px}
+.terminal-local-list{display:grid;gap:7px}
+.terminal-title{margin:6px 3px 1px;padding:7px 10px;border-left:4px solid var(--blue);border-radius:6px;background:var(--surface-soft);color:var(--text);font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.attention-dialog{width:min(760px,96vw);overflow:hidden}
+.attention-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.attention-header h2{margin:0}
+.attention-header p{margin:5px 0 0}
+.attention-close{display:grid;place-items:center;width:34px;height:34px;min-height:34px;flex:0 0 34px;padding:0;border-radius:7px;background:var(--surface-soft);color:var(--text);border:1px solid var(--line);font-size:22px;line-height:1}
+.attention-tablebox{margin-top:14px;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:9px;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.attention-table{width:100%;table-layout:fixed}
+.attention-table th,.attention-table td{padding:9px 8px;overflow-wrap:anywhere}
+.attention-table col:nth-child(1){width:20%}.attention-table col:nth-child(2){width:20%}.attention-table col:nth-child(3){width:38%}.attention-table col:nth-child(4){width:22%}
+.attention-table tbody tr.overdue td{background:color-mix(in srgb,#ef4444 7%,var(--surface))}
+@media (max-width:600px){
+    .terminal-title{margin-top:8px;font-size:11px}
+    .attention-modal{padding:8px}
+    .attention-dialog{display:grid;grid-template-rows:auto minmax(0,1fr) auto;width:100%;height:min(86dvh,720px);max-height:86dvh;padding:13px;overflow:hidden}
+    .attention-header h2{font-size:18px}
+    .attention-header p{font-size:11px;line-height:1.35}
+    .attention-tablebox{height:100%;max-height:none;margin-top:10px;touch-action:pan-y}
+    .attention-table th,.attention-table td{padding:8px 4px;font-size:10px;line-height:1.25}
+    .attention-table th{white-space:normal}
+    .attention-dialog footer{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+    .attention-dialog footer button{width:100%;min-height:42px;padding:7px;font-size:11px}
 }
   
   </style>
@@ -1697,7 +1724,8 @@ body.theme-dark .local-inspections{
 <div class="modal" id="locationsModal"><section class="dialog"><h2>Usuń lokal</h2><p class="muted">Usunięcie chowa lokal z podpowiedzi, ale nie kasuje istniejących przeglądów.</p><ul id="locationList" class="type-list"></ul><footer><button type="button" id="closeLocations" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="trashModal"><section class="dialog"><h2>Kosz</h2><p class="muted">Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.</p><ul id="trashList" class="type-list"></ul><footer><button type="button" id="closeTrash" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="historyModal"><section class="dialog"><h2>Historia wpisu</h2><ul id="historyList" class="type-list"></ul><footer><button type="button" id="closeHistory" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="calendarModal"><section class="dialog calendar-dialog"><h2>Kalendarz terminów przeglądów</h2><div class="calendar-toolbar"><button type="button" id="calendarPrevious" class="secondary" aria-label="Poprzedni miesiąc">‹</button><strong id="calendarTitle"></strong><button type="button" id="calendarNext" class="secondary" aria-label="Następny miesiąc">›</button></div><div class="calendar-weekdays"><span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sob</span><span>Nie</span></div><div id="calendarGrid" class="calendar-grid"></div><div class="calendar-legend"><span class="calendar-legend-item"><span class="calendar-dot reminder-dot"></span><span>14 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot expiry-dot"></span><span>Utrata ważności</span></span></div><div id="calendarDetails" class="calendar-details muted">Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować przegląd.</div><footer><button type="button" id="calendarToday" class="secondary">Dzisiaj</button><button type="button" id="calendarAdd">+ Dodaj przegląd</button><button type="button" id="closeCalendar" class="secondary">Zamknij</button></footer></section></div>
+<div class="modal" id="calendarModal"><section class="dialog calendar-dialog"><h2>Kalendarz terminów przeglądów</h2><div class="calendar-toolbar"><button type="button" id="calendarPrevious" class="secondary" aria-label="Poprzedni miesiąc">‹</button><strong id="calendarTitle"></strong><button type="button" id="calendarNext" class="secondary" aria-label="Następny miesiąc">›</button></div><div class="calendar-weekdays"><span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sob</span><span>Nie</span></div><div id="calendarGrid" class="calendar-grid"></div><div class="calendar-legend"><span class="calendar-legend-item"><span class="calendar-dot reminder30-dot"></span><span>30 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot reminder14-dot"></span><span>14 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot expiry-dot"></span><span>Utrata ważności</span></span></div><div id="calendarDetails" class="calendar-details muted">Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować przegląd.</div><footer><button type="button" id="calendarToday" class="secondary">Dzisiaj</button><button type="button" id="calendarAdd">+ Dodaj przegląd</button><button type="button" id="closeCalendar" class="secondary">Zamknij</button></footer></section></div>
+<div class="modal attention-modal" id="attentionModal"><section class="dialog attention-dialog"><div class="attention-header"><div><h2>Przeglądy wymagające uwagi</h2><p class="muted">Po terminie lub z terminem ważności przypadającym w ciągu 14 dni.</p></div><button type="button" id="closeAttention" class="attention-close" aria-label="Zamknij">×</button></div><div class="attention-tablebox"><table class="attention-table"><colgroup><col><col><col><col></colgroup><thead><tr><th>Nr lokalu</th><th>Miasto</th><th>Rodzaj przeglądu</th><th>Termin ważności</th></tr></thead><tbody id="attentionTableBody"></tbody></table></div><footer><button type="button" id="attentionShowAll" class="secondary">Pokaż wszystkie</button><button type="button" id="closeAttentionFooter">Zamknij</button></footer></section></div>
 <div class="modal" id="themeModal">
 <section class="dialog">
 <h2>Zmień motyw</h2>
@@ -2193,9 +2221,14 @@ function render(){
                     .map(r => r.local)
                     .filter(Boolean)
             )
-        ].sort((a, b) =>
-            a.localeCompare(b, 'pl')
-        );
+        ].sort((a, b) => {
+            if(norm(cityName)==='katowice'){
+                const order={'Terminal A':0,'Terminal B':1,'Pozostałe':2};
+                const groupDiff=order[katowiceTerminal(a)]-order[katowiceTerminal(b)];
+                if(groupDiff)return groupDiff;
+            }
+            return a.localeCompare(b, 'pl', {numeric:true});
+        });
 
 
         /*
@@ -2273,7 +2306,7 @@ function render(){
 
                 <div class="local-list">
 
-                    ${cityLocals.map(local => {
+                    ${cityLocals.map((local,localIndex) => {
 
                         const localRows =
                             cityRows.filter(
@@ -2321,7 +2354,10 @@ const localDue30 =
     }).length;
 
 
-                        return `
+                        const terminal=norm(cityName)==='katowice'?katowiceTerminal(local):'';
+                        const previousTerminal=localIndex>0&&norm(cityName)==='katowice'?katowiceTerminal(cityLocals[localIndex-1]):'';
+                        const terminalHeading=terminal&&terminal!==previousTerminal?`<div class="terminal-title">${terminal}</div>`:'';
+                        return `${terminalHeading}
                             <div class="local-wrapper">
 
                                 <button
@@ -2446,6 +2482,23 @@ const localDue30 =
 }
 function showError(msg){$('#notice').hidden=false;$('#notice').textContent='Nie można połączyć się z rejestrem: '+msg}
 
+function katowiceTerminal(local){
+    const key=norm(local).replace(/\s+/g,'');
+    if(['b53','282','283','284'].includes(key))return 'Terminal A';
+    if(['260','261','262','263','b53.ba1','ba1','ba2'].includes(key))return 'Terminal B';
+    return 'Pozostałe';
+}
+function attentionRows(){
+    return data.filter(requiresAttention).sort((a,b)=>norm(a.city).localeCompare(norm(b.city),'pl')||norm(a.local).localeCompare(norm(b.local),'pl')||norm(a.type).localeCompare(norm(b.type),'pl'));
+}
+function renderAttentionTable(){
+    const body=$('#attentionTableBody');
+    if(!body)return;
+    const rowsToShow=attentionRows();
+    body.innerHTML=rowsToShow.length?rowsToShow.map(record=>{const expiry=nextDate(record.done,record.months),overdue=state(record)==='PO TERMINIE';return `<tr class="${overdue?'overdue':''}"><td>${esc(record.local)}</td><td>${esc(record.city)}</td><td>${esc(record.type)}</td><td>${fmt(expiry)}</td></tr>`}).join(''):'<tr><td colspan="4" class="muted">Brak przeglądów wymagających uwagi.</td></tr>';
+}
+function openAttentionTable(){renderAttentionTable();$('#attentionModal')?.classList.add('open')}
+
 /* =========================================
    OBSŁUGA FILTRÓW
 ========================================= */
@@ -2493,6 +2546,9 @@ $('#clearFilters').addEventListener('click', () => {
 
     render();
 });
+$('#closeAttention').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
+$('#closeAttentionFooter').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
+$('#attentionShowAll').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
 async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleTimeString('pl-PL')}`}
 function pushSupported(){return location.protocol==='https:'&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window}
 function isIosDevice(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
@@ -2702,6 +2758,7 @@ async function applySession(s){
         if(previousUserId!==s.user.id||!readLastActivity(s))saveActivity(s);
         else scheduleInactivityCheck();
         await load();
+        if(window.activeAttention&&!window.attentionModalShown){window.attentionModalShown=true;openAttentionTable()}
         void syncExistingPushSubscription().finally(()=>updatePushButton());
     }else{
         clearTimeout(inactivityTimer);
@@ -2725,15 +2782,17 @@ async function start(){
 $('#loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),{error}=await sb.auth.signInWithPassword({email:f.get('email'),password:f.get('password')});$('#loginMessage').textContent=error?error.message:''};$('#register').onclick=async()=>{if(!config.allowRegistration)return $('#loginMessage').textContent='Rejestracja jest wyłączona. Poproś administratora o utworzenie konta.';const f=new FormData($('#loginForm')),{error}=await sb.auth.signUp({email:f.get('email'),password:f.get('password')});$('#loginMessage').textContent=error?error.message:'Sprawdź skrzynkę e-mail i potwierdź konto.'};$('#logout').onclick=async()=>{$('#loginModal').classList.add('menu-origin');closeUserMenu();clearActivity();await sb.auth.signOut({scope:'local'})};$('#add').onclick=()=>openForm();$('#cancel').onclick=()=>{const back=returnToCalendar;returnToCalendar=false;$('#editModal').classList.remove('open');if(back){renderCalendar();$('#calendarModal').classList.add('open')}};
 function calendarDateKey(year,month,day){return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`}
 function dateShift(date,days){const value=new Date(date+'T12:00:00');value.setDate(value.getDate()+days);return calendarDateKey(value.getFullYear(),value.getMonth(),value.getDate())}
-function calendarEventClass(event){return event.kind==='reminder'?'reminder-dot':'expiry-dot'}
+function calendarEventClass(event){return event.kind==='reminder30'?'reminder30-dot':event.kind==='reminder14'?'reminder14-dot':'expiry-dot'}
 function calendarCountLabel(count){return countLabel(count)}
+function calendarInspectionCount(events){return new Set(events.map(event=>String(event.record.id))).size}
 function calendarEventCard(event,showDate=false){
-    const reminder=event.kind==='reminder';
+    const eventClass=event.kind==='reminder30'?'reminder30':event.kind==='reminder14'?'reminder14':'expiry';
+    const eventText=event.kind==='reminder30'?'Do wykonania — termin za 30 dni':event.kind==='reminder14'?'Do wykonania — termin za 14 dni':'Termin ważności przeglądu';
     return `
-        <article class="calendar-event-card ${reminder?'reminder':'expiry'}">
+        <article class="calendar-event-card ${eventClass}">
             <div class="calendar-event-kind">
-                <span class="calendar-dot ${reminder?'reminder-dot':'expiry-dot'}"></span>
-                ${showDate?`${fmt(event.date)} · `:''}${reminder?'Do wykonania — termin za 14 dni':'Termin ważności przeglądu'}
+                <span class="calendar-dot ${calendarEventClass(event)}"></span>
+                ${showDate?`${fmt(event.date)} · `:''}${eventText}
             </div>
             <div class="calendar-event-place">${esc(event.record.city)} — ${esc(event.record.local)}</div>
             <div class="calendar-event-type">${esc(event.record.type)}</div>
@@ -2752,7 +2811,7 @@ function renderCalendarDetails(date,events){
     details.innerHTML=`
         <div class="calendar-details-heading">
             <strong>${fmt(date)}</strong>
-            <span class="calendar-details-count">${calendarCountLabel(events.length)}</span>
+            <span class="calendar-details-count">${calendarCountLabel(calendarInspectionCount(events))}</span>
         </div>
         <div class="calendar-event-list">
             ${events.map(event=>calendarEventCard(event)).join('')}
@@ -2774,7 +2833,7 @@ function renderCalendarOverview(events,year,month){
     details.innerHTML=`
         <div class="calendar-details-heading">
             <strong>Terminy w tym miesiącu</strong>
-            <span class="calendar-details-count">${calendarCountLabel(monthEvents.length)}</span>
+            <span class="calendar-details-count">${calendarCountLabel(calendarInspectionCount(monthEvents))}</span>
         </div>
         <div class="calendar-event-list">${monthEvents.map(event=>calendarEventCard(event,true)).join('')}</div>
     `;
@@ -2782,7 +2841,7 @@ function renderCalendarOverview(events,year,month){
 function renderCalendar(){
     const year=calendarMonth.getFullYear(),month=calendarMonth.getMonth();
     $('#calendarTitle').textContent=new Date(year,month,1).toLocaleDateString('pl-PL',{month:'long',year:'numeric'});
-    const events=data.reduce((map,record)=>{const expiry=nextDate(record.done,record.months);if(!expiry)return map;const reminder=dateShift(expiry,-14);(map[reminder]??=[]).push({record,kind:'reminder'});(map[expiry]??=[]).push({record,kind:'expiry'});return map},{});
+    const events=data.reduce((map,record)=>{const expiry=nextDate(record.done,record.months);if(!expiry)return map;const reminder30=dateShift(expiry,-30),reminder14=dateShift(expiry,-14);(map[reminder30]??=[]).push({record,kind:'reminder30'});(map[reminder14]??=[]).push({record,kind:'reminder14'});(map[expiry]??=[]).push({record,kind:'expiry'});return map},{});
     const firstWeekday=(new Date(year,month,1).getDay()+6)%7,days=new Date(year,month+1,0).getDate();
     const today=new Date(),todayKey=calendarDateKey(today.getFullYear(),today.getMonth(),today.getDate());
     let html='';
