@@ -2814,13 +2814,14 @@ function renderCalendarDetails(date,events){
         return;
     }
     details.classList.remove('muted');
+    const orderedEvents=[...events].map(event=>({...event,date:event.date||date})).sort(calendarEventSort);
     details.innerHTML=`
         <div class="calendar-details-heading">
             <strong>${fmt(date)}</strong>
             <span class="calendar-details-count">${calendarCountLabel(calendarInspectionCount(events))}</span>
         </div>
         <div class="calendar-event-list">
-            ${events.map(event=>calendarEventCard(event)).join('')}
+            ${orderedEvents.map(event=>calendarEventCard(event)).join('')}
         </div>
     `;
 }
