@@ -1555,7 +1555,6 @@ body.theme-dark .local-inspections{
     .local-stats-mobile{display:grid;gap:3px;width:100%;min-width:0}
     .local-status-line{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-width:0;line-height:1.15}
     .local-status-line{cursor:default}
-    .local-status-line .badge{cursor:pointer}
     .local-status-type{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:10px;font-weight:650}
     .local-status-line .badge{flex:0 0 auto}
     .local-status-empty{color:var(--text-muted);font-size:11px;font-weight:500}
@@ -1666,7 +1665,7 @@ body.theme-dark .local-inspections{
 .attention-table tbody tr:last-child td{border-bottom:0}
 .attention-table tbody td:first-child{font-weight:750;color:var(--blue)}
 .attention-table tbody td:last-child{font-weight:750;white-space:nowrap}
-.attention-table col:nth-child(1){width:20%}.attention-table col:nth-child(2){width:20%}.attention-table col:nth-child(3){width:38%}.attention-table col:nth-child(4){width:22%}
+.attention-table col:nth-child(1){width:18%}.attention-table col:nth-child(2){width:18%}.attention-table col:nth-child(3){width:32%}.attention-table col:nth-child(4){width:19%}.attention-table col:nth-child(5){width:13%}
 .attention-table tbody tr.overdue td{background:color-mix(in srgb,#ef4444 7%,var(--surface))}
 .local-stats-mobile{display:none}
 @media (max-width:600px){
@@ -1751,7 +1750,7 @@ body.theme-dark .local-inspections{
 <div class="modal" id="trashModal"><section class="dialog"><h2>Kosz</h2><p class="muted">Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.</p><ul id="trashList" class="type-list"></ul><footer><button type="button" id="closeTrash" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="historyModal"><section class="dialog"><h2>Historia wpisu</h2><ul id="historyList" class="type-list"></ul><footer><button type="button" id="closeHistory" class="secondary">Zamknij</button></footer></section></div>
 <div class="modal" id="calendarModal"><section class="dialog calendar-dialog"><h2>Kalendarz terminów przeglądów</h2><div class="calendar-toolbar"><button type="button" id="calendarPrevious" class="secondary" aria-label="Poprzedni miesiąc">‹</button><strong id="calendarTitle"></strong><button type="button" id="calendarNext" class="secondary" aria-label="Następny miesiąc">›</button></div><div class="calendar-weekdays"><span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sob</span><span>Nie</span></div><div id="calendarGrid" class="calendar-grid"></div><div class="calendar-legend"><span class="calendar-legend-item"><span class="calendar-dot reminder30-dot"></span><span>30 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot reminder14-dot"></span><span>14 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot expiry-dot"></span><span>Utrata ważności</span></span></div><div id="calendarDetails" class="calendar-details muted">Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować przegląd.</div><footer><button type="button" id="calendarToday" class="secondary">Dzisiaj</button><button type="button" id="calendarAdd">+ Dodaj przegląd</button><button type="button" id="closeCalendar" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal attention-modal" id="attentionModal"><section class="dialog attention-dialog"><div class="attention-header"><div><h2>Przeglądy wymagające uwagi</h2><p class="muted">Po terminie lub z terminem ważności przypadającym w ciągu 14 dni.</p></div><button type="button" id="closeAttention" class="attention-close" aria-label="Zamknij">×</button></div><div class="attention-tablebox"><table class="attention-table"><colgroup><col><col><col><col></colgroup><thead><tr><th>Nr lokalu</th><th>Miasto</th><th>Rodzaj przeglądu</th><th>Termin ważności</th></tr></thead><tbody id="attentionTableBody"></tbody></table></div><footer><button type="button" id="attentionShowAll" class="secondary">Pokaż wszystkie</button><button type="button" id="closeAttentionFooter">Zamknij</button></footer></section></div>
+<div class="modal attention-modal" id="attentionModal"><section class="dialog attention-dialog"><div class="attention-header"><div><h2>Przeglądy wymagające uwagi</h2><p class="muted">Po terminie lub z terminem ważności przypadającym w ciągu 14 dni.</p></div><button type="button" id="closeAttention" class="attention-close" aria-label="Zamknij">×</button></div><div class="attention-tablebox"><table class="attention-table"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>Nr lokalu</th><th>Miasto</th><th>Rodzaj przeglądu</th><th>Termin ważności</th><th>Za ile dni</th></tr></thead><tbody id="attentionTableBody"></tbody></table></div><footer><button type="button" id="attentionShowAll" class="secondary">Pokaż wszystkie</button><button type="button" id="closeAttentionFooter">Zamknij</button></footer></section></div>
 <div class="modal" id="themeModal">
 <section class="dialog">
 <h2>Zmień motyw</h2>
@@ -2484,7 +2483,7 @@ function renderAttentionTable(){
     const body=$('#attentionTableBody');
     if(!body)return;
     const rowsToShow=attentionRows();
-    body.innerHTML=rowsToShow.length?rowsToShow.map(record=>{const expiry=nextDate(record.done,record.months),overdue=state(record)==='PO TERMINIE';return `<tr class="${overdue?'overdue':''}"><td>${esc(record.local)}</td><td>${esc(record.city)}</td><td>${esc(record.type)}</td><td>${fmt(expiry)}</td></tr>`}).join(''):'<tr><td colspan="4" class="muted">Brak przeglądów wymagających uwagi.</td></tr>';
+    body.innerHTML=rowsToShow.length?rowsToShow.map(record=>{const expiry=nextDate(record.done,record.months),days=daysUntilExpiry(record),overdue=days!==null&&days<0,daysText=days===null?'—':days<0?`Po terminie (${Math.abs(days)} ${daysWord(days)})`:days===0?'Dzisiaj':`Za ${days} ${daysWord(days)}`;return `<tr class="${overdue?'overdue':''}"><td>${esc(record.local)}</td><td>${esc(record.city)}</td><td>${esc(record.type)}</td><td>${fmt(expiry)}</td><td>${esc(daysText)}</td></tr>`}).join(''):'<tr><td colspan="5" class="muted">Brak przeglądów wymagających uwagi.</td></tr>';
 }
 function openAttentionTable(){renderAttentionTable();$('#attentionModal')?.classList.add('open')}
 
@@ -3058,15 +3057,6 @@ $('#editForm').onsubmit=async e=>{
 async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
 
 $('#cityGroups').addEventListener('click', async e => {
-
-    const statusBadge=e.target.closest('.local-status-line .badge');
-    if(statusBadge){
-        e.preventDefault();
-        e.stopPropagation();
-        setAttentionFilter(true);
-        openAttentionTable();
-        return;
-    }
 
     /*
        Kliknięcie w lokal
