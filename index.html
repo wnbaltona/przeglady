@@ -1636,14 +1636,20 @@ body.theme-dark .local-inspections{
 .terminal-section{display:grid;gap:7px}
 .terminal-local-list{display:grid;gap:7px}
 .terminal-title{margin:6px 3px 1px;padding:7px 10px;border-left:4px solid var(--blue);border-radius:6px;background:var(--surface-soft);color:var(--text);font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-.attention-dialog{width:min(760px,96vw);overflow:hidden}
+.attention-dialog{width:min(820px,96vw);overflow:hidden;padding:22px}
 .attention-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.attention-header h2{margin:0}
-.attention-header p{margin:5px 0 0}
+.attention-header h2{margin:0;color:var(--text);font-size:21px}
+.attention-header p{margin:6px 0 0;font-size:12px}
 .attention-close{display:grid;place-items:center;width:34px;height:34px;min-height:34px;flex:0 0 34px;padding:0;border-radius:7px;background:var(--surface-soft);color:var(--text);border:1px solid var(--line);font-size:22px;line-height:1}
-.attention-tablebox{margin-top:14px;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:9px;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.attention-table{width:100%;table-layout:fixed}
-.attention-table th,.attention-table td{padding:9px 8px;overflow-wrap:anywhere}
+.attention-tablebox{margin-top:16px;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:10px;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--surface)}
+.attention-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0}
+.attention-table th,.attention-table td{padding:11px 10px;overflow-wrap:anywhere;border-bottom:1px solid var(--line)}
+.attention-table th{position:sticky;top:0;z-index:1;background:var(--table-head);color:var(--table-head-text);font-size:12px;font-weight:800;letter-spacing:.01em;text-align:left}
+.attention-table td{font-size:13px;line-height:1.3;vertical-align:middle}
+.attention-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-soft) 55%,var(--surface))}
+.attention-table tbody tr:last-child td{border-bottom:0}
+.attention-table tbody td:first-child{font-weight:750;color:var(--blue)}
+.attention-table tbody td:last-child{font-weight:750;white-space:nowrap}
 .attention-table col:nth-child(1){width:20%}.attention-table col:nth-child(2){width:20%}.attention-table col:nth-child(3){width:38%}.attention-table col:nth-child(4){width:22%}
 .attention-table tbody tr.overdue td{background:color-mix(in srgb,#ef4444 7%,var(--surface))}
 @media (max-width:600px){
@@ -1653,7 +1659,8 @@ body.theme-dark .local-inspections{
     .attention-header h2{font-size:18px}
     .attention-header p{font-size:11px;line-height:1.35}
     .attention-tablebox{height:100%;max-height:none;margin-top:10px;touch-action:pan-y}
-    .attention-table th,.attention-table td{padding:8px 4px;font-size:10px;line-height:1.25}
+    .attention-table{min-width:560px}
+    .attention-table th,.attention-table td{padding:10px 6px;font-size:10px;line-height:1.3}
     .attention-table th{white-space:normal}
     .attention-dialog footer{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
     .attention-dialog footer button{width:100%;min-height:42px;padding:7px;font-size:11px}
@@ -2222,7 +2229,7 @@ function render(){
                     .filter(Boolean)
             )
         ].sort((a, b) => {
-            if(norm(cityName)==='katowice'){
+            if(norm(cityName).includes('katowice')){
                 const order={'Terminal A':0,'Terminal B':1,'Pozostałe':2};
                 const groupDiff=order[katowiceTerminal(a)]-order[katowiceTerminal(b)];
                 if(groupDiff)return groupDiff;
@@ -2354,9 +2361,10 @@ const localDue30 =
     }).length;
 
 
-                        const terminal=norm(cityName)==='katowice'?katowiceTerminal(local):'';
-                        const previousTerminal=localIndex>0&&norm(cityName)==='katowice'?katowiceTerminal(cityLocals[localIndex-1]):'';
-                        const terminalHeading=terminal&&terminal!==previousTerminal?`<div class="terminal-title">${terminal}</div>`:'';
+                        const isKatowice=norm(cityName).includes('katowice');
+                        const terminal=isKatowice?katowiceTerminal(local):'';
+                        const previousTerminal=localIndex>0&&isKatowice?katowiceTerminal(cityLocals[localIndex-1]):'';
+                        const terminalHeading=terminal&&terminal!==previousTerminal&&terminal!=='Pozostałe'?`<div class="terminal-title">${terminal}</div>`:'';
                         return `${terminalHeading}
                             <div class="local-wrapper">
 
@@ -2484,8 +2492,9 @@ function showError(msg){$('#notice').hidden=false;$('#notice').textContent='Nie 
 
 function katowiceTerminal(local){
     const key=norm(local).replace(/\s+/g,'');
-    if(['b53','282','283','284'].includes(key))return 'Terminal A';
-    if(['260','261','262','263','b53.ba1','ba1','ba2'].includes(key))return 'Terminal B';
+    const code=key.split(/[(:]/)[0].replace(/[^a-z0-9.]/g,'');
+    if(['b53','282','283','284'].includes(code))return 'Terminal A';
+    if(['260','261','262','263','b53.ba1','b53.ba2','ba1','ba2'].includes(code))return 'Terminal B';
     return 'Pozostałe';
 }
 function attentionRows(){
