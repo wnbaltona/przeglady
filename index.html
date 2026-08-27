@@ -1545,6 +1545,8 @@ body.theme-dark .local-inspections{
     .local-name{grid-area:local-name;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .local-count{grid-area:local-count;padding:3px 6px;border-radius:999px;background:var(--surface-soft);font-size:10px;font-weight:650;white-space:nowrap}
     .local-stats{grid-area:stats;align-content:center;align-items:center;width:100%;height:42px;min-height:42px;max-height:42px;margin:0;overflow:hidden}
+    .local-stats-desktop{display:none}
+    .local-stats-mobile{display:grid;gap:3px;width:100%;min-width:0}
     .local-status-line{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-width:0;line-height:1.15}
     .local-status-type{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:10px;font-weight:650}
     .local-status-line .badge{flex:0 0 auto}
@@ -1657,7 +1659,9 @@ body.theme-dark .local-inspections{
 .attention-table tbody td:last-child{font-weight:750;white-space:nowrap}
 .attention-table col:nth-child(1){width:20%}.attention-table col:nth-child(2){width:20%}.attention-table col:nth-child(3){width:38%}.attention-table col:nth-child(4){width:22%}
 .attention-table tbody tr.overdue td{background:color-mix(in srgb,#ef4444 7%,var(--surface))}
+.local-stats-mobile{display:none}
 @media (max-width:600px){
+    .local-stats-mobile{display:grid}
     .terminal-title{margin-top:8px;font-size:11px}
     .attention-modal{padding:8px}
     .attention-dialog{display:grid;grid-template-rows:auto minmax(0,1fr) auto;width:100%;height:min(86dvh,720px);max-height:86dvh;padding:13px;overflow:hidden}
@@ -2414,7 +2418,14 @@ const localDue30 =
                                     </span>
 
 
-                                    <span class="local-stats">${localStatusSummary(localRows)}</span>
+                                    <span class="local-stats">
+                                        <span class="local-stats-desktop">
+                                            ${localDue30>0?`<span class="badge DO30">Do wykonania: ${localDue30}</span>`:''}
+                                            ${localDue14>0?`<span class="badge DO14">Do wykonania: ${localDue14}</span>`:''}
+                                            ${localOverdue>0?`<span class="badge POBLACK">Po terminie: ${localOverdue}</span>`:''}
+                                        </span>
+                                        <span class="local-stats-mobile">${localStatusSummary(localRows)}</span>
+                                    </span>
 
                                 </button>
 
