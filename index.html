@@ -1906,25 +1906,20 @@ function compareRows(a,b,key,direction){
     if(!valueB)return -1;
 
     let result;
-
     if(key==='done' || key==='nextDate'){
-
-        result=String(valueA).localeCompare(
-            String(valueB)
-        );
-
+        result=String(valueA).localeCompare(String(valueB),'en');
+    }else if(key==='status'){
+        const rank={POBLACK:0,DO14:1,DO30:2,OK:3};
+        const rankA=rank[statusClass(a)]??99,rankB=rank[statusClass(b)]??99;
+        result=rankA-rankB;
+    }else if(key==='local'){
+        const numberA=Number.parseInt(String(valueA).match(/^\s*\d+/)?.[0]||'',10),numberB=Number.parseInt(String(valueB).match(/^\s*\d+/)?.[0]||'',10);
+        if(Number.isFinite(numberA)&&Number.isFinite(numberB)&&numberA!==numberB)result=numberA-numberB;
+        else result=String(valueA).localeCompare(String(valueB),'pl',{numeric:true,sensitivity:'base'});
     }else{
-
-        result=String(valueA).localeCompare(
-            String(valueB),
-            'pl',
-            {
-                numeric:true,
-                sensitivity:'base'
-            }
-        );
+        result=String(valueA).localeCompare(String(valueB),'pl',{numeric:true,sensitivity:'base'});
     }
-
+    if(result===0&&key!=='type')result=String(a.type||'').localeCompare(String(b.type||''),'pl',{sensitivity:'base'});
     return direction==='desc' ? -result : result;
 }
 
@@ -2047,10 +2042,10 @@ function mobileInspectionCard(r){
 
 function mobileTypeStatus(r){
     const status=statusClass(r);
-    if(status==='POBLACK')return {className:'POBLACK',label:'Po terminie'};
-    if(status==='DO14')return {className:'DO14',label:'Do wykonania — do 14 dni'};
-    if(status==='DO30')return {className:'DO30',label:'Do wykonania — do 30 dni'};
-    return {className:'OK',label:'Aktualny'};
+    if(status==='POBLACK')return {className:'POBLACK',label:'PO TERMINIE'};
+    if(status==='DO14')return {className:'DO14',label:'≤ 14 DNI'};
+    if(status==='DO30')return {className:'DO30',label:'≤ 30 DNI'};
+    return {className:'OK',label:'AKTUALNY'};
 }
 function localStatusSummary(records){
     const urgent=records.filter(row=>['POBLACK','DO14','DO30'].includes(statusClass(row)));
@@ -2422,8 +2417,8 @@ const localDue30 =
 
                                     <span class="local-stats">
                                         <span class="local-stats-desktop">
-                                            ${localDue30>0?`<span class="badge DO30">Do wykonania: ${localDue30}</span>`:''}
-                                            ${localDue14>0?`<span class="badge DO14">Do wykonania: ${localDue14}</span>`:''}
+                                            ${localDue30>0?`<span class="badge DO30">≤ 30 dni: ${localDue30}</span>`:''}
+                                            ${localDue14>0?`<span class="badge DO14">≤ 14 dni: ${localDue14}</span>`:''}
                                             ${localOverdue>0?`<span class="badge POBLACK">Po terminie: ${localOverdue}</span>`:''}
                                         </span>
                                         <span class="local-stats-mobile">${localStatusSummary(localRows)}</span>
