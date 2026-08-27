@@ -1761,6 +1761,14 @@ const monthsByType={'elektryczny (5-cio letni)':60,'elektryczny (roczny)':12,'kl
 const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));const iso=v=>v?String(v).slice(0,10):'';const fmt=v=>v?new Date(v+'T12:00:00').toLocaleDateString('pl-PL'):'—';const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 const fromDb=r=>({id:r.id,city:r.city,local:r.local,type:r.type,done:iso(r.done),months:r.months,protocolDate:iso(r.protocol_date),protocolFileName:r.protocol_file_name,protocolPath:r.protocol_path,notes:r.notes||'',version:r.version,deletedAt:r.deleted_at});const toDb=r=>({id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''});
 let calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1),calendarSelectedDate='',returnToCalendar=false;
+window.activeAttention=new URLSearchParams(window.location.search).get('filter')==='attention';
+function setAttentionFilter(active){
+    window.activeAttention=Boolean(active);
+    const url=new URL(window.location.href);
+    if(active)url.searchParams.set('filter','attention');
+    else if(url.searchParams.get('filter')==='attention')url.searchParams.delete('filter');
+    try{history.replaceState(null,'',`${url.pathname}${url.search}${url.hash}`)}catch{}
+}
 function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function state(r){
     const n = nextDate(r.done, r.months);
     if(!n) return '';
@@ -1787,6 +1795,15 @@ function statusClass(r){
     if(days <= 14) return 'DO14';
     if(days <= 30) return 'DO30';
     return 'OK';
+}
+
+function requiresAttention(r){
+    const expiry=nextDate(r.done,r.months);
+    if(!expiry)return false;
+    const today=new Date();
+    const todayAtNoon=new Date(today.getFullYear(),today.getMonth(),today.getDate(),12);
+    const days=Math.round((new Date(expiry+'T12:00:00')-todayAtNoon)/86400000);
+    return days<=14;
 }
 
 function statusLabel(r){
@@ -2045,12 +2062,14 @@ function render(){
     const city = $('#city').value;
     const pr = $('#protocol').value;
     const status = window.activeStatus || '';
+    const attentionOnly = window.activeAttention === true;
 
     const activeFilters = [
         q,
         city,
         pr,
-        status
+        status,
+        attentionOnly
     ].filter(Boolean).length;
 
     $('#filterCountNumber').textContent = activeFilters;
@@ -2073,7 +2092,8 @@ function render(){
             matchesSearch &&
             (!city || r.city === city) &&
             (!pr || protocol(r) === pr) &&
-            (!status || state(r) === status)
+            (!status || state(r) === status) &&
+            (!attentionOnly || requiresAttention(r))
         );
 
     });
@@ -2206,7 +2226,7 @@ function render(){
             <details
                 class="card city-group"
                 data-city="${esc(cityName)}"
-                ${expandedCities.has(cityName) ? 'open' : ''}
+                ${expandedCities.has(cityName) || attentionOnly ? 'open' : ''}
             >
 
                 <summary class="city-summary">
@@ -2450,6 +2470,8 @@ document.querySelectorAll('[data-quick-status]').forEach(button => {
     button.addEventListener('click', () => {
         const selectedStatus = button.dataset.quickStatus || '';
 
+        setAttentionFilter(false);
+
         // Kliknięcie tego samego filtra drugi raz = wyłączenie
         if(window.activeStatus === selectedStatus && selectedStatus){
             window.activeStatus = '';
@@ -2467,6 +2489,7 @@ $('#clearFilters').addEventListener('click', () => {
     $('#city').value = '';
     $('#protocol').value = '';
     window.activeStatus = '';
+    setAttentionFilter(false);
 
     render();
 });
