@@ -2703,7 +2703,7 @@ $('#loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.tar
 function calendarDateKey(year,month,day){return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`}
 function dateShift(date,days){const value=new Date(date+'T12:00:00');value.setDate(value.getDate()+days);return calendarDateKey(value.getFullYear(),value.getMonth(),value.getDate())}
 function calendarEventClass(event){return event.kind==='reminder'?'reminder-dot':'expiry-dot'}
-function calendarCountLabel(count){return count===1?'1 termin':`${count} terminów`}
+function calendarCountLabel(count){return countLabel(count)}
 function calendarEventCard(event,showDate=false){
     const reminder=event.kind==='reminder';
     return `
