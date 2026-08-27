@@ -17,8 +17,8 @@ self.addEventListener('push', event => {
   const title = message.title || 'Przeglądy wymagają uwagi';
   const options = {
     body: message.body || 'Otwórz aplikację, aby sprawdzić zbliżające się terminy.',
-    icon: './icons/pwa-icon-192.png',
-    badge: './icons/pwa-icon-192.png',
+    icon: './icons/pwa-icon-192.png?v=20260827-logo1',
+    badge: './icons/pwa-icon-192.png?v=20260827-logo1',
     tag: message.tag || 'inspection-deadlines',
     renotify: true,
     data: { url: message.url || './' }

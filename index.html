@@ -8,9 +8,9 @@
   <meta name="application-name" content="Rejestr Przeglądów">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icons/pwa-icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icons/pwa-icon.svg">
+  <link rel="manifest" href="./manifest.webmanifest?v=20260827-logo1">
+  <link rel="icon" href="./icons/pwa-icon-192.png?v=20260827-logo1" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/pwa-icon-192.png?v=20260827-logo1">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=20260827-3"></script>
   <script src="dane-startowe.js"></script>
@@ -2572,7 +2572,7 @@ async function enablePushNotifications(){
         }
         if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey});
         await savePushSubscription(subscription);
-        await registration.showNotification('Powiadomienia zostały włączone',{body:'Telefon będzie przypominał o przeglądach wymagających uwagi.',icon:'./icons/pwa-icon-192.png',badge:'./icons/pwa-icon-192.png',tag:'push-enabled',data:{url:'./'}});
+        await registration.showNotification('Powiadomienia zostały włączone',{body:'Telefon będzie przypominał o przeglądach wymagających uwagi.',icon:'./icons/pwa-icon-192.png?v=20260827-logo1',badge:'./icons/pwa-icon-192.png?v=20260827-logo1',tag:'push-enabled',data:{url:'./'}});
         await updatePushButton();
     }catch(error){
         alert('Nie udało się włączyć powiadomień: '+(error?.message||error));
