@@ -1676,11 +1676,19 @@ body.theme-dark .local-inspections{
     .attention-dialog{display:grid;grid-template-rows:auto minmax(0,1fr) auto;width:100%;height:min(86dvh,720px);max-height:86dvh;padding:13px;overflow:hidden}
     .attention-header h2{font-size:18px}
     .attention-header p{font-size:11px;line-height:1.35}
-    .attention-tablebox{height:100%;max-height:none;margin-top:10px;touch-action:pan-y}
-    .attention-table{min-width:560px;width:100%;table-layout:fixed}
-    .attention-table th,.attention-table td{padding:9px 4px;font-size:10px;line-height:1.3;overflow-wrap:anywhere;word-break:normal}
-    .attention-table th{white-space:normal}
-    .attention-table tbody td:last-child{white-space:normal}
+    .attention-tablebox{height:100%;max-height:none;margin-top:10px;overflow-x:hidden;touch-action:pan-y;border:0;background:transparent}
+    .attention-table,.attention-table tbody{display:block;width:100%;min-width:0;table-layout:auto}
+    .attention-table colgroup,.attention-table thead{display:none}
+    .attention-table tbody tr{display:block;margin:0 0 8px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 2px 7px #0f172a0a}
+    .attention-table tbody tr.overdue{border-left:4px solid #ef4444;background:color-mix(in srgb,#ef4444 6%,var(--surface))}
+    .attention-table tbody tr:nth-child(even) td,.attention-table tbody tr.overdue td{background:transparent}
+    .attention-table tbody td{display:grid;grid-template-columns:minmax(105px,.8fr) minmax(0,1.2fr);gap:10px;align-items:start;padding:7px 0;font-size:12px;line-height:1.35;border-bottom:1px solid var(--line);white-space:normal}
+    .attention-table tbody td::before{content:attr(data-label);color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
+    .attention-table tbody td:first-child{color:var(--text);font-weight:650}
+    .attention-table tbody td:last-child{color:var(--text);font-weight:800;white-space:normal}
+    .attention-table tbody tr td:last-child{border-bottom:0}
+    .attention-table tbody td[colspan]{display:block;padding:14px 4px;text-align:center}
+    .attention-table tbody td[colspan]::before{display:none}
     .attention-dialog footer{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
     .attention-dialog footer button{width:100%;min-height:42px;padding:7px;font-size:11px}
 }
@@ -2487,7 +2495,7 @@ function renderAttentionTable(){
     const body=$('#attentionTableBody');
     if(!body)return;
     const rowsToShow=attentionRows();
-    body.innerHTML=rowsToShow.length?rowsToShow.map(record=>{const expiry=nextDate(record.done,record.months),days=daysUntilExpiry(record),overdue=days!==null&&days<0,daysText=days===null?'—':days<0?`Po terminie (${Math.abs(days)} ${daysWord(days)})`:days===0?'Dzisiaj':`Za ${days} ${daysWord(days)}`;return `<tr class="${overdue?'overdue':''}"><td>${esc(record.local)}</td><td>${esc(record.city)}</td><td>${esc(record.type)}</td><td>${fmt(expiry)}</td><td>${esc(daysText)}</td></tr>`}).join(''):'<tr><td colspan="5" class="muted">Brak przeglądów wymagających uwagi.</td></tr>';
+    body.innerHTML=rowsToShow.length?rowsToShow.map(record=>{const expiry=nextDate(record.done,record.months),days=daysUntilExpiry(record),overdue=days!==null&&days<0,daysText=days===null?'—':days<0?`Po terminie (${Math.abs(days)} ${daysWord(days)})`:days===0?'Dzisiaj':`Za ${days} ${daysWord(days)}`;return `<tr class="${overdue?'overdue':''}"><td data-label="Nr lokalu">${esc(record.local)}</td><td data-label="Miasto">${esc(record.city)}</td><td data-label="Rodzaj przeglądu">${esc(record.type)}</td><td data-label="Termin ważności">${fmt(expiry)}</td><td data-label="Za ile dni">${esc(daysText)}</td></tr>`}).join(''):'<tr><td colspan="5" class="muted">Brak przeglądów wymagających uwagi.</td></tr>';
 }
 function openAttentionTable(){renderAttentionTable();$('#attentionModal')?.classList.add('open')}
 
