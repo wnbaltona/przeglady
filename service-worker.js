@@ -16,10 +16,7 @@ self.addEventListener('push', event => {
 
   const title = message.title || 'Przeglądy wymagają uwagi';
   const notificationTag = message.tag || 'inspection-deadlines';
-  const requestedUrl = message.url || './';
-  const destinationUrl = requestedUrl === './'
-    ? './?filter=attention'
-    : requestedUrl;
+  const destinationUrl = message.url || './?filter=attention';
   const options = {
     body: message.body || 'Otwórz aplikację, aby sprawdzić zbliżające się terminy.',
     icon: './icons/pwa-icon-192.png?v=20260827-logo3',
@@ -38,14 +35,31 @@ self.addEventListener('notificationclick', event => {
 
   event.waitUntil((async () => {
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of windows) {
+    const appWindow = windows.find(client => {
       try {
-        if ('navigate' in client) await client.navigate(destination);
-        return await client.focus();
+        return new URL(client.url).origin === new URL(destination).origin;
       } catch {
-        // Jeśli istniejąca karta nie może zostać przekierowana, otwieramy nową.
+        return false;
+      }
+    });
+
+    if (appWindow) {
+      try {
+        await appWindow.focus();
+      } catch {
+        // Przechodzimy dalej — samo przekierowanie może nadal zadziałać.
+      }
+      try {
+        if ('navigate' in appWindow) {
+          const navigated = await appWindow.navigate(destination);
+          if (navigated) await navigated.focus();
+          return;
+        }
+      } catch {
+        // Jeżeli system nie pozwala przekierować istniejącego okna, otwieramy nowe.
       }
     }
+
     return self.clients.openWindow(destination);
   })());
 });

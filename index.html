@@ -2575,7 +2575,7 @@ function pushKeysMatch(subscription,expectedKey){
 }
 async function getServiceWorkerRegistration(){
     if(!pushSupported())throw new Error('Ta przeglądarka nie obsługuje powiadomień aplikacji.');
-    await navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click',{scope:'./'});
+    await navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click2',{scope:'./'});
     return navigator.serviceWorker.ready;
 }
 async function savePushSubscription(subscription){
@@ -2659,7 +2659,7 @@ async function enablePushNotifications(){
         }
         if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey});
         await savePushSubscription(subscription);
-        await registration.showNotification('Powiadomienia zostały włączone',{body:'Telefon będzie przypominał o przeglądach wymagających uwagi.',icon:'./icons/pwa-icon-192.png?v=20260827-logo3',badge:'./icons/pwa-icon-192.png?v=20260827-logo3',tag:'push-enabled',data:{url:'./'}});
+        await registration.showNotification('Powiadomienia zostały włączone',{body:'Telefon będzie przypominał o przeglądach wymagających uwagi.',icon:'./icons/pwa-icon-192.png?v=20260827-logo3',badge:'./icons/pwa-icon-192.png?v=20260827-logo3',tag:'push-enabled',data:{url:'./?filter=attention'}});
         await updatePushButton();
     }catch(error){
         alert('Nie udało się włączyć powiadomień: '+(error?.message||error));
@@ -3210,7 +3210,7 @@ start();
 // przeglądów lokalnie — aplikacja zawsze pobiera je z Supabase.
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click', { scope: './' })
+        navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click2', { scope: './' })
             .catch(error => console.warn('Nie udało się zarejestrować PWA:', error));
     });
 }
