@@ -2575,7 +2575,7 @@ function pushKeysMatch(subscription,expectedKey){
 }
 async function getServiceWorkerRegistration(){
     if(!pushSupported())throw new Error('Ta przeglądarka nie obsługuje powiadomień aplikacji.');
-    await navigator.serviceWorker.register('./service-worker.js?v=20260827-push2',{scope:'./'});
+    await navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click',{scope:'./'});
     return navigator.serviceWorker.ready;
 }
 async function savePushSubscription(subscription){
@@ -3210,7 +3210,7 @@ start();
 // przeglądów lokalnie — aplikacja zawsze pobiera je z Supabase.
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=20260827-push2', { scope: './' })
+        navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click', { scope: './' })
             .catch(error => console.warn('Nie udało się zarejestrować PWA:', error));
     });
 }
