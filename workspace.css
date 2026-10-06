@@ -1865,14 +1865,12 @@ body {
   --deadline-red-text: #b42318;
   --deadline-amber-bg: #fef3c7;
   --deadline-amber-text: #854d0e;
-  --deadline-row-bg: #fff3f3;
 }
 body.theme-dark {
   --deadline-red-bg: #422a35;
   --deadline-red-text: #ffb4ab;
   --deadline-amber-bg: #403824;
   --deadline-amber-text: #f5d386;
-  --deadline-row-bg: #291f2c;
 }
 body
   :is(
@@ -1915,7 +1913,7 @@ body
   :is(.attention-table, .workspace-table, .inspections-table)
   tbody
   tr:has(.badge.PO, .badge.POBLACK, .attention-days.overdue) {
-  background: var(--deadline-row-bg);
+  background: var(--surface);
 }
 @media (min-width: 801px) {
   body
@@ -1923,18 +1921,14 @@ body
     tbody
     tr:has(.badge.PO, .badge.POBLACK, .attention-days.overdue)
     td {
-    background: var(--deadline-row-bg);
+    background: var(--surface);
   }
   body
     :is(.attention-table, .workspace-table, .inspections-table)
     tbody
     tr:has(.badge.PO, .badge.POBLACK, .attention-days.overdue):hover
     td {
-    background: color-mix(
-      in srgb,
-      var(--deadline-red-bg) 40%,
-      var(--deadline-row-bg)
-    );
+    background: var(--surface-hover);
   }
 }
 @media (max-width: 800px) {
@@ -1992,5 +1986,144 @@ body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric b {
   }
   body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric b {
     font-size: 26px;
+  }
+}
+
+/* Czytelne akcje tekstowe i zwarte karty na telefonie. */
+.row-actions button span {
+  display: inline;
+}
+.row-actions button {
+  font-size: 11px;
+  min-width: 0;
+  width: auto;
+  padding: 8px 10px;
+}
+@media (max-width: 800px) {
+  .modal .attention-dialog {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    width: min(540px, calc(100vw - 24px));
+    height: auto;
+    max-height: calc(100dvh - 32px);
+    padding: 20px 12px 14px;
+    overflow: hidden;
+  }
+  .attention-dialog .attention-header {
+    margin: 0;
+    padding: 0 38px 0 2px;
+  }
+  .attention-dialog .attention-header h2 {
+    font-size: 16px;
+    line-height: 1.35;
+    margin: 0;
+  }
+  .attention-dialog .attention-tablebox {
+    min-height: 0;
+    height: auto;
+    max-height: min(600px, calc(100dvh - 180px));
+    margin: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .attention-dialog .attention-table tbody {
+    gap: 9px;
+  }
+  .attention-dialog .attention-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(78px, 0.85fr) minmax(0, 1.15fr);
+    grid-template-areas: "local local" "city city" "type type" "date status";
+    padding: 11px;
+    gap: 5px 8px;
+    margin: 0;
+  }
+  .attention-dialog .attention-table tbody tr td {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-bottom: 0;
+    padding: 0;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    background: transparent;
+  }
+  .attention-dialog .attention-table tbody tr td:nth-child(1) {
+    grid-area: local;
+    font-size: 13px;
+  }
+  .attention-dialog .attention-table tbody tr td:nth-child(2) {
+    grid-area: city;
+    font-size: 10px;
+    text-align: left;
+    align-items: flex-start;
+  }
+  .attention-dialog .attention-table tbody tr td:nth-child(3) {
+    grid-area: type;
+    font-size: 12px;
+    padding-bottom: 5px;
+  }
+  .attention-dialog .attention-table tbody tr td:nth-child(4) {
+    grid-area: date;
+    font-size: 11px;
+  }
+  .attention-dialog .attention-table tbody tr td:nth-child(5) {
+    grid-area: status;
+  }
+  .attention-dialog .attention-table tbody tr td:nth-child(n + 4) {
+    padding-top: 7px;
+    border-top: 1px solid var(--line);
+    gap: 4px;
+  }
+  .attention-dialog .attention-table tbody tr td[colspan] {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+  }
+  body .attention-table .attention-days {
+    font-size: 10px;
+    padding: 4px 7px;
+    min-height: 24px;
+    white-space: nowrap;
+    line-height: 1.4;
+    overflow-wrap: normal;
+  }
+  body
+    :is(
+      .badge.PO,
+      .badge.POBLACK,
+      .workspace-table .badge.POBLACK,
+      .badge.DO,
+      .badge.DO14,
+      .badge.DO30,
+      .workspace-table .badge.DO14,
+      .workspace-table .badge.DO30
+    ) {
+    font-size: 10px;
+    padding: 4px 7px;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+  .inspection-type-statuses {
+    max-width: none;
+    flex-shrink: 0;
+  }
+  .inspection-detail-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .inspection-detail-actions button {
+    min-width: 0;
+    min-height: 40px;
+    padding: 8px 4px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .inspection-detail-actions .open-file {
+    grid-column: 1 / -1;
+  }
+  .workspace-table td {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 }

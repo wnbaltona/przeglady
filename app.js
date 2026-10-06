@@ -528,13 +528,13 @@ function rows(records) {
     </span>
 </td><td class="protocol-cell"><span class="badge ${p === "DODANY" ? "OK" : "BRAK"}">${p === "DODANY" ? "DODANY" : "BRAK"}</span>${r.protocolPath ? ` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>` : ""}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
     <button type="button" class="secondary action-edit" data-action="edit" data-id="${esc(r.id)}" title="Edytuj" aria-label="Edytuj">
-        <span class="pencil-icon" aria-hidden="true">✎</span> <span>Edytuj</span>
+        <span>Edytuj</span>
     </button>
     <button type="button" class="danger action-delete" data-action="delete" data-id="${esc(r.id)}" title="Usuń" aria-label="Usuń">
-        🗑 <span>Usuń</span>
+        <span>Usuń</span>
     </button>
     <button type="button" class="secondary action-history" data-action="history" data-id="${esc(r.id)}" title="Historia" aria-label="Historia">
-        ↺ <span>Historia</span>
+        <span>Historia</span>
     </button>
 </div></td></tr>`;
     })
@@ -569,9 +569,9 @@ function mobileInspectionCard(r) {
             </dl>
             <div class="inspection-detail-actions">
                 ${r.protocolPath ? `<button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz protokół</button>` : ""}
-                <button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}"><span class="pencil-icon" aria-hidden="true">✎</span> Edytuj</button>
-                <button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">🗑 Usuń</button>
-                <button type="button" class="secondary" data-action="history" data-id="${esc(r.id)}">↺ Historia</button>
+                <button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}">Edytuj</button>
+                <button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">Usuń</button>
+                <button type="button" class="secondary" data-action="history" data-id="${esc(r.id)}">Historia</button>
             </div>
         </article>
     `;
