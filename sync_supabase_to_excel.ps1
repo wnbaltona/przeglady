@@ -15,7 +15,7 @@ function Get-RequiredEnvironmentVariable([string]$Name) {
         $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
     }
     if ([string]::IsNullOrWhiteSpace($value)) {
-        throw "Brak zmiennej środowiskowej $Name. Ustaw ją zgodnie z instrukcją EXCEL_POWER_AUTOMATE_INSTRUKCJA.md."
+        throw "Brak zmiennej środowiskowej $Name. Ustaw ją przed uruchomieniem skryptu (patrz README.md)."
     }
     return $value.Trim()
 }

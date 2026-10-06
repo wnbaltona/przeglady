@@ -22,8 +22,12 @@ function addMonths(date: string, months: number) {
   const targetMonth = month - 1 + months;
   const targetYear = year + Math.floor(targetMonth / 12);
   const normalizedMonth = ((targetMonth % 12) + 12) % 12;
-  const lastDay = new Date(Date.UTC(targetYear, normalizedMonth + 1, 0)).getUTCDate();
-  return new Date(Date.UTC(targetYear, normalizedMonth, Math.min(day, lastDay)));
+  const lastDay = new Date(
+    Date.UTC(targetYear, normalizedMonth + 1, 0),
+  ).getUTCDate();
+  return new Date(
+    Date.UTC(targetYear, normalizedMonth, Math.min(day, lastDay)),
+  );
 }
 
 Deno.serve(async (request) => {
@@ -34,13 +38,18 @@ Deno.serve(async (request) => {
   const url = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const powerAutomateUrl = Deno.env.get("POWER_AUTOMATE_WEBHOOK_URL");
-  const recipients = (Deno.env.get("ALERT_RECIPIENTS") || "weronika.niziolek11@gmail.com")
+  const recipients = (
+    Deno.env.get("ALERT_RECIPIENTS") || "weronika.niziolek11@gmail.com"
+  )
     .split(",")
     .map((email) => email.trim())
     .filter(Boolean);
 
   if (!url || !serviceRoleKey || !powerAutomateUrl || !recipients.length) {
-    return Response.json({ error: "Missing required Edge Function secrets." }, { status: 500 });
+    return Response.json(
+      { error: "Missing required Edge Function secrets." },
+      { status: 500 },
+    );
   }
 
   const supabase = createClient(url, serviceRoleKey);
@@ -52,40 +61,68 @@ Deno.serve(async (request) => {
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
   const now = new Date();
-  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const today = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
   const todayKey = dateKey(today);
-  const alerts: Alert[] = ((inspections ?? []) as Inspection[]).flatMap((inspection) => {
-    if (!inspection.done || !inspection.months) return [];
-    const expiry = addMonths(inspection.done, Number(inspection.months));
-    const daysUntilExpiry = Math.round((expiry.getTime() - today.getTime()) / 86_400_000);
-    const kind = daysUntilExpiry >= 0 && daysUntilExpiry <= 14
-      ? "daily"
-      : daysUntilExpiry > 14 && daysUntilExpiry <= 30 && daysUntilExpiry % 5 === 0
-      ? "five_day"
-      : null;
-    return kind ? [{ ...inspection, expiresOn: dateKey(expiry), daysUntilExpiry, kind }] : [];
-  });
+  const alerts: Alert[] = ((inspections ?? []) as Inspection[]).flatMap(
+    (inspection) => {
+      if (!inspection.done || !inspection.months) return [];
+      const expiry = addMonths(inspection.done, Number(inspection.months));
+      const daysUntilExpiry = Math.round(
+        (expiry.getTime() - today.getTime()) / 86_400_000,
+      );
+      const kind =
+        daysUntilExpiry >= 0 && daysUntilExpiry <= 14
+          ? "daily"
+          : daysUntilExpiry > 14 &&
+              daysUntilExpiry <= 30 &&
+              daysUntilExpiry % 5 === 0
+            ? "five_day"
+            : null;
+      return kind
+        ? [{ ...inspection, expiresOn: dateKey(expiry), daysUntilExpiry, kind }]
+        : [];
+    },
+  );
 
-  if (!alerts.length) return Response.json({ sent: false, message: "No alerts due today." });
+  if (!alerts.length)
+    return Response.json({ sent: false, message: "No alerts due today." });
 
   const { data: alreadySent, error: logReadError } = await supabase
     .from("inspection_alert_log")
     .select("inspection_id, alert_kind")
     .eq("alert_date", todayKey)
-    .in("inspection_id", alerts.map((alert) => alert.id));
+    .in(
+      "inspection_id",
+      alerts.map((alert) => alert.id),
+    );
 
-  if (logReadError) return Response.json({ error: logReadError.message }, { status: 500 });
+  if (logReadError)
+    return Response.json({ error: logReadError.message }, { status: 500 });
 
-  const sentKeys = new Set((alreadySent || []).map((row) => `${row.inspection_id}:${row.alert_kind}`));
-  const pending = alerts.filter((alert) => !sentKeys.has(`${alert.id}:${alert.kind}`));
-  if (!pending.length) return Response.json({ sent: false, message: "Alerts already sent today." });
+  const sentKeys = new Set(
+    (alreadySent || []).map((row) => `${row.inspection_id}:${row.alert_kind}`),
+  );
+  const pending = alerts.filter(
+    (alert) => !sentKeys.has(`${alert.id}:${alert.kind}`),
+  );
+  if (!pending.length)
+    return Response.json({
+      sent: false,
+      message: "Alerts already sent today.",
+    });
 
-  const rows = pending.map((alert) => `
+  const rows = pending
+    .map(
+      (alert) => `
     <tr>
       <td>${alert.city}</td><td>${alert.local}</td><td>${alert.type}</td>
       <td>${new Date(`${alert.expiresOn}T12:00:00`).toLocaleDateString("pl-PL")}</td>
       <td>${alert.daysUntilExpiry === 0 ? "dzisiaj" : `za ${alert.daysUntilExpiry} dni`}</td>
-    </tr>`).join("");
+    </tr>`,
+    )
+    .join("");
 
   const subject = `Przeglądy: ${pending.length} termin(y/ów) wymaga(ją) uwagi`;
   const html = `<h2>Alerty przeglądów</h2><p>Poniższe przeglądy tracą ważność w ciągu 30 dni.</p><table border="1" cellpadding="8" cellspacing="0"><thead><tr><th>Miasto</th><th>Lokal</th><th>Rodzaj</th><th>Data utraty ważności</th><th>Pozostało</th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -100,19 +137,25 @@ Deno.serve(async (request) => {
   });
 
   if (!response.ok) {
-    return Response.json({ error: `Power Automate error: ${await response.text()}` }, { status: 502 });
+    return Response.json(
+      { error: `Power Automate error: ${await response.text()}` },
+      { status: 502 },
+    );
   }
 
-  const { error: logWriteError } = await supabase.from("inspection_alert_log").insert(
-    pending.map((alert) => ({
-      inspection_id: alert.id,
-      alert_kind: alert.kind,
-      alert_date: todayKey,
-      expires_on: alert.expiresOn,
-      recipients: recipients.join(", "),
-    })),
-  );
+  const { error: logWriteError } = await supabase
+    .from("inspection_alert_log")
+    .insert(
+      pending.map((alert) => ({
+        inspection_id: alert.id,
+        alert_kind: alert.kind,
+        alert_date: todayKey,
+        expires_on: alert.expiresOn,
+        recipients: recipients.join(", "),
+      })),
+    );
 
-  if (logWriteError) return Response.json({ error: logWriteError.message }, { status: 500 });
+  if (logWriteError)
+    return Response.json({ error: logWriteError.message }, { status: 500 });
   return Response.json({ sent: true, count: pending.length });
 });

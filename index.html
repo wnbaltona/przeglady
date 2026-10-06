@@ -1,3450 +1,710 @@
 <!doctype html>
 <html lang="pl">
-<head> 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Rejestr Przeglądów</title>
-  <meta name="theme-color" content="#16324F">
-  <meta name="application-name" content="Rejestr Przeglądów">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="manifest" href="./manifest.webmanifest?v=20260827-logo3">
-  <link rel="icon" href="./icons/pwa-icon-desktop.svg?v=20260827-desktop1" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="./icons/pwa-icon-192.png?v=20260827-logo3">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js?v=20260827-3"></script>
-  <script src="dane-startowe.js"></script>
- <style>
-
-/* =========================================
-   GŁÓWNY — GRANATOWY
-========================================= */
-
-:root{
-    --navy:#16324F;
-    --blue:#0B6285;
-    --bg:#F3F6FA;
-    --line:#D2DDE7;
-    --text:#172536;
-    --text-muted:#53677B;
-    --surface:#FFFFFF;
-    --surface-soft:#F8FAFC;
-    --surface-hover:#EDF4F8;
-    --input-bg:#FFFFFF;
-    --secondary-bg:#E6EDF3;
-    --secondary-text:#23384C;
-    --notice-bg:#E4F3FA;
-    --notice-text:#174C68;
-    --table-head:#E8F0F6;
-    --table-head-text:#30465A;
-    --header-muted:#D7E8F3;
-
-    --red:#991B1B;
-    --amber:#92400E;
-    --green:#065F46;
-}
-
-
-/* =========================================
-   GRANATOWY — PROFESJONALNY
-========================================= */
-
-body.theme-blue{
-    --navy:#16324F;
-    --blue:#0B6285;
-    --bg:#F3F6FA;
-    --line:#D2DDE7;
-    --text:#172536;
-    --text-muted:#53677B;
-    --surface:#FFFFFF;
-    --surface-soft:#F8FAFC;
-    --surface-hover:#EDF4F8;
-    --input-bg:#FFFFFF;
-    --secondary-bg:#E6EDF3;
-    --secondary-text:#23384C;
-    --notice-bg:#E4F3FA;
-    --notice-text:#174C68;
-    --table-head:#E8F0F6;
-    --table-head-text:#30465A;
-    --header-muted:#D7E8F3;
-
-    --red:#991B1B;
-    --amber:#92400E;
-    --green:#065F46;
-}
-
-
-/* =========================================
-   ZIELONY SZAŁWIOWY — SPOKOJNY
-========================================= */
-
-body.theme-corporate{
-    --navy:#2F493D;
-    --blue:#4C735F;
-    --bg:#F2F6F2;
-    --line:#CBD8D0;
-    --text:#24342C;
-    --text-muted:#586C61;
-    --surface:#FCFEFC;
-    --surface-soft:#F6F9F6;
-    --surface-hover:#E8F0EB;
-    --input-bg:#FFFFFF;
-    --secondary-bg:#E3ECE6;
-    --secondary-text:#2D4639;
-    --notice-bg:#E3F0E8;
-    --notice-text:#315443;
-    --table-head:#E5EEE8;
-    --table-head-text:#334B3F;
-    --header-muted:#D8E8DF;
-
-    --red:#A64B43;
-    --amber:#9A702F;
-    --green:#39705A;
-}
-
-
-/* =========================================
-   BEŻOWO-TERAKOTOWY — CIEPŁY
-========================================= */
-
-body.theme-elegant{
-    --navy:#593F32;
-    --blue:#8C5F47;
-    --bg:#F8F3EC;
-    --line:#DDCFC2;
-    --text:#362B25;
-    --text-muted:#705E53;
-    --surface:#FFFDF9;
-    --surface-soft:#F7F0E7;
-    --surface-hover:#F0E4D6;
-    --input-bg:#FFFEFC;
-    --secondary-bg:#EDE2D7;
-    --secondary-text:#4C382E;
-    --notice-bg:#F3E7DA;
-    --notice-text:#664838;
-    --table-head:#EFE4D9;
-    --table-head-text:#594236;
-    --header-muted:#EADDD3;
-
-    --red:#A94C43;
-    --amber:#A47735;
-    --green:#52715C;
-}
-
-
-/* =========================================
-   JASNY — NEUTRALNY / MINIMALISTYCZNY
-========================================= */
-
-body.theme-minimal{
-    --navy:#303A43;
-    --blue:#56636F;
-    --bg:#F6F7F8;
-    --line:#D7DDE2;
-    --text:#222B33;
-    --text-muted:#606C76;
-    --surface:#FFFFFF;
-    --surface-soft:#F3F5F6;
-    --surface-hover:#E9EDF0;
-    --input-bg:#FFFFFF;
-    --secondary-bg:#E8ECEF;
-    --secondary-text:#303A43;
-    --notice-bg:#EDF1F3;
-    --notice-text:#3D4A54;
-    --table-head:#EBEFF2;
-    --table-head-text:#3F4B55;
-    --header-muted:#DDE3E7;
-
-    --red:#B34D45;
-    --amber:#A47732;
-    --green:#4E775F;
-}
-
-
-/* =========================================
-   CIEMNY — GRAFITOWY / PROFESJONALNY
-========================================= */
-
-body.theme-dark{
-    --navy:#121B21;
-    --blue:#397C93;
-
-    --bg:#0E1418;
-    --line:#344650;
-    --text:#E9F0F3;
-
-    --red:#F08078;
-    --amber:#E5B968;
-    --green:#6FC495;
-
-    /* dodatkowe kolory ciemnego motywu */
-    --surface:#182228;
-    --surface-soft:#131C21;
-    --surface-hover:#243139;
-    --surface-2:#202C33;
-    --surface-3:#27363E;
-    --text-muted:#AAB9C1;
-    --input-bg:#11191E;
-    --secondary-bg:#29363D;
-    --secondary-text:#E6EDF0;
-    --notice-bg:#17303A;
-    --notice-text:#D2E6ED;
-    --table-head:#26353D;
-    --table-head-text:#DCE7EB;
-    --header-muted:#B7C8D0;
-}
-
-   /* =========================================
-   CIEMNY MOTYW — DODATKOWE ELEMENTY
-========================================= */
-
-body.theme-dark{
-    background:var(--bg);
-    color:var(--text);
-}
-
-/* Górny pasek */
-body.theme-dark .top{
-    background:var(--navy);
-    color:#F4F7F9;
-    border-bottom-color:var(--blue);
-}
-
-body.theme-dark .top p{
-    color:var(--header-muted);
-}
-
-/* Główne panele */
-body.theme-dark .panel,
-body.theme-dark .card,
-body.theme-dark .notice{
-    background:var(--surface);
-    color:var(--text);
-    border-color:var(--line);
-}
-
-/* Informacja */
-body.theme-dark .notice{
-    background:var(--notice-bg);
-    color:var(--notice-text);
-    border-left-color:var(--blue);
-}
-
-/* Filtry / pola */
-body.theme-dark input,
-body.theme-dark select,
-body.theme-dark textarea{
-    background:var(--input-bg);
-    color:var(--text);
-    border-color:#4A5A64;
-}
-
-body.theme-dark input::placeholder,
-body.theme-dark textarea::placeholder{
-    color:#8797A2;
-}
-
-body.theme-dark select option{
-    background:var(--input-bg);
-    color:var(--text);
-}
-
-/* Przyciski */
-body.theme-dark button{
-    background:var(--blue);
-    color:#F7FAFC;
-}
-
-body.theme-dark button:hover{
-    filter:brightness(1.08);
-}
-
-body.theme-dark .secondary{
-    background:var(--secondary-bg);
-    color:var(--secondary-text);
-    border-color:#46545D;
-}
-
-body.theme-dark .secondary:hover{
-    background:var(--surface-hover);
-}
-
-body.theme-dark .danger{
-    background:#432629;
-    color:#FFB0AA;
-    border-color:#6B3839;
-}
-
-body.theme-dark .danger:hover{
-    background:#593033;
-}
-
-/* Menu */
-body.theme-dark .menu-panel{
-    background:var(--surface);
-    border-color:var(--line);
-    box-shadow:0 12px 28px #00000066;
-}
-
-body.theme-dark .menu-user{
-    color:var(--text-muted);
-    border-bottom-color:var(--line);
-}
-
-/* Teksty pomocnicze */
-body.theme-dark .muted,
-body.theme-dark .city-summary-count{
-    color:var(--text-muted);
-}
-
-/* =========================================
-   STATYSTYKI
-========================================= */
-
-body.theme-dark .stat{
-    background:var(--surface);
-    color:var(--text);
-    border-color:var(--line);
-}
-
-body.theme-dark .stat b{
-    color:#F3F7F9;
-}
-
-body.theme-dark .stat:hover,
-body.theme-dark .stat.active{
-    box-shadow:0 0 0 3px #6F9EAD55,
-               0 8px 18px #00000055;
-}
-
-/* =========================================
-   MIASTA
-========================================= */
-
-body.theme-dark .city-group{
-    background:var(--surface);
-    border-color:var(--line);
-}
-
-/* NAJWAŻNIEJSZE — nazwa miasta */
-body.theme-dark .city-summary strong{
-    color:#F1F5F7;
-}
-
-/* liczba przeglądów */
-body.theme-dark .city-summary-count{
-    color:#AEBBC3;
-}
-
-/* strzałka */
-body.theme-dark .city-summary::after{
-    color:#8FB5C4;
-}
-
-/* tabela pod miastem */
-body.theme-dark .city-table{
-    background:#151C21;
-    border-top-color:var(--line);
-}
-
-/* =========================================
-   TABELA
-========================================= */
-
-body.theme-dark th,
-body.theme-dark td{
-    border-bottom-color:#34414A;
-    color:#E8EDF0;
-}
-
-body.theme-dark th{
-    background:var(--table-head);
-    color:var(--table-head-text);
-}
-
-body.theme-dark tr:hover td{
-    background:#1E282F;
-}
-
-/* =========================================
-   BADGE STATUSÓW
-========================================= */
-
-body.theme-dark .PO,
-body.theme-dark .POBLACK{
-    background:#4A292B;
-    color:#FFAAA3;
-}
-
-body.theme-dark .DO,
-body.theme-dark .DO30{
-    background:#493A22;
-    color:#F2CA79;
-}
-
-body.theme-dark .DO14{
-    background:#4A292B;
-    color:#FFAAA3;
-}
-
-body.theme-dark .OK{
-    background:#203D31;
-    color:#83D3A8;
-}
-
-body.theme-dark .BRAK{
-    background:#342D4A;
-    color:#C7B8F0;
-}
-
-/* =========================================
-   PRZYCISK "OTWÓRZ"
-========================================= */
-
-body.theme-dark .open-file{
-    background:#26323A;
-    color:#DCE5E9;
-    border-color:#4A5963;
-}
-
-body.theme-dark .open-file:hover{
-    background:#34414A;
-}
-
-/* =========================================
-   MODALE
-========================================= */
-
-body.theme-dark .modal{
-    background:#080C0FBB;
-}
-
-body.theme-dark .dialog{
-    background:var(--surface);
-    color:var(--text);
-    border:1px solid var(--line);
-}
-
-body.theme-dark .dialog h2{
-    color:#F1F5F7;
-}
-
-/* listy w modalach */
-body.theme-dark .type-list li{
-    background:#202A31;
-    border-color:#3A4851;
-    color:#E8EDF0;
-}
-
-/* =========================================
-   WYBÓR MOTYWU
-========================================= */
-
-body.theme-dark .theme-options button{
-    background:#202A31;
-    color:#E8EDF0;
-    border-color:#3A4851;
-}
-
-body.theme-dark .theme-options button:hover{
-    background:#2C3942;
-}
-
-/* =========================================
-   POLA FORMULARZY
-========================================= */
-
-body.theme-dark label{
-    color:#DCE5E9;
-}
-
-body.theme-dark small{
-    color:#9EADB6;
-}
-
-/* =========================================
-   LINKI / DROBNE ELEMENTY
-========================================= */
-
-body.theme-dark a{
-    color:#8FBCCB;
-}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);font:14px system-ui,Segoe UI,Arial;color:var(--text,#172033)}
-    .top{background:var(--navy);color:#fff;padding:22px max(24px,calc((100% - 1300px)/2));display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:4px solid var(--blue);}.top h1{margin:0;font-size:26px}.top p{margin:4px 0 0;color:var(--header-muted)}
-    .wrap{max-width:1300px;width:100%;margin:24px auto;padding:0 18px}.panel,.card,.notice{background:var(--surface);border:1px solid var(--line);border-radius:12px}.panel{padding:16px;margin-bottom:16px}.notice{padding:15px 17px;margin-bottom:16px;background:var(--notice-bg);color:var(--notice-text);border-left:4px solid var(--blue)}
-.tools,
-.actions{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    flex-wrap:wrap;
-}
-.attention-open{position:relative;display:inline-grid;place-items:center;width:38px;min-width:38px;height:38px;padding:0}
-.attention-open-icon{display:block;width:21px;height:21px;fill:currentColor}
-.attention-open-count{position:absolute;top:-6px;right:-6px;display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border:2px solid var(--navy);border-radius:999px;background:#dc2626;color:#fff;font-size:11px;font-weight:800;line-height:1}
-.attention-open-count[hidden]{display:none}
-
-.filters{
-    margin-top:14px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
-   body.theme-dark .clear-filters{
-    background:transparent;
-    color:#8FBCCB;
-    border-color:#46545D;
-}
-
-body.theme-dark .clear-filters:hover{
-    background:#26323A;
-}
-
-body.theme-dark .filter-count{
-    background:#202A31;
-    border-color:#46545D;
-    color:#E8EDF0;
-}
-/* ============================
-   WYSZUKIWANIE
-============================ */
-
-.search-row{
-    display:flex;
-    gap:10px;
-    width:100%;
-}
-
-.search-row input{
-    flex:1;
-    min-width:0;
-}
-
-/* ============================
-   FILTRY
-============================ */
-
-.filter-row{
-    display:flex;
-    gap:10px;
-    align-items:center;
-    width:100%;
-}
-
-.filter-row select{
-    flex:1;
-    min-width:155px;
-}
-
-/* ============================
-   WYCZYŚĆ FILTRY
-============================ */
-
-.clear-filters{
-    background:transparent;
-    color:var(--blue);
-    border:1px solid var(--line);
-    padding:9px 13px;
-    white-space:nowrap;
-}
-
-.clear-filters:hover{
-    background:var(--bg);
-}
-
-/* ============================
-   LICZNIK FILTRÓW
-============================ */
-
-.filter-count{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    padding:8px 12px;
-    border:1px solid var(--line);
-    border-radius:8px;
-    background:var(--bg);
-    color:var(--text);
-    white-space:nowrap;
-}
-
-.filter-count b{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    min-width:22px;
-    height:22px;
-    padding:0 6px;
-    border-radius:999px;
-    background:var(--blue);
-    color:#fff;
-    font-size:12px;
-}.user-menu{position:relative}.menu-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:100;min-width:250px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px #0f172a33}.menu-panel button{display:block;width:100%;margin-top:6px;text-align:left}.menu-user{padding:4px 6px 10px;color:var(--text-muted);border-bottom:1px solid var(--line);word-break:break-word}
-.menu-user-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;border-bottom:1px solid var(--line)}
-.menu-section-label{margin:12px 4px 4px;color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.menu-user-row + .menu-section-label{margin-top:8px}
-.menu-panel>button+button{margin-top:5px}
-.menu-panel .menu-section-label+button{margin-top:4px}
-.menu-user-row .menu-user{flex:1;min-width:0;border-bottom:0}
-.menu-panel .menu-close{display:grid;place-items:center;width:30px;height:30px;min-height:30px;flex:0 0 30px;margin:0 2px 6px 0;padding:0;border-radius:5px;font-size:19px;line-height:1;text-align:center;background:var(--surface-soft);color:var(--text);border:1px solid var(--line)}
-    button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.secondary{background:var(--secondary-bg);color:var(--secondary-text)}.danger{background:#fee2e2;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
-    .calendar-dialog{width:min(760px,96vw)}.calendar-toolbar{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:10px;margin:14px 0;text-align:center}.calendar-toolbar button{width:44px;height:40px;padding:0;font-size:24px;line-height:1;justify-self:center}.calendar-toolbar strong{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.calendar-weekdays{margin-bottom:5px;color:var(--text-muted);font-size:12px;font-weight:700;text-align:center}.calendar-day{min-height:78px;padding:6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);text-align:left;vertical-align:top}.calendar-day.empty{visibility:hidden}.calendar-day.has-events{cursor:pointer}.calendar-day.has-events:hover{border-color:var(--blue);background:var(--surface-hover)}.calendar-date{display:block;font-size:12px;font-weight:700}.calendar-events{display:flex;gap:3px;flex-wrap:wrap;margin-top:5px}.calendar-dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle}.expiry-dot{background:var(--blue)}.calendar-legend{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px 9px;margin:14px 0;color:var(--text-muted);font-size:12px}.calendar-details{min-height:44px;padding:10px 12px;border-radius:8px;background:var(--surface-soft);font-size:13px}.calendar-details ul{margin:5px 0 0;padding-left:18px}.calendar-details li{margin:6px 0}.calendar-details button{margin-left:8px;padding:4px 8px;font-size:11px}
-    input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;background:var(--input-bg);color:var(--text);font:inherit}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat{width:100%;padding:15px;border:1px solid var(--line);border-left:5px solid #64748b;background:var(--surface);color:var(--text);text-align:left}.stat:hover,.stat.active{box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 35%,transparent),0 8px 18px #0f172a18;transform:translateY(-1px)}.stat b{display:block;font-size:27px;margin-top:4px}.overdue{border-left-color:#ef4444}.due{border-left-color:#f59e0b}.ok{border-left-color:#10b981}.total{border-left-color:var(--blue)}
-.city-groups{display:grid;gap:12px}.city-group{overflow:hidden}.city-summary{display:flex;align-items:center;gap:14px;padding:16px 18px 16px 13px;cursor:pointer;list-style:none}.city-summary::-webkit-details-marker{display:none}.city-summary::after{content:'›';font-size:25px;line-height:1;color:var(--blue);margin-left:4px;transition:transform .18s}.city-group[open] .city-summary::after{transform:rotate(90deg)}.city-summary-main{display:flex;gap:10px;align-items:baseline}.city-summary strong{font-size:17px}.city-summary-count,.muted{color:var(--text-muted)}.city-summary-stats{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.city-table{border-top:1px solid var(--line);padding:0 12px 12px;background:var(--surface-soft);overflow:hidden;}.tablebox{overflow:auto;max-height:62vh;scrollbar-gutter:stable;overscroll-behavior:contain}table{border-collapse:collapse;width:100%;}th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;font-size:14px;line-height:1.3;}th{position:sticky;top:0;z-index:1;background:var(--table-head);color:var(--table-head-text);font-size:13px;font-weight:700}
-
-/* Jeden układ kolumn dla każdej tabeli przeglądów. */
-.inspections-table{
-    width:100%;
-    min-width:980px;
-    table-layout:auto;
-}
-
-.inspections-table .col-type{width:20%}
-.inspections-table .col-done,
-.inspections-table .col-next,
-.inspections-table .col-status,
-.inspections-table .col-protocol,
-.inspections-table .col-actions{width:1%}
-.inspections-table .col-notes{width:22%}
-
-.inspections-table :is(th,td):nth-child(2),
-.inspections-table :is(th,td):nth-child(3),
-.inspections-table :is(th,td):nth-child(4),
-.inspections-table :is(th,td):nth-child(5),
-.inspections-table :is(th,td):nth-child(7){
-    text-align:center;
-}
-
-.inspections-table :is(th,td):nth-child(2),
-.inspections-table :is(th,td):nth-child(3),
-.inspections-table :is(th,td):nth-child(4),
-.inspections-table :is(th,td):nth-child(5),
-.inspections-table :is(th,td):nth-child(7){
-    white-space:nowrap;
-}
-
-.inspections-table :is(th,td):nth-child(1){
-    min-width:180px;
-}
-
-.inspections-table :is(th,td):nth-child(6){
-    min-width:220px;
-}
-
-.inspections-table th:nth-child(6){
-    text-align:center;
-}
-
-.inspections-table td:nth-child(6){
-    text-align:center;
-    line-height:1.45;
-}
-
-.inspections-table td:nth-child(1),
-.inspections-table td:nth-child(6){
-    overflow-wrap:anywhere;
-    white-space:normal;
-}
-   /* ============================
-   SORTOWANIE TABELI
-============================ */
-
-th.sortable{
-    cursor:pointer;
-    user-select:none;
-    white-space:nowrap;
-    transition:background .15s ease;
-}
-
-th.sortable:hover{
-    background:#dce6ef;
-}
-
-.sort-header{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-}
-
-.sort-arrow{
-    display:inline-flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    width:12px;
-    height:16px;
-    font-size:9px;
-    line-height:7px;
-    color:#94a3b8;
-}
-
-.sort-arrow::before{
-    content:'▲';
-}
-
-.sort-arrow::after{
-    content:'▼';
-}
-
-th.sortable.active.asc .sort-arrow::before{
-    color:var(--blue);
-}
-
-th.sortable.active.asc .sort-arrow::after{
-    color:#cbd5e1;
-}
-
-th.sortable.active.desc .sort-arrow::before{
-    color:#cbd5e1;
-}
-
-th.sortable.active.desc .sort-arrow::after{
-    color:var(--blue);
-}
-
-body.theme-dark th.sortable:hover{
-    background:#34414A;
-}
-
-body.theme-dark .sort-arrow{
-    color:#687984;
-}
-
-body.theme-dark th.sortable.active.asc .sort-arrow::before,
-body.theme-dark th.sortable.active.desc .sort-arrow::after{
-    color:var(--blue);
-}.badge{
-    padding:4px 8px;
-    border-radius:999px;
-    font-size:11px;
-    font-weight:800;
-    white-space:nowrap;
-}
-
-.PO{
-    background:#1f2937;
-    color:#fff;
-}
-
-.DO{
-    background:#fef3c7;
-    color:var(--amber);
-}
-
-.DO30{
-    background:#fef3c7;
-    color:#b45309;
-}
-
-.DO14{
-    background:#fee2e2;
-    color:#dc2626;
-}
-
-.POBLACK{
-    background:#1f2937;
-    color:#fff;
-}
-
-.OK{
-    background:#d1fae5;
-    color:var(--green);
-}
-
-.BRAK{
-    background:#ede9fe;
-    color:#5b21b6;
-}
-    .modal{display:none;position:fixed;inset:0;background:#17203388;place-items:center;padding:18px;z-index:1000}.modal.open{display:grid}.dialog{background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:24px;width:min(720px,100%);max-height:90vh;overflow:auto}.form{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.form label{display:grid;gap:5px;font-weight:650}.wide{grid-column:1/-1}.dialog footer{display:flex;justify-content:flex-end;gap:9px;margin-top:19px}.type-add{display:flex;gap:8px}.type-add input{flex:1}.type-list{list-style:none;padding:0;margin:16px 0;display:grid;gap:7px;max-height:48vh;overflow:auto}.type-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}.trash-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.trash-actions button{padding:7px 10px;font-size:12px}.trash-actions .permanent-delete{background:#fee2e2;color:var(--red)}.trash-actions .permanent-delete:hover{filter:brightness(.97)}body.theme-dark .trash-actions .permanent-delete{background:#432629;color:#FFB0AA;border-color:#6B3839}
-
-    /* Lokale i magazyny — układ zgodny z aplikacją zgłaszania usterek. */
-    .locations-dialog{width:min(920px,100%)}
-    .locations-summary{display:flex;align-items:center;gap:8px;margin:14px 0 12px;color:var(--text-muted);font-size:12px}
-    .locations-summary strong{color:var(--text);font-size:14px}
-    .locations-tablebox{max-height:54vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);scrollbar-gutter:stable}
-    .locations-table{width:100%;min-width:680px;border-collapse:collapse}
-    .locations-table th,.locations-table td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-    .locations-table th{position:sticky;top:0;z-index:1;background:var(--table-head);color:var(--table-head-text);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-    .locations-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-soft) 60%,var(--surface))}
-    .locations-table tbody tr:hover td{background:color-mix(in srgb,var(--blue) 5%,var(--surface))}
-    .locations-table tbody tr:last-child td{border-bottom:0}
-    .location-place{display:grid;gap:3px;min-width:170px}
-    .location-place b{color:var(--text);font-size:13px}
-    .location-place small{color:var(--text-muted);font-size:11px}
-    .location-kind,.location-active{display:inline-flex;align-items:center;justify-content:center;min-height:24px;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:750;white-space:nowrap}
-    .location-kind{background:color-mix(in srgb,var(--blue) 11%,var(--surface));color:var(--blue)}
-    .location-kind.warehouse{background:#ecfdf5;color:#18734e}
-    .location-active{background:#ecfdf5;color:#18734e}
-    .location-remove{min-height:32px;padding:6px 10px;font-size:11px}
-    .locations-empty{padding:26px 14px;text-align:center;color:var(--text-muted);font-size:13px}
-    .dialog-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
-    .dialog-title-row h2{margin-bottom:4px}
-    .dialog-title-row .dialog-add{min-height:36px;padding:7px 11px;white-space:nowrap}
-    .types-dialog{width:min(850px,100%)}
-    .types-tablebox{max-height:48vh;overflow:auto;margin-top:14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);scrollbar-gutter:stable}
-    .types-table{width:100%;min-width:500px;border-collapse:collapse}
-    .types-table th,.types-table td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-    .types-table th{position:sticky;top:0;z-index:1;background:var(--table-head);color:var(--table-head-text);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-    .types-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-soft) 60%,var(--surface))}
-    .types-table tbody tr:hover td{background:color-mix(in srgb,var(--blue) 5%,var(--surface))}
-    .types-table tbody tr:last-child td{border-bottom:0}
-    .type-name-cell{font-weight:750;color:var(--text)}
-    .type-count{color:var(--text-muted);font-size:12px}
-    .type-actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}
-    .type-actions button{min-height:32px;padding:6px 10px;font-size:11px}
-    .type-editing-note{margin:9px 0 0;color:var(--blue);font-size:12px;font-weight:650}
-    #addLocal{display:none!important}
-
-/* Widoczna obsługa klawiaturą bez pierścienia po kliknięciu myszą. */
-:where(button,input,select,textarea,summary):focus-visible{
-    outline:3px solid #38BDF8;
-    outline-offset:2px;
-}
-
-body.theme-dark :where(button,input,select,textarea,summary):focus-visible{
-    outline-color:#8FDBF4;
-}
-    .theme-options{
-    display:grid;
-    gap:10px;
-    margin-top:20px;
-}
-
-.theme-options button{
-    text-align:left;
-    display:flex;
-    align-items:center;
-    gap:11px;
-    background:var(--surface);
-    color:var(--text);
-    border:1px solid var(--line);
-}
-
-.theme-options button:hover{
-    background:var(--surface-hover);
-}
-
-.theme-options button.active{
-    border-color:var(--blue);
-    background:var(--surface-hover);
-    box-shadow:0 0 0 2px color-mix(in srgb,var(--blue) 24%,transparent);
-}
-
-.theme-options button::before{
-    content:'';
-    width:30px;
-    height:30px;
-    flex:0 0 30px;
-    border:1px solid #0002;
-    border-radius:50%;
-    background:linear-gradient(135deg,var(--swatch-1) 0 50%,var(--swatch-2) 50%);
-    box-shadow:0 1px 3px #0002;
-}
-
-.theme-options button[data-theme="default"]{--swatch-1:#16324F;--swatch-2:#0B6285}
-.theme-options button[data-theme="corporate"]{--swatch-1:#2F493D;--swatch-2:#4C735F}
-.theme-options button[data-theme="elegant"]{--swatch-1:#593F32;--swatch-2:#8C5F47}
-.theme-options button[data-theme="minimal"]{--swatch-1:#303A43;--swatch-2:#D7DDE2}
-.theme-options button[data-theme="dark"]{--swatch-1:#121B21;--swatch-2:#397C93}
-.row-actions{display:flex;gap:4px;align-items:center;justify-content:center;flex-wrap:nowrap;white-space:nowrap}.row-actions button{display:inline-flex;justify-content:center;min-width:30px;padding:6px 8px;font-size:14px;line-height:1.2;align-items:center;gap:4px;}.row-actions button span{display:none}.row-actions button .pencil-icon{display:inline-block}.action-edit{
-    background:var(--secondary-bg);
-}
-.types-table th:last-child{text-align:center}
-.types-table td:last-child{text-align:right}
-.types-table .type-actions{justify-content:flex-end}
-
-/* Tabela przeglądów: spokojniejsza hierarchia i bardziej czytelne wiersze. */
-.desktop-inspection-table,.local-inspections-table{
-    border:1px solid var(--line);
-    border-radius:12px;
-    background:var(--surface);
-    box-shadow:0 3px 12px #0f172a0a;
-}
-.inspections-table th{
-    padding:14px 15px;
-    background:linear-gradient(180deg,var(--table-head),color-mix(in srgb,var(--table-head) 88%,var(--surface)));
-    border-bottom:1px solid color-mix(in srgb,var(--blue) 18%,var(--line));
-}
-.inspections-table td{padding:14px 15px;border-bottom:1px solid color-mix(in srgb,var(--line) 80%,transparent)}
-.inspections-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-soft) 58%,var(--surface))}
-.inspections-table tbody tr:hover td{background:color-mix(in srgb,var(--blue) 6%,var(--surface))}
-.inspections-table tbody tr:last-child td{border-bottom:0}
-.row-actions{gap:7px}
-.row-actions button{min-width:36px;min-height:36px;padding:7px 9px;border-radius:10px;transition:transform .15s ease,filter .15s ease}
-.row-actions button:hover{transform:translateY(-1px);filter:brightness(.98)}
-.pencil-icon{display:inline-block;transform:scaleX(-1);transform-origin:center}
-
-.action-delete{
-    background:#fee2e2;
-}
-
-.action-history{
-    background:var(--secondary-bg);
-}.open-file{background:var(--surface-soft);color:var(--text);border:1px solid var(--line);padding:6px 9px;font-size:12px;font-weight:700;border-radius:8px;line-height:1.2;}.open-file:hover{background:var(--surface-hover);}.protocol-cell{white-space:nowrap;text-align:center;}.protocol-cell .badge{vertical-align:middle;}.protocol-cell .open-file{margin-left:6px;vertical-align:middle;}.status-cell{white-space:nowrap;text-align:center;vertical-align:middle;}.status-cell .badge{display:inline-flex;justify-content:center;align-items:center;height:22px;min-width:38px;}
-   /* ============================
-   RESPONSYWNOŚĆ EKRANÓW
-============================ */
-
-
-/* Duże monitory 1600px+ */
-@media (min-width:1600px){
-
-    .top{
-        padding-left: max(40px, calc((100% - 1500px)/2));
-        padding-right: max(40px, calc((100% - 1500px)/2));
-    }
-
-
-    .wrap{
-        max-width:1500px;
-        padding-left:20px;
-        padding-right:20px;
-    }
-
-
-    table{
-        font-size:14px;
-    }
-
-
-    th,td{
-        padding:12px 14px;
-    }
-
-
-    .stats{
-        gap:18px;
-    }
-
-}
-
-
-
-/* Standardowe monitory / laptopy */
-@media (min-width:1200px) and (max-width:1599px){
-
-    .wrap{
-        max-width:1300px;
-    }
-
-
-    th,td{
-        padding:10px;
-    }
-
-
-}
-
-
-
-/* Małe laptopy */
-@media (max-width:1199px){
-
-    .wrap{
-        padding-left:12px;
-        padding-right:12px;
-    }
-
-
-    .stats{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-
-    .filters{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-
-    .filters input,
-    .filters select{
-        width:100%;
-    }
-
-}
-
-
-
-/* Tablet */
-@media (max-width:768px){
-
-    .top{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:12px;
-    }
-
-
-    .actions{
-        width:100%;
-    }
-
-
-    .actions button{
-        width:100%;
-    }
-
-
-    .stats{
-        grid-template-columns:1fr;
-    }
-
-
-    .city-summary{
-        padding:12px;
-        flex-wrap:wrap;
-    }
-
-
-    .city-summary-stats{
-        margin-left:0;
-        width:100%;
-        padding-left:32px;
-    }
-
-
-    .tablebox{
-        overflow-x:auto;
-    }
-
-
-}
-
-
-
-/* Telefony */
-@media (max-width:480px){
-
-    body{
-        font-size:13px;
-    }
-
-    .wrap{
-        margin-top:15px;
-        padding:0 10px;
-    }
-
-    .panel{
-        padding:12px;
-    }
-
-    .dialog{
-        padding:18px;
-        max-height:94vh;
-    }
-
-    .dialog footer{
-        flex-direction:column-reverse;
-    }
-
-    .dialog footer button{
-        width:100%;
-    }
-
-
-    /* Nagłówek */
-    .top{
-        padding:12px 10px;
-        gap:8px;
-        flex-wrap:nowrap;
-    }
-
-    .top h1{
-        font-size:18px;
-        white-space:nowrap;
-    }
-
-    .top p{
-        display:none;
-    }
-      .search-row{
-        flex-direction:column;
-    }
-
-    .filter-row{
-        flex-direction:column;
-        align-items:stretch;
-    }
-
-    .filter-row select{
-        width:100%;
-    }
-
-    .clear-filters{
-        width:100%;
-    }
-
-    .filter-count{
-        width:100%;
-        justify-content:center;
-    }
-
-
-    /* Przyciski w nagłówku jedna linia */
-    .top .actions{
-        gap:5px;
-        flex-wrap:nowrap;
-        margin-left:auto;
-    }
-
-    .top .actions button{
-        padding:7px 8px;
-        font-size:12px;
-        white-space:nowrap;
-    }
-
-
-    /* Menu */
-    #menuToggle{
-        padding:7px 8px;
-    }
-
-
-    .dialog{
-        padding:16px;
-    }
-
-
-    .form{
-        grid-template-columns:1fr;
-    }
-
-
-    /* tabela na telefonie */
-    .tablebox{
-        overflow-x:auto;
-    }
-
-
-    th,td{
-        font-size:12px;
-        padding:8px;
-    }
-
-
-    .row-actions button{
-        padding:5px 6px;
-        font-size:11px;
-    }
-
-}
-
-/* =========================================
-   MIASTO → LOKALE → PRZEGLĄDY
-========================================= */
-
-.city-group{
-    overflow:hidden;
-}
-
-.city-summary{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding:16px 18px 16px 13px;
-    cursor:pointer;
-    list-style:none;
-}
-
-.city-summary::-webkit-details-marker{
-    display:none;
-}
-
-.city-summary::after{
-    content:'›';
-    font-size:25px;
-    line-height:1;
-    color:var(--blue);
-    margin-left:4px;
-    transition:transform .18s;
-}
-
-.city-group[open] .city-summary::after{
-    transform:rotate(90deg);
-}
-
-.city-summary-main{
-    display:flex;
-    gap:10px;
-    align-items:baseline;
-}
-
-.city-summary strong{
-    font-size:17px;
-}
-
-.city-summary-count{
-    color:#475569;
-}
-
-.city-summary-stats{
-    display:flex;
-    gap:7px;
-    flex-wrap:wrap;
-    margin-left:auto;
-}
-
-/* Lista lokali */
-
-.local-list{
-    border-top:1px solid var(--line);
-    background:var(--bg);
-    padding:10px;
-    display:grid;
-    gap:7px;
-}
-
-.local-item{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    width:100%;
-    padding:12px 14px;
-    border:1px solid var(--line);
-    border-radius:9px;
-    background:var(--surface);
-    color:var(--text);
-    cursor:pointer;
-    text-align:left;
-    position:relative;
-    transition:
-        background .15s ease,
-        border-color .15s ease,
-        transform .1s ease;
-}
-
-.local-item:hover{
-    background:var(--surface-hover);
-    border-color:var(--blue);
-    transform:translateX(2px);
-}
-
-.local-arrow{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:18px;
-    height:25px;
-    flex:0 0 18px;
-    font-size:25px;
-    line-height:25px;
-    color:var(--blue);
-    transform-origin:center center;
-    transition:transform .18s;
-}
-              
-.local-item.open .local-arrow{
-    transform:rotate(90deg);
-}
-
-.local-main{
-    flex:1;
-    min-width:0;
-    display:flex;
-    align-items:baseline;
-    gap:8px;
-}
-
-.local-name{
-    font-weight:700;
-    font-size:14px;
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.local-count{
-    margin-left:0;
-    color:var(--text-muted);
-    font-size:12px;
-    font-weight:500;
-    flex:0 0 auto;
-    white-space:nowrap;
-}
-
-.local-stats{
-    display:flex;
-    gap:5px;
-    align-items:center;
-    flex-wrap:wrap;
-}
-
-/* Rozwinięte przeglądy lokalu */
-
-.local-inspections{
-    display:none;
-    margin:0 0 6px 30px;
-    padding:10px;
-    border-left:3px solid var(--blue);
-    background:var(--surface-soft);
-    overflow-x:auto;
-}
-
-.local-inspections.open{
-    display:block;
-}
-
-/* Na komputerze zachowujemy pełną tabelę. Mobilna lista rodzajów
-   jest włączana dopiero w regule dla telefonu. */
-.mobile-inspection-types{
-    display:none;
-}
-
-/* Ciemny motyw */
-
-body.theme-dark .local-list{
-    background:#151C21;
-}
-
-body.theme-dark .local-item{
-    background:var(--surface);
-    border-color:var(--line);
-    color:var(--text);
-}
-
-body.theme-dark .local-item:hover{
-    background:#26323A;
-    border-color:var(--blue);
-}
-
-body.theme-dark .local-count{
-    color:var(--text-muted);
-}
-
-body.theme-dark .local-inspections{
-    background:#151C21;
-}
-
-/* Telefon */
-
-@media (max-width:480px){
-
-    .local-item{
-        display:grid;
-        grid-template-columns:18px minmax(0,1fr);
-        grid-template-areas:
-            "arrow main"
-            "arrow stats";
-        align-items:center;
-        column-gap:10px;
-        row-gap:8px;
-        padding:11px;
-    }
-
-    .local-arrow{
-        grid-area:arrow;
-        align-self:center;
-    }
-
-    .local-main{
-        grid-area:main;
-        display:flex;
-        flex-direction:row;
-        align-items:baseline;
-        gap:8px;
-    }
-
-    .local-name{
-        min-width:0;
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap;
-    }
-
-    .local-count{
-        margin-left:0;
-        flex:0 0 auto;
-        white-space:nowrap;
-    }
-
-    .local-stats{
-        grid-area:stats;
-        width:100%;
-        margin-left:0;
-        justify-content:flex-start;
-    }
-
-    .local-stats .badge{
-        display:inline-flex;
-        align-items:center;
-        min-height:22px;
-    }
-
-    .local-inspections{
-        margin-left:12px;
-    }
-
-}
-
-/* Ograniczenie animacji zgodnie z ustawieniami systemu. */
-@media (prefers-reduced-motion:reduce){
-    *,*::before,*::after{
-        scroll-behavior:auto !important;
-        animation-duration:.01ms !important;
-        animation-iteration-count:1 !important;
-        transition-duration:.01ms !important;
-    }
-}
-
-/* Kalendarz zawsze mieści się w oknie. Na komputerze miesiąc i szczegóły są
-   obok siebie, a na węższych ekranach układają się jeden pod drugim. */
-#calendarModal{overflow:hidden}
-.calendar-dialog{
-    width:min(880px,calc(100vw - 36px));
-    max-height:calc(100dvh - 36px);
-    overflow:auto;
-    overscroll-behavior:contain;
-}
-.calendar-grid{grid-template-rows:repeat(6,minmax(60px,1fr))}
-.calendar-day{min-width:0;min-height:60px}
-.calendar-details{height:auto;min-height:96px;max-height:260px;overflow:auto;scrollbar-gutter:stable}
-.calendar-day.today{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 12%,var(--surface));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--blue) 55%,transparent)}
-.calendar-day.selected{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 18%,var(--surface));box-shadow:inset 0 0 0 2px var(--blue)}
-.calendar-dot.reminder30-dot{background:#22c55e}
-.calendar-dot.reminder14-dot{background:#eab308}
-.calendar-dot.expiry-dot{background:#ef4444}
-.calendar-weekdays span:nth-child(6),.calendar-weekdays span:nth-child(7){color:var(--text-muted);background:var(--surface-soft);border-radius:6px}
-.calendar-grid>:nth-child(7n + 6),.calendar-grid>:nth-child(7n + 7){background:color-mix(in srgb,var(--text-muted) 8%,var(--surface))}
-.calendar-grid>.calendar-day.has-events:nth-child(7n + 6),.calendar-grid>.calendar-day.has-events:nth-child(7n + 7){background:color-mix(in srgb,var(--text-muted) 10%,var(--surface))}
-.calendar-grid>.calendar-day.today:nth-child(7n + 6),.calendar-grid>.calendar-day.today:nth-child(7n + 7){background:color-mix(in srgb,var(--blue) 12%,var(--surface))}
-.calendar-details-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
-.calendar-details-count{color:var(--text-muted);font-size:11px;font-weight:600}
-.calendar-event-list{display:grid;gap:8px}
-.calendar-event-card{padding:9px 10px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:8px;background:var(--surface);color:var(--text)}
-.calendar-event-card.reminder30{border-left-color:#22c55e}
-.calendar-event-card.reminder14{border-left-color:#eab308}
-.calendar-event-card.expiry{border-left-color:#ef4444}
-.calendar-event-kind{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px;font-weight:750}
-.calendar-event-place{font-weight:750;overflow-wrap:anywhere}
-.calendar-event-type{margin-top:3px;color:var(--text-muted);overflow-wrap:anywhere}
-.calendar-event-expiry{margin-top:5px;color:var(--text-muted);font-size:12px}
-.calendar-event-expiry strong{color:var(--text);font-weight:750}
-    .calendar-event-card button{margin:8px 0 0}
-    /* Zwarte komunikaty terminów w kalendarzu. */
-    .calendar-event-card{padding:8px 10px;border-radius:10px;box-shadow:0 1px 3px #0f172a08}
-    .calendar-event-kind{margin-bottom:4px;line-height:1.2}
-    .calendar-event-place{font-size:14px;line-height:1.25}
-    .calendar-event-type{margin-top:2px;font-size:13px;line-height:1.25}
-    .calendar-event-expiry{margin-top:4px;font-size:12px;line-height:1.25}
-    .calendar-event-card button{min-height:34px;margin-top:7px;padding:6px 9px}
-.calendar-dialog footer{align-items:center}
-#calendarToday{margin-right:auto}
-@media (min-width:900px){
-    .calendar-dialog{
-        display:grid;
-        grid-template-columns:minmax(500px,1.55fr) minmax(300px,.85fr);
-        grid-template-rows:auto auto auto minmax(0,1fr) auto auto;
-        grid-template-areas:
-            "title title"
-            "toolbar details"
-            "weekdays details"
-            "grid details"
-            "legend details"
-            "footer footer";
-        gap:8px 16px;
-        width:min(1120px,calc(100vw - 36px));
-        height:min(780px,calc(100dvh - 36px));
-        max-height:calc(100dvh - 36px);
-        padding:20px;
-        overflow:hidden;
-    }
-    .calendar-dialog>h2{grid-area:title;margin:0}
-    .calendar-toolbar{grid-area:toolbar;margin:0}
-    .calendar-weekdays{grid-area:weekdays;margin:0}
-    .calendar-grid{grid-area:grid;min-height:0;height:100%;grid-template-rows:repeat(6,minmax(48px,1fr))}
-    .calendar-legend{grid-area:legend;margin:0}
-    .calendar-details{grid-area:details;height:100%;min-height:0;max-height:none;overflow:auto;padding:14px}
-    .calendar-details-heading{position:sticky;top:-14px;z-index:2;margin:-2px -2px 10px;padding:2px 2px 10px;background:var(--surface-soft);border-bottom:1px solid var(--line)}
-    .calendar-dialog>footer{grid-area:footer;margin:2px 0 0}
-    .calendar-event-card button{width:100%;margin-top:10px}
-}
-@media (max-width:600px){.calendar-dialog{padding:16px}.calendar-grid{grid-template-rows:repeat(6,52px)}.calendar-day{min-height:52px}}
-
-/* Telefon: czytelny układ bez ścisku i z wygodnymi strefami dotyku. */
-@media (max-width:600px){
-    body{font-size:14px}
-    button,input,select,textarea{min-height:44px}
-    button{touch-action:manipulation}
-
-    .top{
-        padding:14px 12px 16px;
-        gap:13px;
-    }
-
-    .top>div:first-child{width:100%}
-    .top h1{font-size:21px;white-space:normal;line-height:1.15}
-    .top p{display:block;font-size:12px;line-height:1.35}
-
-    .top .actions{
-        display:grid;
-        grid-template-columns:repeat(2,minmax(0,1fr));
-        width:100%;
-        gap:8px;
-        margin:0;
-    }
-
-    .top .actions button{
-        width:100%;
-        min-height:44px;
-        padding:8px 9px;
-        font-size:13px;
-        white-space:normal;
-        line-height:1.2;
-    }
-
-    #add{grid-column:1/-1}
-    .top .attention-open{min-width:0}
-    .top .user-menu{grid-column:1/-1;width:100%}
-    .top .user-menu #menuToggle{width:100%}
-    .menu-backdrop[hidden]{display:none !important}
-    .menu-backdrop:not([hidden]){display:block;position:fixed;inset:0;background:#0f172a80;backdrop-filter:blur(2px);z-index:1090}
-    .menu-panel{position:fixed;top:var(--mobile-menu-top,max(72px,calc(env(safe-area-inset-top) + 58px)));right:10px;bottom:auto;left:10px;max-height:calc(100dvh - var(--mobile-menu-top,72px) - 10px);overflow:auto;min-width:0;padding:10px;border-radius:14px;z-index:1100;box-shadow:0 18px 48px #0f172a66}
-    .menu-user-row{min-height:46px;margin:0 0 7px;padding:5px 5px 5px 9px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft)}
-    .menu-user-row .menu-user{padding:0;font-size:12px;line-height:1.3}
-    .menu-panel .menu-close{width:30px;height:30px;min-height:30px;flex-basis:30px;margin:0 2px 0 0;border-radius:5px;font-size:19px}
-    .menu-panel>button{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:46px;margin:5px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);font-size:13px;text-align:left}
-    .menu-panel>button:not(#logout)::after{content:'›';flex:0 0 auto;color:var(--blue);font-size:20px;line-height:1}
-    .menu-panel>#logout{margin-top:9px;background:#fee2e2;color:var(--red);border-color:color-mix(in srgb,var(--red) 28%,var(--line))}
-    body.theme-dark .menu-panel>#logout{background:#432629;color:#ffb0aa;border-color:#6b3839}
-    body.menu-open{overflow:hidden}
-    .modal.menu-origin{align-items:start;padding:var(--mobile-menu-top,72px) 8px 8px}
-    .modal.menu-origin>.dialog{width:100%;max-height:calc(100dvh - var(--mobile-menu-top,72px) - 8px);border-radius:14px}
-
-    .wrap{margin:14px auto 24px;padding:0 10px}
-    .panel,.notice{border-radius:10px}
-    .panel{padding:12px}
-    .notice{padding:12px 13px;font-size:13px}
-    .tools{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
-    .tools button{width:100%}
-    #syncInfo{text-align:center;font-size:12px}
-
-    .filters{gap:8px;margin-top:12px}
-    .search-row,.filter-row{gap:8px}
-    .filter-row{display:grid;grid-template-columns:1fr;align-items:stretch}
-    .filter-row select,.clear-filters,.filter-count{min-height:44px}
-    .filter-count{justify-content:center}
-
-    .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
-    .stat{padding:12px 10px;font-size:12px;min-height:82px}
-    .stat b{font-size:24px}
-
-    /* Czytelna hierarchia: lokalizacja jako nagłówek sekcji,
-       a lokale jako równe, kompaktowe kafelki poniżej. */
-    .city-groups{gap:10px}
-    .city-group{
-        border-radius:13px;
-        border-color:color-mix(in srgb,var(--blue) 25%,var(--line));
-        box-shadow:0 5px 14px #0f172a0d;
-    }
-    .city-group[open]{border-color:color-mix(in srgb,var(--blue) 48%,var(--line));box-shadow:0 7px 18px #0f172a14}
-    .city-summary{
-        display:grid;
-        grid-template-columns:30px minmax(0,1fr);
-        grid-template-rows:37px 30px;
-        grid-template-areas:
-            "arrow main"
-            "arrow stats";
-        gap:5px 10px;
-        height:92px;
-        min-height:92px;
-        padding:10px 11px;
-        align-items:center;
-        align-content:center;
-        overflow:hidden;
-        background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 8%,var(--surface)),var(--surface) 68%);
-    }
-    .city-summary::after{display:none}
-    .city-summary::before{
-        content:'›';
-        grid-area:arrow;
-        display:grid;
-        place-items:center;
-        align-self:center;
-        width:30px;
-        height:30px;
-        border-radius:9px;
-        background:color-mix(in srgb,var(--blue) 12%,var(--surface));
-        color:var(--blue);
-        font-size:23px;
-        line-height:1;
-        transition:transform .18s;
-    }
-    .city-group[open] .city-summary::before{transform:rotate(90deg)}
-    .city-summary-main{
-        grid-area:main;
-        display:grid;
-        grid-template-columns:minmax(0,1fr) auto;
-        grid-template-areas:"eyebrow eyebrow" "name count";
-        gap:1px 7px;
-        align-items:center;
-        min-width:0;
-    }
-    .city-summary-main::before{content:'LOKALIZACJA';grid-area:eyebrow;color:var(--text-muted);font-size:9px;font-weight:750;letter-spacing:.08em}
-    .city-summary strong{grid-area:name;min-width:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .city-summary-count{grid-area:count;padding:3px 6px;border-radius:999px;background:var(--surface-soft);font-size:10px;font-weight:650;white-space:nowrap}
-    .city-summary-stats{grid-area:stats;align-content:center;margin:0;padding:0;gap:5px;width:100%;height:30px;min-height:30px;max-height:30px;overflow:hidden}
-    .city-summary-stats:not(:has(.badge))::before{content:'Brak pilnych terminów';color:var(--text-muted);font-size:11px;font-weight:500}
-    .badge{padding:3px 6px;font-size:9px}
-
-    .local-list{padding:9px;gap:7px;background:color-mix(in srgb,var(--blue) 3%,var(--bg))}
-    .local-item{
-        display:grid;
-        grid-template-columns:30px minmax(0,1fr);
-        grid-template-rows:36px 42px;
-        grid-template-areas:"arrow main" "arrow stats";
-        align-content:center;
-        align-items:center;
-        column-gap:10px;
-        row-gap:3px;
-        width:100%;
-        height:98px;
-        min-height:98px;
-        padding:8px 10px;
-        overflow:hidden;
-        border-radius:11px;
-        box-shadow:0 2px 7px #0f172a0a;
-        transform:none;
-    }
-    .local-item:hover{transform:none}
-    .local-item.open{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 6%,var(--surface))}
-    .local-arrow{grid-area:arrow;display:grid;place-items:center;align-self:center;width:30px;height:30px;border-radius:9px;background:var(--surface-soft);font-size:22px}
-    .local-main{
-        grid-area:main;
-        display:grid;
-        grid-template-columns:minmax(0,1fr) auto;
-        grid-template-areas:"local-label local-label" "local-name local-count";
-        gap:1px 7px;
-        align-items:center;
-        min-width:0;
-    }
-    .local-main::before{content:'LOKAL';grid-area:local-label;color:var(--text-muted);font-size:9px;font-weight:750;letter-spacing:.08em}
-    .local-name{grid-area:local-name;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .local-count{grid-area:local-count;padding:3px 6px;border-radius:999px;background:var(--surface-soft);font-size:10px;font-weight:650;white-space:nowrap}
-    .local-stats{grid-area:stats;align-content:center;align-items:center;width:100%;height:42px;min-height:42px;max-height:42px;margin:0;overflow:hidden}
-    .local-stats-desktop{display:none}
-    .local-stats-mobile{display:grid;gap:3px;width:100%;min-width:0}
-    .local-status-line{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-width:0;line-height:1.15}
-    .local-status-line{cursor:default}
-    .local-status-type{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:10px;font-weight:650}
-    .local-status-line .badge{flex:0 0 auto}
-    .local-status-empty{color:var(--text-muted);font-size:11px;font-weight:500}
-    .local-status-more{color:var(--text-muted);font-size:10px;font-weight:700;line-height:1.1}
-    .local-stats .badge{display:inline-flex;align-items:center;min-height:19px}
-    .local-inspections{margin:0 0 6px;padding:7px;border-left:0;width:100%;max-width:100%;min-width:0;overflow:visible}
-    .desktop-inspection-table{display:none}
-    .mobile-inspection-types{display:grid;gap:7px}
-    .inspection-type-group{overflow:hidden;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
-    .inspection-type-summary{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:8px;align-items:center;padding:11px 10px;cursor:pointer;list-style:none;color:var(--text)}
-    .inspection-type-summary::-webkit-details-marker{display:none}
-    .inspection-type-summary::before{content:'›';color:var(--blue);font-size:22px;line-height:1;transition:transform .18s}
-    .inspection-type-group[open]>.inspection-type-summary::before{transform:rotate(90deg)}
-    .inspection-type-name{font-weight:700;overflow-wrap:anywhere}
-    .inspection-type-count{color:var(--text-muted);font-size:11px;white-space:nowrap}
-    .inspection-type-statuses{display:flex;flex-wrap:wrap;justify-content:flex-end;max-width:54%;gap:3px;text-align:right}
-    .inspection-type-statuses .badge{font-size:9px;padding:3px 5px}
-    .inspection-detail-list{display:grid;gap:8px;padding:0 8px 8px}
-    .inspection-detail-card{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft)}
-    .inspection-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin:0}
-    .inspection-detail-grid>div{min-width:0}
-    .inspection-detail-grid .detail-wide{grid-column:1/-1}
-    .inspection-detail-grid dt{margin:0 0 3px;color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.04em}
-    .inspection-detail-grid dd{margin:0;font-size:13px;overflow-wrap:anywhere}
-    .inspection-detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
-    .inspection-detail-actions button{width:100%;min-height:40px;padding:7px 8px}
-    .inspection-detail-actions .open-file{grid-column:1/-1}
-    th,td{padding:8px 9px;font-size:12px}
-    th{font-size:11px}
-
-    .modal{padding:8px;align-items:end}
-    .dialog{width:100%;max-height:calc(100dvh - 16px);padding:18px 14px;border-radius:14px 14px 10px 10px}
-    .dialog h2{font-size:19px;margin-top:0}
-    .form{gap:11px}
-    .type-add{flex-direction:column}
-    .type-add button{width:100%}
-    .type-list{max-height:42dvh}
-    .type-list li{align-items:flex-start;flex-direction:column;gap:8px}
-    .type-list li button{width:100%}
-    .locations-dialog{padding:18px 12px}
-    .locations-summary{margin:12px 2px 10px}
-    .locations-tablebox{max-height:56dvh;border-radius:9px}
-    .locations-table{min-width:0}
-    .locations-table thead{display:none}
-    .locations-table,.locations-table tbody{display:block;width:100%}
-    .locations-table tbody{padding:7px}
-    .locations-table tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 10px;padding:11px 10px;margin:0 0 7px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
-    .locations-table tbody tr:last-child{margin-bottom:0}
-    .locations-table td{display:flex;align-items:center;padding:0;border:0;background:transparent!important}
-    .locations-table td:nth-child(1){grid-column:1/-1}
-    .locations-table td:nth-child(2){grid-column:1;grid-row:2}
-    .locations-table td:nth-child(3){grid-column:2;grid-row:2}
-    .locations-table td:nth-child(4){grid-column:1;grid-row:3}
-    .locations-table td:nth-child(5){grid-column:2;grid-row:3}
-    .location-place{gap:2px}
-    .location-place b{font-size:13px}
-    .locations-empty{display:block!important;padding:20px 8px!important}
-    .dialog-title-row{gap:10px}
-    .dialog-title-row .dialog-add{min-height:38px}
-    .types-dialog{padding:18px 12px}
-    .types-tablebox{max-height:50dvh;border-radius:9px}
-    .types-table{min-width:0}
-    .types-table thead{display:none}
-    .types-table,.types-table tbody{display:block;width:100%}
-    .types-table tbody{padding:7px}
-    .types-table tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 10px;padding:11px 10px;margin:0 0 7px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
-    .types-table tbody tr:last-child{margin-bottom:0}
-    .types-table td{display:flex;align-items:center;padding:0;border:0;background:transparent!important}
-    .types-table td:nth-child(1){grid-column:1/-1}
-    .types-table td:nth-child(2){grid-column:1;grid-row:2}
-    .types-table td:nth-child(3){grid-column:1/-1;grid-row:3}
-    .type-actions{justify-content:stretch;width:100%}
-    .type-actions button{flex:1;min-height:38px}
-    .trash-actions{width:100%;justify-content:stretch}
-    .trash-actions button{flex:1;min-height:40px}
-
-    #calendarModal{align-items:center;padding:6px}
-    .calendar-dialog{
-        display:grid;
-        grid-template-rows:auto auto auto minmax(240px,252px) auto minmax(92px,1fr) auto;
-        gap:7px;
-        width:100%;
-        height:min(720px,calc(100dvh - 12px));
-        max-height:calc(100dvh - 12px);
-        padding:12px;
-        overflow:hidden;
-        border-radius:16px;
-    }
-    .calendar-dialog h2{margin:0;text-align:center;font-size:17px;line-height:1.2}
-    .calendar-toolbar{grid-template-columns:44px minmax(0,1fr) 44px;gap:8px;margin:0}
-    .calendar-toolbar button{width:44px;height:44px;min-height:44px;padding:0;border-radius:10px;font-size:25px}
-    .calendar-toolbar strong{font-size:15px}
-    .calendar-weekdays,.calendar-grid{gap:4px}
-    .calendar-weekdays{margin:0;font-size:10px;line-height:1}
-    .calendar-weekdays span{display:grid;place-items:center;min-height:22px;border-radius:5px;background:var(--surface-soft)}
-    .calendar-grid{min-height:240px;grid-template-rows:repeat(6,minmax(36px,1fr))}
-    .calendar-day{
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        min-width:0;
-        min-height:0;
-        height:auto;
-        padding:5px 2px 4px;
-        border-radius:7px;
-        text-align:center;
-    }
-    .calendar-day.has-events{border-width:2px;padding:4px 1px 3px}
-    .calendar-date{font-size:12px;line-height:1;font-weight:750}
-    .calendar-events{align-items:center;justify-content:center;gap:2px;margin-top:auto;padding-top:3px}
-    .calendar-events small{font-size:8px;line-height:1;color:var(--text-muted)}
-    .calendar-dot{width:7px;height:7px;flex:0 0 7px}
-    .calendar-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0;font-size:9px;line-height:1.2}
-    .calendar-legend-item{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface-soft);text-align:left}
-    .calendar-legend-item .calendar-dot{flex:0 0 8px;width:8px;height:8px}
-    .calendar-details{height:100%;min-height:92px;max-height:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:9px;font-size:11px;line-height:1.35;scrollbar-gutter:stable}
-    .calendar-details-heading{position:sticky;top:-9px;z-index:1;margin:-1px -1px 7px;padding:2px 1px 7px;background:var(--surface-soft);border-bottom:1px solid var(--line)}
-    .calendar-event-list{gap:7px}
-    .calendar-event-card{padding:8px 9px;background:var(--surface)}
-    .calendar-event-kind{margin-bottom:4px;font-size:11px}
-    .calendar-event-place{font-size:12px}
-    .calendar-event-type{font-size:11px}
-    .calendar-event-expiry{font-size:10px}
-    .calendar-event-card button{width:100%;min-height:34px;margin:7px 0 0;padding:5px 8px}
-    .calendar-dialog footer{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0}
-    .calendar-dialog footer button{width:100%;min-height:42px;padding:7px 5px;font-size:11px}
-    #calendarToday{margin-right:0}
-}
-.terminal-section{display:grid;gap:7px}
-.terminal-local-list{display:grid;gap:7px}
-.terminal-title{margin:6px 3px 1px;padding:7px 10px;border-left:4px solid var(--blue);border-radius:6px;background:var(--surface-soft);color:var(--text);font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-.attention-dialog{width:min(1060px,96vw);overflow:hidden;padding:26px}
-.attention-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.attention-header h2{margin:0;color:var(--text);font-size:21px}
-.attention-header p{margin:6px 0 0;font-size:12px}
-.attention-close{display:grid;place-items:center;width:34px;height:34px;min-height:34px;flex:0 0 34px;padding:0;border-radius:7px;background:var(--surface-soft);color:var(--text);border:1px solid var(--line);font-size:22px;line-height:1}
-.attention-tablebox{margin-top:18px;max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:12px;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--surface)}
-.attention-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0}
-.attention-table th,.attention-table td{padding:14px 13px;overflow-wrap:anywhere;border-bottom:1px solid var(--line)}
-.attention-table th{position:sticky;top:0;z-index:1;background:var(--table-head);color:var(--table-head-text);font-size:12px;font-weight:800;letter-spacing:.025em;text-align:left}
-.attention-table td{font-size:13px;line-height:1.35;vertical-align:middle}
-.attention-table tbody tr{transition:background .15s ease}
-.attention-table tbody tr:hover td{background:color-mix(in srgb,var(--blue) 5%,var(--surface))}
-.attention-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-soft) 55%,var(--surface))}
-.attention-table tbody tr:last-child td{border-bottom:0}
-.attention-table tbody td:first-child{font-weight:750;color:var(--blue)}
-.attention-table tbody td:last-child{font-weight:750;white-space:normal}
-.attention-table col:nth-child(1){width:16%}.attention-table col:nth-child(2){width:14%}.attention-table col:nth-child(3){width:24%}.attention-table col:nth-child(4){width:18%}.attention-table col:nth-child(5){width:28%}
-.attention-table tbody tr.overdue td{background:color-mix(in srgb,#ef4444 7%,var(--surface))}
-.attention-days{display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border-radius:999px;background:#fef3c7;color:#854d0e;font-size:12px;font-weight:800;line-height:1.2}
-.attention-days.overdue{background:#fee2e2;color:#b42318}
-.attention-days.today{background:#fee2e2;color:#b42318}
-.local-stats-mobile{display:none}
-@media (max-width:600px){
-    .local-stats-mobile{display:grid}
-    .terminal-title{margin-top:8px;font-size:11px}
-    .attention-modal{padding:8px}
-    .attention-dialog{display:grid;grid-template-rows:auto minmax(0,1fr) auto;width:100%;height:min(86dvh,720px);max-height:86dvh;padding:13px;overflow:hidden}
-    .attention-header h2{font-size:18px}
-    .attention-header p{font-size:11px;line-height:1.35}
-    .attention-tablebox{height:100%;max-height:none;margin-top:10px;overflow-x:hidden;touch-action:pan-y;border:0;background:transparent}
-    .attention-table,.attention-table tbody{display:block;width:100%;min-width:0;table-layout:auto}
-    .attention-table colgroup,.attention-table thead{display:none}
-    .attention-table tbody tr{display:block;margin:0 0 8px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:0 2px 7px #0f172a0a}
-    .attention-table tbody tr.overdue{border-left:4px solid #ef4444;background:color-mix(in srgb,#ef4444 6%,var(--surface))}
-    .attention-table tbody tr:nth-child(even) td,.attention-table tbody tr.overdue td{background:transparent}
-    .attention-table tbody td{display:grid;grid-template-columns:minmax(105px,.8fr) minmax(0,1.2fr);gap:10px;align-items:start;padding:7px 0;font-size:12px;line-height:1.35;border-bottom:1px solid var(--line);white-space:normal}
-    .attention-table tbody td::before{content:attr(data-label);color:var(--text-muted);font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase}
-    .attention-table tbody td:first-child{color:var(--text);font-weight:650}
-    .attention-table tbody td:last-child{color:var(--text);font-weight:800;white-space:normal}
-    .attention-table tbody tr td:last-child{border-bottom:0}
-    .attention-table tbody td[colspan]{display:block;padding:14px 4px;text-align:center}
-    .attention-table tbody td[colspan]::before{display:none}
-    .attention-dialog footer{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
-    .attention-dialog footer button{width:100%;min-height:42px;padding:7px;font-size:11px}
-}
-  
-  </style>
-</head>
-<body>
-<header class="top"><div><h1>Rejestr Przeglądów</h1><p>Wspólny rejestr, terminy i protokoły</p></div><div class="actions"><button id="add">+ Dodaj przegląd</button><button id="showCalendar" class="secondary" type="button">Kalendarz terminów</button><button id="attentionOpen" class="secondary attention-open" type="button" aria-label="Otwórz alerty" title="Alerty"><svg class="attention-open-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22a2.6 2.6 0 0 0 2.45-1.73h-4.9A2.6 2.6 0 0 0 12 22Zm7.2-5.08-1.58-1.58V10.2A5.63 5.63 0 0 0 13.5 4.8V4a1.5 1.5 0 0 0-3 0v.8A5.63 5.63 0 0 0 6.38 10.2v5.14L4.8 16.92A1.1 1.1 0 0 0 5.58 18.8h12.84a1.1 1.1 0 0 0 .78-1.88Z"/></svg><span id="attentionOpenCount" class="attention-open-count" hidden>0</span></button><div class="user-menu"><button id="menuToggle" class="secondary" type="button" aria-expanded="false" aria-controls="userMenu">Menu ▾</button><div id="userMenu" class="menu-panel" hidden><div class="menu-user-row"><div id="user" class="menu-user">Niezalogowano</div><button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu">×</button></div><div class="menu-section-label">Dane i przeglądy</div><button id="refreshData" class="secondary" type="button">Odśwież dane</button><button id="manageTypes" class="secondary" type="button">Dodaj / usuń rodzaj przeglądu</button><button id="addLocal" class="secondary" type="button">Dodaj lokal / magazyn</button><button id="manageLocations" class="secondary" type="button">Lokale i magazyny</button><div class="menu-section-label">Widok i konto</div><button id="showTrash" class="secondary" type="button">Kosz</button><button id="pushToggle" class="secondary" type="button" hidden>Włącz powiadomienia</button><button id="themeOpen" class="secondary" type="button">Zmień motyw</button><button id="logout" class="danger" type="button" hidden>Wyloguj</button></div></div></div></header>
-<div id="menuBackdrop" class="menu-backdrop" hidden></div>
-<main class="wrap">
-  <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
-  <section class="panel">
-
-    <div class="tools">
-        <button id="export" class="secondary">Eksportuj CSV</button>
-        <span id="syncInfo" class="muted"></span>
-    </div>
-
-    <div class="filters">
-
-        <div class="search-row">
-            <input
-                id="search"
-                placeholder="Szukaj miasta, lokalu, rodzaju przeglądu lub uwag..."
-                autocomplete="off"
-            >
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Rejestr Przeglądów</title>
+    <meta name="theme-color" content="#16324F" />
+    <meta name="application-name" content="Rejestr Przeglądów" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="./manifest.webmanifest?v=20260827-logo3" />
+    <link
+      rel="icon"
+      href="./icons/pwa-icon-desktop.svg?v=20260827-desktop1"
+      type="image/svg+xml"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="./icons/pwa-icon-192.png?v=20260827-logo3"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=20260827-3"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="layout.css" />
+    <link rel="stylesheet" href="workspace.css" />
+  </head>
+  <body data-workspace="dashboard">
+    <aside class="workspace-sidebar" aria-label="Menu aplikacji">
+      <a
+        class="workspace-brand"
+        href="#pulpit"
+        aria-label="Rejestr przeglądów — pulpit"
+        ><span class="brand-mark"
+          ><img src="icons/pwa-icon-desktop.svg" alt="" /></span
+        ><span>Rejestr przeglądów<small>Zarządzanie obiektami</small></span></a
+      >
+      <nav id="workspaceNav" aria-label="Nawigacja główna"></nav>
+      <div class="sidebar-footer">Terminy · dokumenty · historia</div>
+    </aside>
+    <header class="top">
+      <a
+        class="mobile-app-logo"
+        href="#pulpit"
+        aria-label="Rejestr przeglądów — pulpit"
+        ><img src="icons/pwa-icon-desktop.svg" alt=""
+      /></a>
+      <div class="workspace-page-title">
+        <h1>Rejestr Przeglądów</h1>
+        <p>Wspólny rejestr, terminy i protokoły</p>
+      </div>
+      <div class="actions">
+        <button id="add">+ Dodaj przegląd</button
+        ><button id="showCalendar" class="secondary" type="button">
+          Kalendarz terminów</button
+        ><button
+          id="attentionOpen"
+          class="secondary attention-open"
+          type="button"
+          aria-label="Otwórz alerty"
+          title="Alerty"
+        >
+          <svg
+            class="attention-open-icon"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M12 22a2.6 2.6 0 0 0 2.45-1.73h-4.9A2.6 2.6 0 0 0 12 22Zm7.2-5.08-1.58-1.58V10.2A5.63 5.63 0 0 0 13.5 4.8V4a1.5 1.5 0 0 0-3 0v.8A5.63 5.63 0 0 0 6.38 10.2v5.14L4.8 16.92A1.1 1.1 0 0 0 5.58 18.8h12.84a1.1 1.1 0 0 0 .78-1.88Z"
+            /></svg
+          ><span id="attentionOpenCount" class="attention-open-count" hidden
+            >0</span
+          >
+        </button>
+        <div class="user-menu">
+          <button
+            id="menuToggle"
+            class="secondary"
+            type="button"
+            aria-expanded="false"
+            aria-controls="userMenu"
+          >
+            Menu ▾
+          </button>
+          <div id="userMenu" class="menu-panel" hidden>
+            <div class="menu-user-row">
+              <div id="user" class="menu-user">Niezalogowano</div>
+              <button
+                id="menuClose"
+                class="menu-close"
+                type="button"
+                aria-label="Zamknij menu"
+              >
+                ×
+              </button>
+            </div>
+            <div class="menu-section-label">Dane i przeglądy</div>
+            <button id="refreshData" class="secondary" type="button">
+              Odśwież dane</button
+            ><button id="manageTypes" class="secondary" type="button">
+              Dodaj / usuń rodzaj przeglądu</button
+            ><button id="addLocal" class="secondary" type="button">
+              Dodaj lokal / magazyn</button
+            ><button id="manageLocations" class="secondary" type="button">
+              Lokale i magazyny
+            </button>
+            <div class="menu-section-label">Widok i konto</div>
+            <button id="showTrash" class="secondary" type="button">Kosz</button
+            ><button id="pushToggle" class="secondary" type="button" hidden>
+              Włącz powiadomienia</button
+            ><button id="themeOpen" class="secondary" type="button">
+              Zmień motyw</button
+            ><button id="logout" class="danger" type="button" hidden>
+              Wyloguj
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div id="menuBackdrop" class="menu-backdrop" hidden></div>
+    <main class="wrap">
+      <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
+      <section class="panel" id="registerFilters">
+        <div class="tools">
+          <button id="export" class="secondary">Eksportuj CSV</button>
         </div>
 
-        <div class="filter-row">
+        <div class="filters">
+          <div class="search-row">
+            <input
+              id="search"
+              aria-label="Szukaj przeglądów"
+              placeholder="Szukaj miasta, lokalu, rodzaju przeglądu lub uwag..."
+              autocomplete="off"
+            />
+          </div>
 
-            <select id="city">
-                <option value="">Wszystkie miasta</option>
+          <div class="filter-row">
+            <select id="city" aria-label="Filtr miasta">
+              <option value="">Wszystkie miasta</option>
             </select>
 
-            <select id="protocol">
-                <option value="">Wszystkie protokoły</option>
-                <option value="DODANY">Z protokołem</option>
-                <option value="BRAK PROTOKOŁU">Bez protokołu</option>
+            <select id="protocol" aria-label="Filtr protokołu">
+              <option value="">Wszystkie protokoły</option>
+              <option value="DODANY">Z protokołem</option>
+              <option value="BRAK PROTOKOŁU">Bez protokołu</option>
             </select>
 
             <span id="filterCount" class="filter-count" hidden>
-                Aktywne filtry:
-                <b id="filterCountNumber">0</b>
+              Aktywne filtry:
+              <b id="filterCountNumber">0</b>
             </span>
 
             <button
-                type="button"
-                id="clearFilters"
-                class="clear-filters"
-                hidden
+              type="button"
+              id="clearFilters"
+              class="clear-filters"
+              hidden
             >
-                Wyczyść filtry
+              Wyczyść filtry
             </button>
-
+          </div>
         </div>
+      </section>
+      <section class="stats" id="legacyStats">
+        <button
+          type="button"
+          class="card stat overdue"
+          data-quick-status="PO TERMINIE"
+        >
+          Po terminie<b id="overdue">0</b></button
+        ><button
+          type="button"
+          class="card stat due"
+          data-quick-status="DO WYKONANIA"
+        >
+          Do wykonania <b id="due">0</b></button
+        ><button type="button" class="card stat ok" data-quick-status="OK">
+          Aktualne<b id="ok">0</b></button
+        ><button type="button" class="card stat total" data-quick-status="">
+          Wszystkie wpisy<b id="all">0</b>
+        </button>
+      </section>
+      <section id="dashboardView" class="workspace-section">
+        <div class="workspace-heading">
+          <div>
+            <h2>Pulpit</h2>
+          </div>
+          <button class="secondary" data-workspace-view="inspections">
+            Otwórz rejestr
+          </button>
+        </div>
+        <div id="dashboardMetrics" class="dashboard-metrics"></div>
+        <section class="workspace-card">
+          <div class="section-heading">
+            <div>
+              <h3>Przeglądy wymagające uwagi</h3>
+              <p>Zacznij od najpilniejszych terminów.</p>
+            </div>
+            <button class="secondary" data-workspace-view="attention">
+              Wszystkie alerty
+            </button>
+          </div>
+          <div id="dashboardUrgent"></div>
+        </section>
+      </section>
+      <section id="registerView" class="workspace-section" hidden>
+        <div class="workspace-heading">
+          <div>
+            <span class="eyebrow">Wspólny rejestr</span>
+            <h2>Przeglądy</h2>
+            <p>Wybierz miasto i lokal, aby zobaczyć przeglądy.</p>
+          </div>
+          <span id="registerResultCount" class="result-count"></span>
+        </div>
+        <div
+          id="registerStatusFilters"
+          class="dashboard-metrics register-status-filters"
+          role="group"
+          aria-label="Filtr statusu przeglądów"
+        >
+          <button
+            type="button"
+            class="dashboard-metric metric-overdue"
+            data-workspace-status="PO TERMINIE"
+            aria-pressed="false"
+          >
+            <span>Po terminie</span><b id="registerOverdueCount">0</b>
+          </button>
 
+          <button
+            type="button"
+            class="dashboard-metric metric-due"
+            data-workspace-status="DO WYKONANIA"
+            aria-pressed="false"
+          >
+            <span>Do wykonania</span><b id="registerDueCount">0</b>
+          </button>
+          <button
+            type="button"
+            class="dashboard-metric metric-current"
+            data-workspace-status="OK"
+            aria-pressed="false"
+          >
+            <span>Aktualne</span><b id="registerCurrentCount">0</b>
+          </button>
+          <button
+            type="button"
+            class="dashboard-metric"
+            data-workspace-status=""
+            aria-pressed="true"
+          >
+            <span>Wszystkie wpisy</span><b id="registerAllCount">0</b>
+          </button>
+        </div>
+        <div id="registerTable" class="workspace-card"></div>
+        <section id="cityGroups" class="city-groups"></section>
+      </section>
+      <section id="settingsView" class="workspace-section" hidden>
+        <div class="workspace-heading">
+          <div>
+            <span class="eyebrow">Administracja</span>
+            <h2>Ustawienia</h2>
+            <p>Zarządzaj słownikami, wyglądem i kontem.</p>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <section class="workspace-card">
+            <h3>Dane i słowniki</h3>
+            <button class="settings-action" data-forward="manageTypes">
+              Rodzaje przeglądów <span>›</span></button
+            ><button class="settings-action" data-forward="showTrash">
+              Kosz <span>›</span>
+            </button>
+          </section>
+          <section class="workspace-card">
+            <h3>Wygląd i konto</h3>
+            <p id="workspaceUser" class="muted"></p>
+            <button class="settings-action" data-forward="themeOpen">
+              Motyw aplikacji <span>›</span></button
+            ><button
+              id="workspacePush"
+              class="settings-action"
+              data-forward="pushToggle"
+              hidden
+            >
+              Powiadomienia <span>›</span></button
+            ><button
+              id="workspaceLogout"
+              class="settings-action danger"
+              data-forward="logout"
+              hidden
+            >
+              Wyloguj <span>›</span>
+            </button>
+          </section>
+        </div>
+      </section>
+    </main>
+    <div class="modal" id="loginModal">
+      <form class="dialog" id="loginForm">
+        <button
+          type="button"
+          id="closeLogin"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <h2>Dostęp do rejestru</h2>
+        <p>Logowanie jest wymagane, aby dane były wspólne i chronione.</p>
+        <div class="form">
+          <label class="wide"
+            >E-mail<input required type="email" name="email" /></label
+          ><label class="wide"
+            >Hasło<input required type="password" name="password"
+          /></label>
+        </div>
+        <p id="loginMessage" class="muted"></p>
+        <footer>
+          <button type="button" id="themeOpenLogin" class="secondary">
+            Zmień motyw</button
+          ><button type="button" id="register" class="secondary">
+            Utwórz konto</button
+          ><button>Zaloguj</button>
+        </footer>
+      </form>
     </div>
-
-</section>
-  <section class="stats"><button type="button" class="card stat overdue" data-quick-status="PO TERMINIE">Po terminie<b id="overdue">0</b></button><button type="button" class="card stat due" data-quick-status="DO WYKONANIA">Do wykonania <b id="due">0</b></button><button type="button" class="card stat ok" data-quick-status="OK">Aktualne<b id="ok">0</b></button><button type="button" class="card stat total" data-quick-status="">Wszystkie wpisy<b id="all">0</b></button></section>
-  <section id="cityGroups" class="city-groups"></section>
-</main>
-<div class="modal" id="loginModal"><form class="dialog" id="loginForm"><h2>Dostęp do rejestru</h2><p>Logowanie jest wymagane, aby dane były wspólne i chronione.</p><div class="form"><label class="wide">E-mail<input required type="email" name="email"></label><label class="wide">Hasło<input required type="password" name="password"></label></div><p id="loginMessage" class="muted"></p><footer><button type="button" id="themeOpenLogin" class="secondary">Zmień motyw</button><button type="button" id="register" class="secondary">Utwórz konto</button><button>Zaloguj</button></footer></form></div>
-<div class="modal" id="editModal"><form class="dialog" id="editForm"><h2 id="formTitle">Dodaj przegląd</h2><div class="form"><label>Miasto<input required name="city" list="cities"></label><label>Nr lokalu<input required name="local" list="locals"></label><label>Rodzaj przeglądu<input required name="type" list="types"></label><label>Data wykonania<input required type="date" name="done"></label><label>Ważny przez (mies.)<input required min="1" type="number" name="months" value="12"></label><label>Data dodania protokołu<input type="date" name="protocolDate"></label><label class="wide">Plik protokołu<input type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"><small id="fileInfo" class="muted">Opcjonalnie: PDF, dokument lub zdjęcie.</small><button type="button" id="removeAttachment" class="danger" hidden>Usuń załącznik</button></label><label class="wide">Uwagi<textarea name="notes" rows="3"></textarea></label></div><footer><button type="button" id="cancel" class="secondary">Anuluj</button><button>Zapisz</button></footer></form></div>
-<div class="modal" id="typesModal"><section class="dialog"><h2>Rodzaje przeglądów</h2><p class="muted">Usunięta nazwa znika z podpowiedzi. Istniejące przeglądy pozostają bez zmian.</p><div class="type-add"><input id="newType" placeholder="Nowy rodzaj przeglądu"><button type="button" id="addType">Dodaj</button></div><ul id="typeList" class="type-list"></ul><footer><button type="button" id="closeTypes" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="localModal"><form class="dialog" id="localForm"><h2>Dodaj lokal / magazyn</h2><p class="muted">Obiekt pojawi się na liście po wybraniu wskazanego miasta.</p><div class="form"><label>Miasto<input required name="city" list="cities"></label><label>MPK<input required name="mpk" placeholder="np. B52 lub 208"></label><label class="wide">Nazwa lokalu / magazynu<input required name="name" placeholder="np. Multistore lub Magazyn"></label></div><footer><button type="button" id="cancelLocal" class="secondary">Anuluj</button><button>Zapisz obiekt</button></footer></form></div>
-<div class="modal" id="locationsModal"><section class="dialog locations-dialog"><h2>Lokale i magazyny</h2><p class="muted">Zarządzaj pozycjami widocznymi w podpowiedziach. Usunięcie nie kasuje istniejących przeglądów.</p><div id="locationListSummary" class="locations-summary" aria-live="polite"></div><div class="locations-tablebox"><table class="locations-table"><thead><tr><th>MPK / nazwa</th><th>Miasto</th><th>Typ</th><th>Status</th><th><span class="sr-only">Akcja</span></th></tr></thead><tbody id="locationList"></tbody></table></div><footer><button type="button" id="closeLocations" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="trashModal"><section class="dialog"><h2>Kosz</h2><p class="muted">Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.</p><ul id="trashList" class="type-list"></ul><footer><button type="button" id="closeTrash" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="historyModal"><section class="dialog"><h2>Historia wpisu</h2><ul id="historyList" class="type-list"></ul><footer><button type="button" id="closeHistory" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal" id="calendarModal"><section class="dialog calendar-dialog"><h2>Kalendarz terminów przeglądów</h2><div class="calendar-toolbar"><button type="button" id="calendarPrevious" class="secondary" aria-label="Poprzedni miesiąc">‹</button><strong id="calendarTitle"></strong><button type="button" id="calendarNext" class="secondary" aria-label="Następny miesiąc">›</button></div><div class="calendar-weekdays"><span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sob</span><span>Nie</span></div><div id="calendarGrid" class="calendar-grid"></div><div class="calendar-legend"><span class="calendar-legend-item"><span class="calendar-dot reminder30-dot"></span><span>30 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot reminder14-dot"></span><span>14 dni przed terminem</span></span><span class="calendar-legend-item"><span class="calendar-dot expiry-dot"></span><span>Utrata ważności</span></span></div><div id="calendarDetails" class="calendar-details muted">Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować przegląd.</div><footer><button type="button" id="calendarToday" class="secondary">Dzisiaj</button><button type="button" id="calendarAdd">+ Dodaj przegląd</button><button type="button" id="closeCalendar" class="secondary">Zamknij</button></footer></section></div>
-<div class="modal attention-modal" id="attentionModal"><section class="dialog attention-dialog"><div class="attention-header"><div><h2>Przeglądy wymagające uwagi</h2><p class="muted">Po terminie lub z terminem ważności przypadającym w ciągu 14 dni.</p></div><button type="button" id="closeAttention" class="attention-close" aria-label="Zamknij">×</button></div><div class="attention-tablebox"><table class="attention-table"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>Nr lokalu</th><th>Miasto</th><th>Rodzaj przeglądu</th><th>Termin ważności</th><th>Za ile dni</th></tr></thead><tbody id="attentionTableBody"></tbody></table></div><footer><button type="button" id="attentionShowAll" class="secondary">Pokaż wszystkie</button><button type="button" id="closeAttentionFooter">Zamknij</button></footer></section></div>
-<div class="modal" id="themeModal">
-<section class="dialog">
-<h2>Zmień motyw</h2>
-
-
-<div class="theme-options">
-
-    <button type="button" data-theme="default">
-        Granatowy
-    </button>
-
-    <button type="button" data-theme="corporate">
-        Zielony szałwiowy
-    </button>
-
-    <button type="button" data-theme="elegant">
-        Beżowo-terakotowy
-    </button>
-
-    <button type="button" data-theme="minimal">
-        Minimalistyczny
-    </button>
-
-    <button type="button" data-theme="dark">
-        Ciemny
-    </button>
-
-</div>
-  
-<footer>
-<button type="button" id="closeTheme" class="secondary">Zamknij</button>
-</footer>
-
-</section>
-</div>
-<datalist id="cities"></datalist><datalist id="locals"></datalist><datalist id="types"></datalist>
-<script>
-const $=s=>document.querySelector(s),config=window.APP_CONFIG||{},ready=Boolean(config.supabaseUrl&&config.supabaseAnonKey);
-const safeStorage=(()=>{try{localStorage.setItem('__test','1');localStorage.removeItem('__test');return localStorage}catch{const s={};return{getItem:k=>s[k]||null,setItem:(k,v)=>s[k]=String(v),removeItem:k=>delete s[k]}}})();
-const sb=ready?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{storage:safeStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
-const INACTIVITY_HOURS=Math.max(1,Number(config.inactivityHours)||24);
-const INACTIVITY_LIMIT_MS=INACTIVITY_HOURS*60*60*1000;
-const ACTIVITY_STORAGE_PREFIX='przeglady:last-activity:';
-const ACTIVITY_WRITE_INTERVAL_MS=60*1000;
-const PUSH_PUBLIC_KEY=String(config.pushVapidPublicKey||'').trim();
-let activeSession=null,inactivityTimer=null,inactivityLogoutInProgress=false,lastActivityWrite=0;
-let data=[],
-    inspectionTypes=[],
-    locations=[],
-    typeCatalogAvailable=false,
-    editing=null,
-    editingVersion=null,
-    themeOpenedFromLogin=false,
-    editingType=null;
-
-/* Sortowanie tabel */
-let tableSortKey='';
-let tableSortDirection='asc';
-const MAX_PROTOCOL_SIZE=10*1024*1024,ALLOWED_PROTOCOL_TYPES=new Set(['application/pdf','image/jpeg','image/png','image/webp','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
-const fallbackTypes=['Elektryczny (roczny)','Elektryczny (5-cio letni)','Systemy PPOŻ','Gaśnice','Klimatyzacja','Alarmy','Hydranty','Rolety','Wentylacja','Wymiana filtrów','Regałów magazynowych','CRO','Mroźnia/Chłodnia','Regały chłodnicze','Separatory tłuszczu','Vendingi','UDT (wózki widłowe, paleciaki)','BHP (drabiny, schodki, podesty)','Ansul','Okap','Brama garażowa','Żaluzje (gastro)','Bramki antykradzieżowe','Klamki na kod','Oświetlenie','Drzwi przeciwpożarowe','Drzwi na zaplecze','Systemy multmedialne','Posadzki, wykładziny','Kontrola kurzu','Light boxy','Floorboxy','Meble','Szyby','Lampy owadobójcze','Samochody','Windy w samochodach','Mycie jednostek klimatyzacji','Sprawdzenie pompy odpływowej'];
-const monthsByType={'elektryczny (5-cio letni)':60,'elektryczny (roczny)':12,'klimatyzacja':3,'mycie jednostek klimatyzacji':36,'wentylacja':12,'rolety':12,'rolety sklepowe':12,'gasnice':12,'oswietlenie':1,'sprawdzenie pompy odplywowej':2};
-const esc=v=>String(v??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));const iso=v=>v?String(v).slice(0,10):'';const fmt=v=>v?new Date(v+'T12:00:00').toLocaleDateString('pl-PL'):'—';const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-const fromDb=r=>({id:r.id,city:r.city,local:r.local,type:r.type,done:iso(r.done),months:r.months,protocolDate:iso(r.protocol_date),protocolFileName:r.protocol_file_name,protocolPath:r.protocol_path,notes:r.notes||'',version:r.version,deletedAt:r.deleted_at});const toDb=r=>({id:r.id,city:r.city.trim(),local:r.local.trim(),type:r.type.trim(),done:r.done||null,months:Number(r.months),protocol_date:r.protocolDate||null,protocol_file_name:r.protocolFileName||null,protocol_path:r.protocolPath||null,notes:r.notes||''});
-let calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1),calendarSelectedDate='',returnToCalendar=false;
-window.activeAttention=new URLSearchParams(window.location.search).get('filter')==='attention';
-function setAttentionFilter(active){
-    window.activeAttention=Boolean(active);
-    const url=new URL(window.location.href);
-    if(active)url.searchParams.set('filter','attention');
-    else if(url.searchParams.get('filter')==='attention')url.searchParams.delete('filter');
-    try{history.replaceState(null,'',`${url.pathname}${url.search}${url.hash}`)}catch{}
-}
-function nextDate(d,m){if(!d||!m)return'';const [year,month,day]=String(d).split('-').map(Number),months=Number(m);if(!Number.isInteger(year)||!Number.isInteger(month)||!Number.isInteger(day)||!Number.isInteger(months)||months<1)return'';const target=month-1+months,targetYear=year+Math.floor(target/12),targetMonth=((target%12)+12)%12,lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate(),targetDay=Math.min(day,lastDay);return `${targetYear}-${String(targetMonth+1).padStart(2,'0')}-${String(targetDay).padStart(2,'0')}`}function daysUntilExpiry(r){const expiry=nextDate(r.done,r.months);if(!expiry)return null;const today=new Date();const todayAtNoon=new Date(today.getFullYear(),today.getMonth(),today.getDate(),12);return Math.round((new Date(expiry+'T12:00:00')-todayAtNoon)/86400000)}function daysWord(value){return Math.abs(Number(value))===1?'dzień':'dni'}function state(r){
-    const days=daysUntilExpiry(r);
-    if(days===null) return '';
-
-    if(days < 0) return 'PO TERMINIE';
-    if(days <= 14) return 'DO WYKONANIA';
-    if(days <= 30) return 'DO WYKONANIA';
-    return 'OK';
-}
-
-function statusClass(r){
-    const days=daysUntilExpiry(r);
-    if(days===null) return '';
-
-    if(days < 0) return 'POBLACK';
-    if(days <= 14) return 'DO14';
-    if(days <= 30) return 'DO30';
-    return 'OK';
-}
-
-function requiresAttention(r){
-    const days=daysUntilExpiry(r);
-    return days!==null&&days<=14;
-}
-
-function statusLabel(r){
-    const days=daysUntilExpiry(r);
-    if(days===null) return '—';
-
-    if(days < 0) return `Po terminie (${Math.abs(days)} ${daysWord(days)})`;
-    if(days === 0) return 'Do wykonania (dzisiaj)';
-    if(days <= 30) return `Do wykonania (za ${days} ${daysWord(days)})`;
-    return 'OK';
-}function protocol(r){return r.protocolFileName||r.protocolDate?'DODANY':'BRAK PROTOKOŁU'}function countLabel(n){return n===1?'1 przegląd':(n%100<12||n%100>14)&&n%10>=2&&n%10<=4?`${n} przeglądy`:`${n} przeglądów`}function sortValue(r,key){
-
-    switch(key){
-
-        case 'local':
-            return String(r.local || '');
-
-        case 'type':
-            return String(r.type || '');
-
-        case 'done':
-            return r.done || '';
-
-        case 'nextDate':
-            return nextDate(r.done,r.months) || '';
-
-        case 'status':
-            return state(r) || '';
-
-        case 'protocol':
-            return protocol(r) || '';
-
-        case 'notes':
-            return String(r.notes || '');
-
-        default:
-            return '';
-    }
-}
-
-
-function compareRows(a,b,key,direction){
-
-    const valueA=sortValue(a,key);
-    const valueB=sortValue(b,key);
-
-    /* Puste wartości zawsze na końcu */
-    if(!valueA && !valueB)return 0;
-    if(!valueA)return 1;
-    if(!valueB)return -1;
-
-    let result;
-    if(key==='done' || key==='nextDate'){
-        result=String(valueA).localeCompare(String(valueB),'en');
-    }else if(key==='status'){
-        const rank={POBLACK:0,DO14:1,DO30:2,OK:3};
-        const rankA=rank[statusClass(a)]??99,rankB=rank[statusClass(b)]??99;
-        result=rankA-rankB;
-    }else if(key==='local'){
-        const numberA=Number.parseInt(String(valueA).match(/^\s*\d+/)?.[0]||'',10),numberB=Number.parseInt(String(valueB).match(/^\s*\d+/)?.[0]||'',10);
-        if(Number.isFinite(numberA)&&Number.isFinite(numberB)&&numberA!==numberB)result=numberA-numberB;
-        else result=String(valueA).localeCompare(String(valueB),'pl',{numeric:true,sensitivity:'base'});
-    }else{
-        result=String(valueA).localeCompare(String(valueB),'pl',{numeric:true,sensitivity:'base'});
-    }
-    if(result===0&&key!=='type')result=String(a.type||'').localeCompare(String(b.type||''),'pl',{sensitivity:'base'});
-    return direction==='desc' ? -result : result;
-}
-
-
-function sortRows(records){
-
-    if(!tableSortKey){
-        return [...records];
-    }
-
-    return [...records].sort(
-        (a,b)=>compareRows(
-            a,
-            b,
-            tableSortKey,
-            tableSortDirection
-        )
-    );
-}
-
-
-function tableHeaders(){
-
-    const headers=[
-        ['type','Rodzaj'],
-        ['done','Wykonano'],
-        ['nextDate','Następny termin'],
-        ['status','Status'],
-        ['protocol','Protokół']
-    ];
-
-    return headers.map(([key,label])=>{
-        const active=tableSortKey===key;
-        const direction=active?tableSortDirection:'';
-
-        return `
-            <th
-                class="sortable ${active?'active '+direction:''}"
-                data-sort-key="${key}"
-                title="Kliknij, aby posortować"
-            >
-                <span class="sort-header">
-                    ${label}
-                    <span class="sort-arrow"></span>
-                </span>
-            </th>
-        `;
-    }).join('')+`
-        <th>Uwagi</th>
-        <th>Akcje</th>
-    `;
-}
-
-function tableColumns(){
-    return `
-        <colgroup>
-            <col class="col-type">
-            <col class="col-done">
-            <col class="col-next">
-            <col class="col-status">
-            <col class="col-protocol">
-            <col class="col-notes">
-            <col class="col-actions">
-        </colgroup>
-    `;
-}
-function refreshLists(){const selected=$('#city').value,types=typeCatalogAvailable?inspectionTypes:fallbackTypes,cities=[...new Set([...data.map(x=>x.city),...locations.map(x=>x.city)].map(x=>String(x||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#city').innerHTML='<option value="">Wszystkie miasta</option>'+cities.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');$('#city').value=selected;$('#cities').innerHTML=cities.map(x=>`<option value="${esc(x)}">`).join('');$('#types').innerHTML=[...new Set(types)].sort((a,b)=>a.localeCompare(b,'pl')).map(x=>`<option value="${esc(x)}">`).join('')}
-function refreshLocals(){const city=norm($('#editForm').elements.city.value),source=[...locations,...data.map(r=>({city:r.city,local:r.local}))],names=[...new Set(source.filter(r=>!city||norm(r.city)===city).map(r=>String(r.local||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));$('#locals').innerHTML=names.map(x=>`<option value="${esc(x)}">`).join('')}
-function rows(records){return records.map(r=>{const s=state(r),p=protocol(r);return`<tr><td>${esc(r.type)}</td><td>${fmt(r.done)}</td><td>${fmt(nextDate(r.done,r.months))}</td><td class="status-cell">
-    <span class="badge ${statusClass(r)}">
-        ${statusLabel(r)}
-    </span>
-</td><td class="protocol-cell"><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span>${r.protocolPath?` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>`:''}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
-    <button type="button" class="secondary action-edit" data-action="edit" data-id="${esc(r.id)}" title="Edytuj" aria-label="Edytuj">
-        <span class="pencil-icon" aria-hidden="true">✎</span> <span>Edytuj</span>
-    </button>
-    <button type="button" class="danger action-delete" data-action="delete" data-id="${esc(r.id)}" title="Usuń" aria-label="Usuń">
-        🗑 <span>Usuń</span>
-    </button>
-    <button type="button" class="secondary action-history" data-action="history" data-id="${esc(r.id)}" title="Historia" aria-label="Historia">
-        ↺ <span>Historia</span>
-    </button>
-</div></td></tr>`}).join('')}
-
-function mobileInspectionCard(r){
-    const p=protocol(r);
-    return `
-        <article class="inspection-detail-card">
-            <dl class="inspection-detail-grid">
-                <div>
-                    <dt>Wykonano</dt>
-                    <dd>${fmt(r.done)}</dd>
-                </div>
-                <div>
-                    <dt>Następny termin</dt>
-                    <dd>${fmt(nextDate(r.done,r.months))}</dd>
-                </div>
-                <div>
-                    <dt>Status</dt>
-                    <dd><span class="badge ${statusClass(r)}">${statusLabel(r)}</span></dd>
-                </div>
-                <div>
-                    <dt>Protokół</dt>
-                    <dd><span class="badge ${p==='DODANY'?'OK':'BRAK'}">${p==='DODANY'?'DODANY':'BRAK'}</span></dd>
-                </div>
-                <div class="detail-wide">
-                    <dt>Uwagi</dt>
-                    <dd>${esc(r.notes||'—')}</dd>
-                </div>
-            </dl>
-            <div class="inspection-detail-actions">
-                ${r.protocolPath?`<button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz protokół</button>`:''}
-                <button type="button" class="secondary" data-action="edit" data-id="${esc(r.id)}"><span class="pencil-icon" aria-hidden="true">✎</span> Edytuj</button>
-                <button type="button" class="danger" data-action="delete" data-id="${esc(r.id)}">🗑 Usuń</button>
-                <button type="button" class="secondary" data-action="history" data-id="${esc(r.id)}">↺ Historia</button>
-            </div>
-        </article>
-    `;
-}
-
-function mobileTypeStatus(r){
-    const status=statusClass(r);
-    if(status==='POBLACK')return {className:'POBLACK',label:'PO TERMINIE'};
-    if(status==='DO14')return {className:'DO14',label:'≤ 14 DNI'};
-    if(status==='DO30')return {className:'DO30',label:'≤ 30 DNI'};
-    return {className:'OK',label:'AKTUALNY'};
-}
-function localStatusSummary(records){
-    const urgent=records.filter(row=>['POBLACK','DO14','DO30'].includes(statusClass(row)))
-        .sort((a,b)=>(nextDate(a.done,a.months)||'9999-12-31').localeCompare(nextDate(b.done,b.months)||'9999-12-31'));
-    if(!urgent.length)return '<span class="local-status-empty">Brak pilnych terminów</span>';
-    const visible=urgent.slice(0,2);
-    const html=visible.map(row=>{const info=mobileTypeStatus(row);return `<span class="local-status-line"><span class="local-status-type">${esc(row.type||'Bez rodzaju')}</span><span class="badge ${info.className}">${info.label}</span></span>`}).join('');
-    const remaining=urgent.length-visible.length;
-    return html+(remaining?`<span class="local-status-more">+${remaining} ${remaining===1?'pilny termin':'pilne terminy'}</span>`:'');
-}
-
-function mobileInspectionTypes(records,city,local,expandedTypes){
-    const types=[...new Set(records.map(r=>String(r.type||'Bez rodzaju')))]
-        .sort((a,b)=>a.localeCompare(b,'pl'));
-
-    return `
-        <div class="mobile-inspection-types">
-            ${types.map(type=>{
-                const typeRows=sortRows(records.filter(r=>String(r.type||'Bez rodzaju')===type));
-                const typeKey=`${city}|||${local}|||${type}`;
-                const statusBadges=[...new Map(typeRows.map(row=>{const info=mobileTypeStatus(row);return [info.className,info]})).values()]
-                    .map(info=>`<span class="badge ${info.className}">${info.label}</span>`).join('');
-                return `
-                    <details class="inspection-type-group" data-type-key="${esc(typeKey)}" ${expandedTypes.has(typeKey)?'open':''}>
-                        <summary class="inspection-type-summary">
-                            <span class="inspection-type-name">${esc(type)}</span>
-                            <span class="inspection-type-statuses">${statusBadges}</span>
-                        </summary>
-                        <div class="inspection-detail-list">
-                            ${typeRows.map(mobileInspectionCard).join('')}
-                        </div>
-                    </details>
-                `;
-            }).join('')}
+    <div class="modal" id="editModal">
+      <form class="dialog" id="editForm">
+        <button
+          type="button"
+          id="cancel"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <h2 id="formTitle">Dodaj przegląd</h2>
+        <div class="form">
+          <label>Miasto<input required name="city" list="cities" /></label
+          ><label>Nr lokalu<input required name="local" list="locals" /></label
+          ><label
+            >Rodzaj przeglądu<input required name="type" list="types" /></label
+          ><label
+            >Data wykonania<input required type="date" name="done" /></label
+          ><label
+            >Ważny przez (mies.)<input
+              required
+              min="1"
+              type="number"
+              name="months"
+              value="12" /></label
+          ><label
+            >Data dodania protokołu<input
+              type="date"
+              name="protocolDate" /></label
+          ><label class="wide"
+            >Plik protokołu<input
+              type="file"
+              name="file"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"
+            /><small id="fileInfo" class="muted"
+              >Opcjonalnie: PDF, dokument lub zdjęcie.</small
+            ><button type="button" id="removeAttachment" class="danger" hidden>
+              Usuń załącznik
+            </button></label
+          ><label class="wide"
+            >Uwagi<textarea name="notes" rows="3"></textarea>
+          </label>
         </div>
-    `;
-}
-function renderLocalInspections(local, city){
-
-    const records = data.filter(r =>
-        r.city === city &&
-        r.local === local
-    );
-
-    if(!records.length){
-        return `
-            <div class="muted">
-                Brak przeglądów dla tego lokalu.
-            </div>
-        `;
-    }
-
-    return `
-        <div class="local-inspections-table tablebox">
-            <table class="inspections-table">
-                ${tableColumns()}
-                <thead>
-                    <tr>
-                        ${tableHeaders()}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows(sortRows(records))}
-                </tbody>
-            </table>
+        <footer><button type="submit">Zapisz</button></footer>
+      </form>
+    </div>
+    <div class="modal" id="typesModal">
+      <section class="dialog types-dialog">
+        <button
+          type="button"
+          id="closeTypes"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <div class="dialog-title-row">
+          <div>
+            <h2>Rodzaje przeglądów</h2>
+            <p class="muted">
+              Usunięta nazwa znika z podpowiedzi. Istniejące przeglądy pozostają
+              bez zmian.
+            </p>
+          </div>
         </div>
-    `;
-}
-function render(){
-
-    refreshLists();
-
-    const q = norm($('#search').value);
-    const city = $('#city').value;
-    const pr = $('#protocol').value;
-    const status = window.activeStatus || '';
-    const attentionOnly = window.activeAttention === true;
-
-    const activeFilters = [
-        q,
-        city,
-        pr,
-        status,
-        attentionOnly
-    ].filter(Boolean).length;
-
-    $('#filterCountNumber').textContent = activeFilters;
-    $('#filterCount').hidden = activeFilters === 0;
-
-    // Przycisk zawsze widoczny
-    $('#clearFilters').hidden = false;
-    $('#clearFilters').disabled = activeFilters === 0;
-
-    const shown = data.filter(r => {
-
-        const matchesSearch =
-            !q ||
-            norm(r.city).includes(q) ||
-            norm(r.local).includes(q) ||
-            norm(r.type).includes(q) ||
-            norm(r.notes).includes(q);
-
-        return (
-            matchesSearch &&
-            (!city || r.city === city) &&
-            (!pr || protocol(r) === pr) &&
-            (!status || state(r) === status) &&
-            (!attentionOnly || requiresAttention(r))
-        );
-
-    });
-
-    // Statystyki
-    for(const [id, s] of [
-        ['overdue', 'PO TERMINIE'],
-        ['due', 'DO WYKONANIA'],
-        ['ok', 'OK']
-    ]){
-
-        $('#' + id).textContent =
-            data.filter(r => state(r) === s).length;
-
-    }
-
-    $('#all').textContent = data.length;
-
-    const attentionCount=data.filter(requiresAttention).length;
-    const attentionBadge=$('#attentionOpenCount');
-    attentionBadge.textContent=String(attentionCount);
-    attentionBadge.hidden=attentionCount===0;
-    $('#attentionOpen').setAttribute('aria-label',attentionCount?`Otwórz alerty: ${countLabel(attentionCount)}`:'Otwórz alerty');
-
-
-    /*
-       Zapamiętujemy rozwinięte miasta
-    */
-
-    const expandedCities = new Set(
-        [...document.querySelectorAll(
-            '#cityGroups details.city-group[open]'
-        )].map(x => x.dataset.city)
-    );
-
-
-    /*
-       Zapamiętujemy rozwinięte lokale
-    */
-
-    const expandedLocals = new Set(
-        [...document.querySelectorAll(
-            '.local-inspections.open'
-        )].map(x =>
-            `${x.dataset.city}|||${x.dataset.local}`
-        )
-    );
-
-    /* Zapamiętujemy rozwinięte rodzaje przeglądów na telefonie. */
-    const expandedTypes = new Set(
-        [...document.querySelectorAll(
-            '.inspection-type-group[open]'
-        )].map(x => x.dataset.typeKey)
-    );
-
-
-    /*
-       Lista miast
-    */
-
-    const cities = [
-        ...new Set(
-            shown.map(r => r.city || 'Bez miasta')
-        )
-    ].sort((a, b) =>
-        a.localeCompare(b, 'pl')
-    );
-
-
-    /*
-       Brak wyników
-    */
-
-    if(!cities.length){
-
-        $('#cityGroups').innerHTML =
-            '<div class="notice">' +
-            'Brak przeglądów spełniających wybrane kryteria.' +
-            '</div>';
-
-        return;
-    }
-
-
-    /*
-       Generowanie miast
-    */
-
-    $('#cityGroups').innerHTML = cities.map(cityName => {
-
-        const cityRows = shown.filter(
-            r => (r.city || 'Bez miasta') === cityName
-        );
-
-
-        /*
-           Lokale w mieście
-        */
-
-        const cityLocals = [
-            ...new Set(
-                cityRows
-                    .map(r => r.local)
-                    .filter(Boolean)
-            )
-        ].sort((a, b) => {
-            if(norm(cityName).includes('katowice')){
-                const order={'Terminal A':0,'Terminal B':1,'Pozostałe':2};
-                const groupDiff=order[katowiceTerminal(a)]-order[katowiceTerminal(b)];
-                if(groupDiff)return groupDiff;
-            }
-            return a.localeCompare(b, 'pl', {numeric:true});
-        });
-
-
-        /*
-           Statystyki miasta
-        */
-
-        const overdue = cityRows.filter(
-            r => state(r) === 'PO TERMINIE'
-        ).length;
-
-        const due = cityRows.filter(
-            r => state(r) === 'DO WYKONANIA'
-        ).length;
-
-
-        const localCountText =
-            cityLocals.length === 1
-                ? '1 lokal'
-                : (
-                    cityLocals.length >= 2 &&
-                    cityLocals.length <= 4
-                )
-                    ? `${cityLocals.length} lokale`
-                    : `${cityLocals.length} lokali`;
-
-
-        return `
-            <details
-                class="card city-group"
-                data-city="${esc(cityName)}"
-                ${expandedCities.has(cityName) || attentionOnly ? 'open' : ''}
-            >
-
-                <summary class="city-summary">
-
-                    <span class="city-summary-main">
-
-                        <strong>
-                            ${esc(cityName)}
-                        </strong>
-
-                        <span class="city-summary-count">
-                            ${localCountText}
-                        </span>
-
-                    </span>
-
-
-                    <span class="city-summary-stats">
-
-                        ${
-                            overdue
-                                ? `
-                                    <span class="badge PO">
-                                        Po terminie: ${overdue}
-                                    </span>
-                                  `
-                                : ''
-                        }
-
-                        ${
-                            due
-                                ? `
-                                    <span class="badge DO">
-                                        Do wykonania: ${due}
-                                    </span>
-                                  `
-                                : ''
-                        }
-
-                    </span>
-
-                </summary>
-
-
-                <div class="local-list">
-
-                    ${cityLocals.map((local,localIndex) => {
-
-                        const localRows =
-                            cityRows.filter(
-                                r => r.local === local
-                            );
-
-
-                        const localKey =
-                            `${cityName}|||${local}`;
-
-
-                        const isOpen =
-                            expandedLocals.has(localKey);
-
-
-                        const localOverdue =
-    localRows.filter(
-        r => state(r) === 'PO TERMINIE'
-    ).length;
-
-
-const localDue14 =
-    localRows.filter(r => {
-        const days=daysUntilExpiry(r);
-        return days!==null && days >= 0 && days <= 14;
-    }).length;
-
-
-const localDue30 =
-    localRows.filter(r => {
-        const days=daysUntilExpiry(r);
-        return days!==null && days > 14 && days <= 30;
-    }).length;
-
-
-                        const isKatowice=norm(cityName).includes('katowice');
-                        const terminal=isKatowice?katowiceTerminal(local):'';
-                        const previousTerminal=localIndex>0&&isKatowice?katowiceTerminal(cityLocals[localIndex-1]):'';
-                        const terminalHeading=terminal&&terminal!==previousTerminal&&terminal!=='Pozostałe'?`<div class="terminal-title">${terminal}</div>`:'';
-                        return `${terminalHeading}
-                            <div class="local-wrapper">
-
-                                <button
-                                    type="button"
-                                    class="local-item ${isOpen ? 'open' : ''}"
-                                    data-local-toggle="1"
-                                    data-city="${esc(cityName)}"
-                                    data-local="${esc(local)}"
-                                >
-
-                                    <span class="local-arrow">
-                                        ›
-                                    </span>
-
-
-                                    <span class="local-main">
-
-                                        <span class="local-name">
-                                            ${esc(local)}
-                                        </span>
-
-                                        <span class="local-count">
-                                            ${countLabel(localRows.length)}
-                                        </span>
-
-                                    </span>
-
-
-                                    <span class="local-stats">
-                                        <span class="local-stats-desktop">
-                                            ${localDue30>0?`<span class="badge DO30">≤ 30 dni: ${localDue30}</span>`:''}
-                                            ${localDue14>0?`<span class="badge DO14">≤ 14 dni: ${localDue14}</span>`:''}
-                                            ${localOverdue>0?`<span class="badge POBLACK">Po terminie: ${localOverdue}</span>`:''}
-                                        </span>
-                                        <span class="local-stats-mobile">${localStatusSummary(localRows)}</span>
-                                    </span>
-
-                                </button>
-
-
-                                <div
-                                    class="local-inspections ${
-                                        isOpen ? 'open' : ''
-                                    }"
-                                    data-city="${esc(cityName)}"
-                                    data-local="${esc(local)}"
-                                >
-
-                                    ${
-                                        localRows.length
-                                            ? `
-                                                <div class="tablebox desktop-inspection-table" tabindex="0" aria-label="Tabela szczegółów przeglądów">
-                                                    <table class="inspections-table">
-                                                        ${tableColumns()}
-
-                                                        <thead>
-                                                            <tr>
-                                                                ${tableHeaders()}
-                                                            </tr>
-                                                        </thead>
-
-                                                        <tbody>
-                                                            ${rows(
-                                                                sortRows(localRows)
-                                                            )}
-                                                        </tbody>
-
-                                                    </table>
-                                                </div>
-                                                ${mobileInspectionTypes(
-                                                    localRows,
-                                                    cityName,
-                                                    local,
-                                                    expandedTypes
-                                                )}
-                                              `
-                                            : `
-                                                <div class="muted">
-                                                    Brak przeglądów dla tego lokalu.
-                                                </div>
-                                              `
-                                    }
-
-                                </div>
-
-                            </div>
-                        `;
-
-                    }).join('')}
-
-                </div>
-
-            </details>
-        `;
-
-    }).join('');
-}
-function showError(msg){$('#notice').hidden=false;$('#notice').textContent='Nie można połączyć się z rejestrem: '+msg}
-
-function katowiceTerminal(local){
-    const key=norm(local).replace(/\s+/g,'');
-    const code=key.split(/[(:]/)[0].replace(/[^a-z0-9.]/g,'');
-    if(['b53','282','283','284'].includes(code))return 'Terminal A';
-    if(['260','261','262','263','b53.ba1','b53.ba2','ba1','ba2'].includes(code))return 'Terminal B';
-    return 'Pozostałe';
-}
-function attentionRows(){
-    return data.filter(requiresAttention).sort((a,b)=>{
-        const dateA=nextDate(a.done,a.months)||'9999-12-31',dateB=nextDate(b.done,b.months)||'9999-12-31';
-        return dateA.localeCompare(dateB)||norm(a.city).localeCompare(norm(b.city),'pl')||norm(a.local).localeCompare(norm(b.local),'pl')||norm(a.type).localeCompare(norm(b.type),'pl');
-    });
-}
-function renderAttentionTable(){
-    const body=$('#attentionTableBody');
-    if(!body)return;
-    const rowsToShow=attentionRows();
-    body.innerHTML=rowsToShow.length?rowsToShow.map(record=>{const expiry=nextDate(record.done,record.months),days=daysUntilExpiry(record),overdue=days!==null&&days<0,daysText=days===null?'—':days<0?`Po terminie (${Math.abs(days)} ${daysWord(days)})`:days===0?'Dzisiaj':`Za ${days} ${daysWord(days)}`,daysClass=overdue?'overdue':days===0?'today':'due';return `<tr class="${overdue?'overdue':''}"><td data-label="Nr lokalu">${esc(record.local)}</td><td data-label="Miasto">${esc(record.city)}</td><td data-label="Rodzaj przeglądu">${esc(record.type)}</td><td data-label="Termin ważności">${fmt(expiry)}</td><td data-label="Za ile dni"><span class="attention-days ${daysClass}">${esc(daysText)}</span></td></tr>`}).join(''):'<tr><td colspan="5" class="muted">Brak przeglądów wymagających uwagi.</td></tr>';
-}
-function openAttentionTable(){renderAttentionTable();$('#attentionModal')?.classList.add('open')}
-$('#attentionOpen').addEventListener('click',()=>{
-    closeUserMenu();
-    setAttentionFilter(false);
-    openAttentionTable();
-});
-
-/* =========================================
-   OBSŁUGA FILTRÓW
-========================================= */
-
-// Wyszukiwanie
-$('#search').addEventListener('input', () => {
-    render();
-});
-
-// Filtr miasta
-$('#city').addEventListener('change', () => {
-    render();
-});
-
-// Filtr protokołu
-$('#protocol').addEventListener('change', () => {
-    render();
-});
-
-// Szybkie filtry statusu
-document.querySelectorAll('[data-quick-status]').forEach(button => {
-    button.addEventListener('click', () => {
-        const selectedStatus = button.dataset.quickStatus || '';
-
-        setAttentionFilter(false);
-
-        // Kliknięcie tego samego filtra drugi raz = wyłączenie
-        if(window.activeStatus === selectedStatus && selectedStatus){
-            window.activeStatus = '';
-        }else{
-            window.activeStatus = selectedStatus;
-        }
-
-        render();
-    });
-});
-
-// Wyczyść wszystkie filtry
-$('#clearFilters').addEventListener('click', () => {
-    $('#search').value = '';
-    $('#city').value = '';
-    $('#protocol').value = '';
-    window.activeStatus = '';
-    setAttentionFilter(false);
-
-    render();
-});
-$('#refreshData').addEventListener('click', async () => {
-    const button=$('#refreshData');
-    if(!activeSession?.user||button.disabled)return;
-    button.disabled=true;
-    const oldText=button.textContent;
-    button.textContent='Odświeżanie…';
-    try{await load()}finally{button.disabled=false;button.textContent=oldText;closeUserMenu()}
-});
-$('#closeAttention').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
-$('#closeAttentionFooter').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
-$('#attentionShowAll').addEventListener('click',()=>{$('#attentionModal').classList.remove('open');setAttentionFilter(false);render()});
-async function load(){const[{data:rs,error},{data:ts,error:te},{data:ls,error:le},{data:stateRows,error:se}]=await Promise.all([sb.from('inspections').select('*').is('deleted_at',null).order('updated_at',{ascending:false}),sb.from('inspection_types').select('name').eq('active',true).order('name'),sb.from('locations').select('city,local').order('city').order('local'),sb.from('app_state').select('value').eq('key','initial_seed_done').maybeSingle()]);if(error)return showError(error.message);if(te||le||se)return showError([te,le,se].filter(Boolean).map(x=>x.message).join(' | '));typeCatalogAvailable=true;inspectionTypes=(ts||[]).map(x=>x.name).filter(Boolean);locations=(ls||[]).map(x=>({city:String(x.city||'').trim(),local:String(x.local||'').trim()})).filter(x=>x.city&&x.local);data=rs.map(fromDb);if(!data.length&&!stateRows&&window.DEFAULT_DATA?.length){const seed=window.DEFAULT_DATA.map((r,i)=>toDb({...r,id:r.id||`seed-${i+1}`}));const{error:e}=await sb.from('inspections').upsert(seed);if(e)return showError(e.message);const{error:markError}=await sb.from('app_state').upsert({key:'initial_seed_done',value:new Date().toISOString()});if(markError)return showError(markError.message);return load()}render();$('#notice').hidden=true;$('#syncInfo').textContent=`Ostatnie odświeżenie: ${new Date().toLocaleString('pl-PL')} · ${countLabel(data.length)}`}
-function pushSupported(){return location.protocol==='https:'&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window}
-function isIosDevice(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
-function isStandalonePwa(){return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}
-function base64UrlToUint8Array(value){
-    const padding='='.repeat((4-value.length%4)%4);
-    const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');
-    const raw=atob(base64);
-    return Uint8Array.from(raw,character=>character.charCodeAt(0));
-}
-function pushKeysMatch(subscription,expectedKey){
-    const current=subscription?.options?.applicationServerKey;
-    if(!current)return false;
-    const a=new Uint8Array(current),b=expectedKey;
-    return a.length===b.length&&a.every((value,index)=>value===b[index]);
-}
-async function getServiceWorkerRegistration(){
-    if(!pushSupported())throw new Error('Ta przeglądarka nie obsługuje powiadomień aplikacji.');
-    await navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click2',{scope:'./'});
-    return navigator.serviceWorker.ready;
-}
-async function savePushSubscription(subscription){
-    if(!activeSession?.user)throw new Error('Najpierw zaloguj się do aplikacji.');
-    const json=subscription.toJSON(),keys=json.keys||{};
-    if(!keys.p256dh||!keys.auth)throw new Error('Przeglądarka nie przekazała kluczy subskrypcji.');
-    const{error}=await sb.from('push_subscriptions').upsert({
-        user_id:activeSession.user.id,
-        endpoint:subscription.endpoint,
-        p256dh:keys.p256dh,
-        auth:keys.auth,
-        user_agent:String(navigator.userAgent||'').slice(0,500),
-        enabled:true,
-        last_seen_at:new Date().toISOString()
-    },{onConflict:'user_id,endpoint'});
-    if(error)throw error;
-}
-async function currentPushSubscription(){
-    if(!pushSupported())return null;
-    const registration=await getServiceWorkerRegistration();
-    return registration.pushManager.getSubscription();
-}
-async function updatePushButton(){
-    const button=$('#pushToggle');
-    if(!button)return;
-    button.hidden=!activeSession?.user;
-    if(button.hidden)return;
-    if(!PUSH_PUBLIC_KEY){
-        button.disabled=true;
-        button.textContent='Powiadomienia — dokończ konfigurację';
-        button.title='Brakuje publicznego klucza VAPID w supabase-config.js';
-        return;
-    }
-    if(isIosDevice()&&!isStandalonePwa()){
-        button.disabled=false;
-        button.textContent='Powiadomienia — dodaj aplikację do ekranu';
-        button.title='Na iPhonie i iPadzie powiadomienia działają po dodaniu aplikacji do ekranu początkowego.';
-        return;
-    }
-    if(!pushSupported()){
-        button.disabled=true;
-        button.textContent='Powiadomienia niedostępne';
-        button.title='Ta przeglądarka lub sposób otwarcia aplikacji nie obsługuje Web Push.';
-        return;
-    }
-    if(Notification.permission==='denied'){
-        button.disabled=false;
-        button.textContent='Powiadomienia zablokowane';
-        button.title='Odblokuj powiadomienia w ustawieniach telefonu lub przeglądarki.';
-        return;
-    }
-    button.disabled=false;
-    button.title='';
-    const subscription=await currentPushSubscription();
-    button.textContent=subscription?'Wyłącz powiadomienia':'Włącz powiadomienia';
-}
-async function syncExistingPushSubscription(){
-    if(!activeSession?.user||!PUSH_PUBLIC_KEY||!pushSupported()||Notification.permission!=='granted')return;
-    try{
-        const subscription=await currentPushSubscription();
-        if(subscription)await savePushSubscription(subscription);
-    }catch(error){console.warn('Nie udało się odświeżyć subskrypcji push:',error)}
-}
-async function enablePushNotifications(){
-    if(!activeSession?.user)return alert('Najpierw zaloguj się do aplikacji.');
-    if(!PUSH_PUBLIC_KEY)return alert('Konfiguracja powiadomień nie została jeszcze zakończona.');
-    if(isIosDevice()&&!isStandalonePwa())return alert('Na iPhonie lub iPadzie najpierw dodaj aplikację do ekranu początkowego, otwórz ją z ikony i ponownie wybierz „Włącz powiadomienia”.');
-    if(!pushSupported())return alert('Ta przeglądarka nie obsługuje powiadomień aplikacji.');
-    try{
-        const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();
-        if(permission!=='granted'){
-            await updatePushButton();
-            return alert('Powiadomienia nie zostały włączone. Zgodę można zmienić w ustawieniach telefonu lub przeglądarki.');
-        }
-        const registration=await getServiceWorkerRegistration();
-        const applicationServerKey=base64UrlToUint8Array(PUSH_PUBLIC_KEY);
-        let subscription=await registration.pushManager.getSubscription();
-        if(subscription&&!pushKeysMatch(subscription,applicationServerKey)){
-            await subscription.unsubscribe();
-            subscription=null;
-        }
-        if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey});
-        await savePushSubscription(subscription);
-        await registration.showNotification('Powiadomienia zostały włączone',{body:'Telefon będzie przypominał o przeglądach wymagających uwagi.',icon:'./icons/pwa-icon-192.png?v=20260827-logo3',badge:'./icons/pwa-icon-192.png?v=20260827-logo3',tag:'push-enabled',data:{url:'./?filter=attention'}});
-        await updatePushButton();
-    }catch(error){
-        alert('Nie udało się włączyć powiadomień: '+(error?.message||error));
-        await updatePushButton();
-    }
-}
-async function disablePushNotifications(){
-    try{
-        const subscription=await currentPushSubscription();
-        if(subscription){
-            const{error}=await sb.from('push_subscriptions').delete().eq('user_id',activeSession.user.id).eq('endpoint',subscription.endpoint);
-            if(error)throw error;
-            await subscription.unsubscribe();
-        }
-        await updatePushButton();
-        alert('Powiadomienia na tym urządzeniu zostały wyłączone.');
-    }catch(error){alert('Nie udało się wyłączyć powiadomień: '+(error?.message||error))}
-}
-$('#pushToggle').onclick=async()=>{
-    const subscription=await currentPushSubscription().catch(()=>null);
-    if(subscription)await disablePushNotifications();
-    else await enablePushNotifications();
-};
-function activityStorageKey(session=activeSession){return session?.user?.id?`${ACTIVITY_STORAGE_PREFIX}${session.user.id}`:''}
-function readLastActivity(session=activeSession){
-    const key=activityStorageKey(session);
-    if(!key)return 0;
-    const value=Number(safeStorage.getItem(key));
-    return Number.isFinite(value)&&value>0?value:0;
-}
-function sessionInactive(session=activeSession){
-    const lastActivity=readLastActivity(session);
-    return lastActivity>0&&Date.now()-lastActivity>=INACTIVITY_LIMIT_MS;
-}
-function scheduleInactivityCheck(){
-    clearTimeout(inactivityTimer);
-    inactivityTimer=null;
-    if(!activeSession?.user)return;
-    const lastActivity=readLastActivity(activeSession);
-    const remaining=lastActivity?INACTIVITY_LIMIT_MS-(Date.now()-lastActivity):INACTIVITY_LIMIT_MS;
-    inactivityTimer=setTimeout(()=>void enforceInactivity(),Math.max(0,remaining));
-}
-function saveActivity(session=activeSession){
-    const key=activityStorageKey(session);
-    if(!key)return;
-    const now=Date.now();
-    safeStorage.setItem(key,String(now));
-    lastActivityWrite=now;
-    scheduleInactivityCheck();
-}
-function clearActivity(session=activeSession){
-    const key=activityStorageKey(session);
-    if(key)safeStorage.removeItem(key);
-    clearTimeout(inactivityTimer);
-    inactivityTimer=null;
-    lastActivityWrite=0;
-}
-async function expireInactiveSession(){
-    if(!activeSession?.user||inactivityLogoutInProgress)return;
-    inactivityLogoutInProgress=true;
-    const expiredSession=activeSession;
-    clearActivity(expiredSession);
-    activeSession=null;
-    try{
-        await sb.auth.signOut({scope:'local'});
-    }finally{
-        data=[];
-        render();
-        await applySession(null);
-        $('#loginMessage').textContent=`Sesja wygasła po ${INACTIVITY_HOURS} godzinach bezczynności. Zaloguj się ponownie.`;
-        inactivityLogoutInProgress=false;
-    }
-}
-async function enforceInactivity(){
-    if(!activeSession?.user)return false;
-    if(sessionInactive(activeSession)){
-        await expireInactiveSession();
-        return true;
-    }
-    scheduleInactivityCheck();
-    return false;
-}
-async function registerUserActivity(){
-    if(!activeSession?.user||inactivityLogoutInProgress)return;
-    if(await enforceInactivity())return;
-    if(Date.now()-lastActivityWrite>=ACTIVITY_WRITE_INTERVAL_MS)saveActivity(activeSession);
-}
-function startActivityTracking(){
-    ['pointerdown','touchstart','scroll'].forEach(eventName=>window.addEventListener(eventName,()=>void registerUserActivity(),{passive:true}));
-    window.addEventListener('keydown',()=>void registerUserActivity());
-    window.addEventListener('focus',()=>void registerUserActivity());
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden)void registerUserActivity()});
-    window.addEventListener('storage',event=>{
-        if(event.key===activityStorageKey())void enforceInactivity();
-    });
-}
-async function applySession(s){
-    const previousUserId=activeSession?.user?.id||'';
-    activeSession=s||null;
-    $('#user').textContent=s?.user?.email||'Niezalogowano';
-    $('#logout').hidden=!s?.user;
-    $('#loginModal').classList.toggle('open',!s?.user);
-    if(s?.user){
-        if(previousUserId!==s.user.id||!readLastActivity(s))saveActivity(s);
-        else scheduleInactivityCheck();
-        await load();
-        if(window.activeAttention&&!window.attentionModalShown){window.attentionModalShown=true;openAttentionTable()}
-        void syncExistingPushSubscription().finally(()=>updatePushButton());
-    }else{
-        clearTimeout(inactivityTimer);
-        inactivityTimer=null;
-        void updatePushButton();
-    }
-}
-async function start(){
-    if(!ready){
-        showError('Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js.');
-        $('#add').disabled=true;
-        return;
-    }
-    const{data:{session}}=await sb.auth.getSession();
-    activeSession=session;
-    if(session&&sessionInactive(session))await expireInactiveSession();
-    else await applySession(session);
-    sb.auth.onAuthStateChange((_event,nextSession)=>{void applySession(nextSession)});
-    sb.channel('live').on('postgres_changes',{event:'*',schema:'public',table:'inspections'},load).on('postgres_changes',{event:'*',schema:'public',table:'inspection_types'},load).on('postgres_changes',{event:'*',schema:'public',table:'locations'},load).subscribe();
-}
-$('#loginForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),{error}=await sb.auth.signInWithPassword({email:f.get('email'),password:f.get('password')});$('#loginMessage').textContent=error?error.message:''};$('#register').onclick=async()=>{if(!config.allowRegistration)return $('#loginMessage').textContent='Rejestracja jest wyłączona. Poproś administratora o utworzenie konta.';const f=new FormData($('#loginForm')),{error}=await sb.auth.signUp({email:f.get('email'),password:f.get('password')});$('#loginMessage').textContent=error?error.message:'Sprawdź skrzynkę e-mail i potwierdź konto.'};$('#logout').onclick=async()=>{$('#loginModal').classList.add('menu-origin');closeUserMenu();clearActivity();await sb.auth.signOut({scope:'local'})};$('#add').onclick=()=>openForm();$('#cancel').onclick=()=>{const back=returnToCalendar;returnToCalendar=false;$('#editModal').classList.remove('open');if(back){renderCalendar();$('#calendarModal').classList.add('open')}};
-function calendarDateKey(year,month,day){return `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`}
-function dateShift(date,days){const value=new Date(date+'T12:00:00');value.setDate(value.getDate()+days);return calendarDateKey(value.getFullYear(),value.getMonth(),value.getDate())}
-function calendarEventClass(event){return event.kind==='reminder30'?'reminder30-dot':event.kind==='reminder14'?'reminder14-dot':'expiry-dot'}
-function calendarCountLabel(count){return countLabel(count)}
-function calendarInspectionCount(events){return new Set(events.map(event=>String(event.record.id))).size}
-function calendarEventSort(a,b){return String(a.date).localeCompare(String(b.date))||norm(a.record.city).localeCompare(norm(b.record.city),'pl')||norm(a.record.local).localeCompare(norm(b.record.local),'pl')||norm(a.record.type).localeCompare(norm(b.record.type),'pl')}
-function calendarEventCard(event,showDate=false){
-    const eventClass=event.kind==='reminder30'?'reminder30':event.kind==='reminder14'?'reminder14':'expiry';
-    const eventText=event.kind==='reminder30'?'Do wykonania (za 30 dni)':event.kind==='reminder14'?'Do wykonania (za 14 dni)':'Termin ważności';
-    const expiry=nextDate(event.record.done,event.record.months);
-    return `
-        <article class="calendar-event-card ${eventClass}">
-            <div class="calendar-event-kind">
-                <span class="calendar-dot ${calendarEventClass(event)}"></span>
-                ${showDate?`${fmt(event.date)} · `:''}${eventText}
-            </div>
-            <div class="calendar-event-place">${esc(event.record.city)} — ${esc(event.record.local)}</div>
-            <div class="calendar-event-type">${esc(event.record.type)}</div>
-            <div class="calendar-event-expiry">Ważność do: <strong>${fmt(expiry)}</strong></div>
-            <button type="button" class="secondary" data-calendar-edit="${esc(event.record.id)}">Edytuj przegląd</button>
-        </article>
-    `;
-}
-function renderCalendarDetails(date,events){
-    const details=$('#calendarDetails');
-    if(!events?.length){
-        details.classList.add('muted');
-        details.textContent='Brak terminów w tym dniu.';
-        return;
-    }
-    details.classList.remove('muted');
-    const orderedEvents=[...events].map(event=>({...event,date:event.date||date})).sort(calendarEventSort);
-    details.innerHTML=`
-        <div class="calendar-details-heading">
-            <strong>${fmt(date)}</strong>
-            <span class="calendar-details-count">${calendarCountLabel(calendarInspectionCount(events))}</span>
+        <div class="type-add">
+          <input id="newType" placeholder="Nowy rodzaj przeglądu" /><button
+            type="button"
+            id="addType"
+          >
+            Dodaj</button
+          ><button type="button" id="cancelTypeEdit" class="secondary" hidden>
+            Anuluj
+          </button>
         </div>
-        <div class="calendar-event-list">
-            ${orderedEvents.map(event=>calendarEventCard(event)).join('')}
+        <p id="typeEditingNote" class="type-editing-note" hidden></p>
+        <div class="types-tablebox">
+          <table class="types-table">
+            <thead>
+              <tr>
+                <th>Rodzaj przeglądu</th>
+                <th>Liczba wpisów</th>
+                <th>Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="typeListTable"></tbody>
+          </table>
         </div>
-    `;
-}
-function renderCalendarOverview(events,year,month){
-    const details=$('#calendarDetails'),prefix=`${year}-${String(month+1).padStart(2,'0')}-`;
-    const monthEvents=Object.entries(events)
-        .filter(([date])=>date.startsWith(prefix))
-        .flatMap(([date,items])=>items.map(event=>({...event,date})))
-        .sort(calendarEventSort);
-    if(!monthEvents.length){
-        details.classList.add('muted');
-        details.textContent='W tym miesiącu nie ma oznaczonych terminów.';
-        return;
-    }
-    details.classList.remove('muted');
-    details.innerHTML=`
-        <div class="calendar-details-heading">
-            <strong>Terminy w tym miesiącu</strong>
-            <span class="calendar-details-count">${calendarCountLabel(calendarInspectionCount(monthEvents))}</span>
+      </section>
+    </div>
+    <div class="modal" id="localModal">
+      <form class="dialog" id="localForm">
+        <button
+          type="button"
+          id="cancelLocal"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <h2 id="localFormTitle">Dodaj lokal / magazyn</h2>
+        <p class="muted" id="localFormDescription">
+          Obiekt pojawi się na liście po wybraniu wskazanego miasta.
+        </p>
+        <div class="form">
+          <label>Miasto<input required name="city" list="cities" /></label
+          ><label
+            >MPK<input
+              required
+              name="mpk"
+              placeholder="np. B52 lub 208" /></label
+          ><label class="wide"
+            >Nazwa lokalu / magazynu<input
+              required
+              name="name"
+              placeholder="np. Multistore lub Magazyn"
+          /></label>
         </div>
-        <div class="calendar-event-list">${monthEvents.map(event=>calendarEventCard(event,true)).join('')}</div>
-    `;
-}
-function renderCalendar(){
-    const year=calendarMonth.getFullYear(),month=calendarMonth.getMonth();
-    $('#calendarTitle').textContent=new Date(year,month,1).toLocaleDateString('pl-PL',{month:'long',year:'numeric'});
-    const events=data.reduce((map,record)=>{const expiry=nextDate(record.done,record.months);if(!expiry)return map;const reminder30=dateShift(expiry,-30),reminder14=dateShift(expiry,-14);(map[reminder30]??=[]).push({record,kind:'reminder30'});(map[reminder14]??=[]).push({record,kind:'reminder14'});(map[expiry]??=[]).push({record,kind:'expiry'});return map},{});
-    const firstWeekday=(new Date(year,month,1).getDay()+6)%7,days=new Date(year,month+1,0).getDate();
-    const today=new Date(),todayKey=calendarDateKey(today.getFullYear(),today.getMonth(),today.getDate());
-    let html='';
-    for(let index=0;index<firstWeekday;index++)html+='<span class="calendar-day empty" aria-hidden="true"></span>';
-    for(let day=1;day<=days;day++){
-        const key=calendarDateKey(year,month,day),dayEvents=events[key]||[],dots=dayEvents.slice(0,5).map(event=>`<span class="calendar-dot ${calendarEventClass(event)}" aria-hidden="true"></span>`).join('');
-        const dayLabel=new Date(year,month,day).toLocaleDateString('pl-PL',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),eventLabel=dayEvents.length?`, ${calendarCountLabel(dayEvents.length)}`:', brak terminów';
-        html+=`<button type="button" class="calendar-day ${dayEvents.length?'has-events':''} ${key===todayKey?'today':''} ${key===calendarSelectedDate?'selected':''}" data-calendar-date="${key}" aria-label="${esc(dayLabel+eventLabel)}" aria-pressed="${key===calendarSelectedDate}"><span class="calendar-date">${day}</span>${dayEvents.length?`<span class="calendar-events">${dots}${dayEvents.length>5?`<small>+${dayEvents.length-5}</small>`:''}</span>`:''}</button>`;
-    }
-    for(let index=firstWeekday+days;index<42;index++)html+='<span class="calendar-day empty" aria-hidden="true"></span>';
-    $('#calendarGrid').innerHTML=html;
-    $('#calendarGrid').onclick=e=>{const day=e.target.closest('[data-calendar-date]');if(!day)return;calendarSelectedDate=day.dataset.calendarDate;renderCalendar()};
-    if(calendarSelectedDate)renderCalendarDetails(calendarSelectedDate,events[calendarSelectedDate]);else renderCalendarOverview(events,year,month);
-}
-$('#showCalendar').onclick=()=>{calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);calendarSelectedDate='';closeUserMenu();renderCalendar();$('#calendarModal').classList.add('open')};
-$('#closeCalendar').onclick=()=>$('#calendarModal').classList.remove('open');
-$('#calendarAdd').onclick=()=>{$('#calendarModal').classList.remove('open');openForm(null,true);if(calendarSelectedDate)$('#editForm').elements.done.value=calendarSelectedDate};
-$('#calendarToday').onclick=()=>{const today=new Date();calendarMonth=new Date(today.getFullYear(),today.getMonth(),1);calendarSelectedDate=calendarDateKey(today.getFullYear(),today.getMonth(),today.getDate());renderCalendar()};
-$('#calendarPrevious').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()-1,1);calendarSelectedDate='';renderCalendar()};
-$('#calendarNext').onclick=()=>{calendarMonth=new Date(calendarMonth.getFullYear(),calendarMonth.getMonth()+1,1);calendarSelectedDate='';renderCalendar()};
-$('#calendarDetails').onclick=e=>{const button=e.target.closest('button[data-calendar-edit]');if(!button)return;const record=data.find(row=>String(row.id)===String(button.dataset.calendarEdit));if(!record)return;$('#calendarModal').classList.remove('open');openForm(record,true)};
-function setUserMenu(open){
-    const isMobile=window.matchMedia('(max-width: 600px)').matches;
-    if(open&&isMobile){
-        const toggleRect=$('#menuToggle').getBoundingClientRect();
-        const menuTop=Math.max(8,Math.min(toggleRect.bottom+8,window.innerHeight-180));
-        document.documentElement.style.setProperty('--mobile-menu-top',`${menuTop}px`);
-    }
-    $('#userMenu').hidden=!open;
-    $('#menuToggle').setAttribute('aria-expanded',String(open));
-    $('#menuBackdrop').hidden=!(open&&isMobile);
-    document.body.classList.toggle('menu-open',open&&isMobile);
-}
-function closeUserMenu(){setUserMenu(false)}
-function openMenuModal(selector){
-    closeUserMenu();
-    $(selector).classList.add('menu-origin','open');
-}
-new MutationObserver(()=>{
-    if($('#userMenu').hidden){
-        $('#menuBackdrop').hidden=true;
-        document.body.classList.remove('menu-open');
-    }
-}).observe($('#userMenu'),{attributes:true,attributeFilter:['hidden']});
-$('#menuToggle').onclick=()=>setUserMenu($('#userMenu').hidden);
-$('#menuClose').onclick=closeUserMenu;
-$('#menuBackdrop').onclick=closeUserMenu;
-document.addEventListener('click',e=>{if(!e.target.closest('.user-menu'))closeUserMenu()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#userMenu').hidden)closeUserMenu()});
-function openThemeModal(fromLogin=false){
-    themeOpenedFromLogin=fromLogin;
-    closeUserMenu();
-    if(fromLogin)$('#loginModal').classList.remove('open');
-    $('#themeModal').classList.toggle('menu-origin',!fromLogin);
-    $('#themeModal').classList.add('open');
-}
+        <footer><button type="submit">Zapisz obiekt</button></footer>
+      </form>
+    </div>
+    <div class="modal" id="locationsModal">
+      <section class="dialog locations-dialog">
+        <button
+          type="button"
+          id="closeLocations"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <div class="dialog-title-row">
+          <div>
+            <h2>Lokale i magazyny</h2>
+            <p class="muted">
+              Zarządzaj pozycjami widocznymi w podpowiedziach. Usunięcie nie
+              kasuje istniejących przeglądów.
+            </p>
+          </div>
+          <button type="button" id="locationAdd" class="dialog-add">
+            + Dodaj
+          </button>
+        </div>
+        <label class="location-search"
+          >Szukaj lokalu lub miasta<input
+            id="locationSearch"
+            type="search"
+            placeholder="MPK, nazwa lokalu lub miasto…"
+            autocomplete="off"
+        /></label>
+        <div
+          id="locationListSummary"
+          class="locations-summary"
+          aria-live="polite"
+        ></div>
+        <div class="locations-tablebox">
+          <table class="locations-table">
+            <thead>
+              <tr>
+                <th>MPK / nazwa</th>
+                <th>Miasto</th>
+                <th>Typ</th>
+                <th>Status</th>
+                <th><span class="sr-only">Akcja</span></th>
+              </tr>
+            </thead>
+            <tbody id="locationList"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+    <div class="modal" id="trashModal">
+      <section class="dialog">
+        <button
+          type="button"
+          id="closeTrash"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <h2>Kosz</h2>
+        <p class="muted">
+          Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.
+        </p>
+        <ul id="trashList" class="type-list"></ul>
+      </section>
+    </div>
+    <div class="modal" id="historyModal">
+      <section class="dialog">
+        <button
+          type="button"
+          id="closeHistory"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <h2>Historia wpisu</h2>
+        <ul id="historyList" class="type-list"></ul>
+      </section>
+    </div>
+    <div class="modal" id="calendarModal">
+      <section class="dialog calendar-dialog">
+        <button
+          type="button"
+          id="closeCalendar"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <h2>Kalendarz terminów przeglądów</h2>
+        <div class="calendar-toolbar">
+          <button
+            type="button"
+            id="calendarPrevious"
+            class="secondary"
+            aria-label="Poprzedni miesiąc"
+          >
+            ‹</button
+          ><strong id="calendarTitle"></strong
+          ><button
+            type="button"
+            id="calendarNext"
+            class="secondary"
+            aria-label="Następny miesiąc"
+          >
+            ›
+          </button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span
+          ><span>Pt</span><span>Sob</span><span>Nie</span>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+        <div class="calendar-legend">
+          <span class="calendar-legend-item"
+            ><span class="calendar-dot reminder30-dot"></span
+            ><span>30 dni przed terminem</span></span
+          ><span class="calendar-legend-item"
+            ><span class="calendar-dot reminder14-dot"></span
+            ><span>14 dni przed terminem</span></span
+          ><span class="calendar-legend-item"
+            ><span class="calendar-dot expiry-dot"></span
+            ><span>Utrata ważności</span></span
+          >
+        </div>
+        <div id="calendarDetails" class="calendar-details muted">
+          Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować
+          przegląd.
+        </div>
+        <footer>
+          <button type="button" id="calendarToday" class="secondary">
+            Dzisiaj</button
+          ><button type="button" id="calendarAdd">+ Dodaj przegląd</button>
+        </footer>
+      </section>
+    </div>
+    <div class="modal attention-modal" id="attentionModal">
+      <section class="dialog attention-dialog">
+        <button
+          type="button"
+          id="closeAttention"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <div class="attention-header">
+          <div>
+            <h2>Przeglądy wymagające uwagi</h2>
+          </div>
+        </div>
+        <div class="attention-tablebox">
+          <table class="attention-table">
+            <colgroup>
+              <col />
+              <col />
+              <col />
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Nr lokalu</th>
+                <th>Miasto</th>
+                <th>Rodzaj przeglądu</th>
+                <th>Termin ważności</th>
+                <th>Status terminu</th>
+              </tr>
+            </thead>
+            <tbody id="attentionTableBody"></tbody>
+          </table>
+        </div>
+        <footer>
+          <button type="button" id="attentionShowAll" class="secondary">
+            Pokaż wszystkie
+          </button>
+        </footer>
+      </section>
+    </div>
+    <div class="modal" id="themeModal">
+      <section class="dialog">
+        <button
+          type="button"
+          id="closeTheme"
+          class="modal-close"
+          aria-label="Zamknij okno"
+        >
+          ×
+        </button>
+        <h2>Zmień motyw</h2>
 
-function closeThemeModal(){
-    $('#themeModal').classList.remove('open');
-    if(themeOpenedFromLogin)$('#loginModal').classList.add('open');
-    themeOpenedFromLogin=false;
-}
+        <div class="theme-options">
+          <button type="button" data-theme="default">Granatowy</button>
 
-$('#themeOpen').onclick=()=>openThemeModal(false);
-$('#themeOpenLogin').onclick=()=>openThemeModal(true);
-$('#closeTheme').onclick=closeThemeModal;
+          <button type="button" data-theme="corporate">
+            Zielony szałwiowy
+          </button>
 
+          <button type="button" data-theme="elegant">Beżowo-terakotowy</button>
 
-document.querySelectorAll('[data-theme]').forEach(btn=>{
-    btn.onclick=()=>{
-        const theme = btn.dataset.theme;
+          <button type="button" data-theme="minimal">Minimalistyczny</button>
 
-        // usuwamy stare motywy
-        document.body.classList.remove(
-            'theme-blue',
-            'theme-corporate',
-            'theme-elegant',
-            'theme-minimal',
-            'theme-dark'
-);
-        // dodajemy nowy
-        if(theme !== 'default'){
-            document.body.classList.add('theme-' + theme);
-        }
-
-        localStorage.setItem('theme', theme);
-
-        document.querySelectorAll('[data-theme]').forEach(option=>{
-            const selected=option===btn;
-            option.classList.toggle('active',selected);
-            option.setAttribute('aria-pressed',String(selected));
-        });
-
-        closeThemeModal();
-    }
-});
-function openForm(r=null,fromCalendar=false){returnToCalendar=fromCalendar;editing=r?.id||null;editingVersion=r?.version??null;const f=$('#editForm');f.reset();const v=r||{months:12};['city','local','type','done','months','protocolDate','notes'].forEach(n=>f.elements[n].value=v[n]??'');refreshLocals();const edit=Boolean(r);['city','local'].forEach(n=>f.elements[n].readOnly=edit);$('#formTitle').textContent=edit?'Edytuj przegląd':'Dodaj przegląd';$('#fileInfo').textContent=r?.protocolFileName?`Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`:'Opcjonalnie: PDF, dokument lub zdjęcie.';$('#removeAttachment').hidden=!r?.protocolPath;$('#editModal').classList.add('open')}
-$('#editForm').elements.city.addEventListener('input',refreshLocals);function setDefaultMonths(){if(editing)return;const m=monthsByType[norm($('#editForm').elements.type.value)];if(m)$('#editForm').elements.months.value=m}$('#editForm').elements.type.addEventListener('input',setDefaultMonths);$('#editForm').elements.type.addEventListener('change',setDefaultMonths);
-function fillCityFromLocal(){
-    if(editing)return;
-    const form=$('#editForm');
-    const local=norm(form.elements.local.value);
-    if(!local)return;
-    const source=[...locations,...data.map(r=>({city:r.city,local:r.local}))];
-    const cities=[...new Set(source.filter(row=>norm(row.local)===local).map(row=>String(row.city||'').trim()).filter(Boolean))];
-    if(cities.length===1){
-        form.elements.city.value=cities[0];
-        refreshLocals();
-    }
-}
-$('#editForm').elements.local.addEventListener('input',fillCityFromLocal);
-$('#editForm').elements.local.addEventListener('change',fillCityFromLocal);
-$('#removeAttachment').onclick=async()=>{
-    const r=data.find(x=>String(x.id)===String(editing));
-    if(!r?.protocolPath)return;
-    if(!confirm(`Usunąć załącznik „${r.protocolFileName||'plik'}”?`))return;
-    const button=$('#removeAttachment');
-    button.disabled=true;
-    try{
-        const {data:changed,error}=await sb.from('inspections').update({protocol_file_name:null,protocol_path:null}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id,version');
-        if(error)throw error;
-        if(!changed?.length)throw new Error('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');
-        editingVersion=changed[0].version;
-        const {error:removeError}=await sb.storage.from('protocols').remove([r.protocolPath]);
-        if(removeError)throw new Error(`Załącznik odłączono od wpisu, ale nie udało się usunąć pliku: ${removeError.message}`);
-        $('#fileInfo').textContent='Opcjonalnie: PDF, dokument lub zdjęcie.';
-        button.hidden=true;
-        await load();
-        alert('Załącznik został usunięty.');
-    }catch(err){alert('Nie udało się usunąć załącznika: '+err.message)}finally{button.disabled=false}
-};
-$('#editForm').onsubmit=async e=>{
-    e.preventDefault();
-    const submit=e.submitter;
-    let uploadedPath=null;
-    let inspectionSaved=false;
-
-    try{
-        const f=new FormData(e.target),
-            file=f.get('file'),
-            city=String(f.get('city')||'').trim(),
-            local=String(f.get('local')||'').trim(),
-            type=String(f.get('type')||'').trim(),
-            months=Number(f.get('months'));
-
-        if(!city||!local||!type)throw new Error('Uzupełnij miasto, lokal i rodzaj przeglądu.');
-        if(!Number.isInteger(months)||months<1||months>120)throw new Error('Okres ważności musi wynosić od 1 do 120 miesięcy.');
-        if(data.some(r=>String(r.id)!==String(editing)&&norm(r.city)===norm(city)&&norm(r.local)===norm(local)&&norm(r.type)===norm(type)))throw new Error('Taki przegląd dla tego lokalu już istnieje.');
-
-        if(submit)submit.disabled=true;
-
-        // Najpierw zapisujemy słowniki. Dzięki temu błąd pomocniczego zapisu
-        // nie wystąpi już po utworzeniu wpisu wskazującego na protokół.
-        const{error:typeError}=await sb.from('inspection_types').upsert({name:type,active:true},{onConflict:'name'});
-        if(typeError)throw typeError;
-        const{error:locationError}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});
-        if(locationError)throw locationError;
-
-        if(file&&file.size){
-            if(file.size>MAX_PROTOCOL_SIZE)throw new Error('Plik protokołu może mieć maksymalnie 10 MB.');
-            if(!ALLOWED_PROTOCOL_TYPES.has(file.type))throw new Error('Niedozwolony typ pliku protokołu.');
-            const ext=file.name.split('.').pop().toLowerCase(),
-                path=`${Date.now()}_${crypto.randomUUID()}.${ext}`,
-                {error}=await sb.storage.from('protocols').upload(path,file,{contentType:file.type});
-            if(error)throw error;
-            uploadedPath=path;
-        }
-
-        const old=data.find(x=>String(x.id)===String(editing)),
-            payload={id:editing||`custom-${crypto.randomUUID()}`,city,local,type,done:f.get('done')||null,months,protocolDate:f.get('protocolDate')||null,notes:f.get('notes')||''};
-
-        if(uploadedPath){
-            payload.protocolFileName=file.name;
-            payload.protocolPath=uploadedPath;
-        }else if(old){
-            payload.protocolFileName=old.protocolFileName;
-            payload.protocolPath=old.protocolPath;
-        }
-
-        let saveError;
-        if(editing){
-            const{data:changed,error}=await sb.from('inspections').update(toDb(payload)).eq('id',editing).eq('version',editingVersion).is('deleted_at',null).select('id');
-            saveError=error;
-            if(!saveError&&!changed?.length)throw new Error('Ten wpis został zmieniony lub przeniesiony do kosza przez inną osobę. Odśwież dane i spróbuj ponownie.');
-        }else{
-            const{error}=await sb.from('inspections').insert(toDb(payload));
-            saveError=error;
-        }
-        if(saveError)throw saveError;
-        inspectionSaved=true;
-
-        if(uploadedPath&&old?.protocolPath&&old.protocolPath!==uploadedPath){
-            const{error:removeError}=await sb.storage.from('protocols').remove([old.protocolPath]);
-            if(removeError)console.warn('Nie udało się usunąć poprzedniego pliku:',removeError.message);
-        }
-
-        const backToCalendar=returnToCalendar;
-        returnToCalendar=false;
-        $('#editModal').classList.remove('open');
-        await load();
-        if(backToCalendar){
-            renderCalendar();
-            $('#calendarModal').classList.add('open');
-        }
-    }catch(err){
-        // Nowy plik usuwamy tylko wtedy, gdy wpis nie został zapisany w bazie.
-        if(uploadedPath&&!inspectionSaved)await sb.storage.from('protocols').remove([uploadedPath]);
-        alert('Błąd podczas zapisywania: '+err.message);
-    }finally{
-        if(submit)submit.disabled=false;
-    }
-};
-async function editRow(id){const r=data.find(x=>String(x.id)===String(id));if(r)openForm(r)}async function deleteRow(id){const r=data.find(x=>String(x.id)===String(id));if(!r||!confirm(`Przenieść wpis „${r.local} — ${r.type}” do kosza? Można go później przywrócić.`))return;const{data:changed,error}=await sb.from('inspections').update({deleted_at:new Date().toISOString()}).eq('id',r.id).eq('version',r.version).is('deleted_at',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież dane i spróbuj ponownie.');await load()}async function openFile(id){const r=data.find(x=>String(x.id)===String(id));if(!r?.protocolPath)return;const{data:link,error}=await sb.storage.from('protocols').createSignedUrl(r.protocolPath,60);if(error)return alert(error.message);window.open(link.signedUrl,'_blank','noopener')}
-
-$('#cityGroups').addEventListener('click', async e => {
-
-    /*
-       Kliknięcie w lokal
-    */
-
-    const localButton =
-        e.target.closest('button[data-local-toggle]');
-
-    if(localButton){
-
-        const wrapper =
-            localButton.closest('.local-wrapper');
-
-        const inspections =
-            wrapper.querySelector('.local-inspections');
-
-        const arrow =
-            localButton.querySelector('.local-arrow');
-
-
-        if(inspections.classList.contains('open')){
-
-            inspections.classList.remove('open');
-            arrow.textContent = '›';
-            localButton.classList.remove('open');
-
-        }else{
-
-            inspections.classList.add('open');
-            arrow.textContent = '›';
-            localButton.classList.add('open');
-
-        }
-
-        return;
-    }
-
-
-    /*
-       Sortowanie tabeli
-    */
-
-    const th =
-        e.target.closest('th.sortable');
-
-    if(th){
-
-        const key =
-            th.dataset.sortKey;
-
-
-        if(tableSortKey === key){
-
-            tableSortDirection =
-                tableSortDirection === 'asc'
-                    ? 'desc'
-                    : 'asc';
-
-        }else{
-
-            tableSortKey = key;
-            tableSortDirection = 'asc';
-
-        }
-
-        render();
-
-        return;
-    }
-
-
-    /*
-       Akcje wiersza
-    */
-
-    const b =
-        e.target.closest('button[data-action]');
-
-    if(!b){
-        return;
-    }
-
-
-    if(b.dataset.action === 'edit'){
-        await editRow(b.dataset.id);
-    }
-
-
-    if(b.dataset.action === 'delete'){
-        await deleteRow(b.dataset.id);
-    }
-
-
-    if(b.dataset.action === 'open'){
-        await openFile(b.dataset.id);
-    }
-
-
-    if(b.dataset.action === 'history'){
-        await showHistory(b.dataset.id);
-    }
-
-});
-function renderTypeList(){$('#typeList').innerHTML=inspectionTypes.length?inspectionTypes.sort((a,b)=>a.localeCompare(b,'pl')).map(n=>`<li><span>${esc(n)}</span><button type="button" class="danger" data-name="${esc(n)}">Usuń</button></li>`).join(''):'<li class="muted">Brak aktywnych rodzajów.</li>'}$('#manageTypes').onclick=()=>{renderTypeList();openMenuModal('#typesModal')};$('#closeTypes').onclick=()=>$('#typesModal').classList.remove('open');$('#addType').onclick=async()=>{const name=$('#newType').value.trim();if(!name)return;const{error}=await sb.from('inspection_types').upsert({name,active:true},{onConflict:'name'});if(error)return alert(error.message);$('#newType').value='';await load();renderTypeList()};$('#typeList').onclick=async e=>{const b=e.target.closest('button[data-name]');if(!b||!confirm(`Usunąć „${b.dataset.name}” z listy?`))return;const{error}=await sb.from('inspection_types').update({active:false}).eq('name',b.dataset.name);if(error)return alert(error.message);await load();renderTypeList()};
-$('#addLocal').onclick=()=>{$('#localForm').reset();openMenuModal('#localModal')};$('#cancelLocal').onclick=()=>$('#localModal').classList.remove('open');$('#localForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),city=String(f.get('city')).trim(),mpk=String(f.get('mpk')).trim(),name=String(f.get('name')).trim(),local=`${mpk} (${name})`,{error}=await sb.from('locations').upsert({city,local},{onConflict:'city,local'});if(error)return alert('Nie udało się dodać lokalu: '+error.message);$('#localModal').classList.remove('open');await load()};
-  function locationKind(local){return /magazyn/i.test(String(local||''))?'Magazyn':'Lokal'}
-  function locationParts(local){const value=String(local||'').trim();const match=value.match(/^\s*([^()]+?)\s*\((.*?)\)\s*$/);return match?{mpk:match[1].trim(),name:match[2].trim()}: {mpk:'—',name:value||'Bez nazwy'}}
-  function renderLocationList(){
-    const rows=[...locations].sort((a,b)=>a.city.localeCompare(b.city,'pl')||a.local.localeCompare(b.local,'pl',{numeric:true}));
-    const warehouses=rows.filter(row=>locationKind(row.local)==='Magazyn').length;
-    $('#locationListSummary').innerHTML=rows.length?`<strong>${rows.length} obiektów</strong><span>·</span><span>${rows.length-warehouses} ${rows.length-warehouses===1?'lokal':'lokali'}</span><span>·</span><span>${warehouses} ${warehouses===1?'magazyn':'magazynów'}</span>`:'';
-    $('#locationList').innerHTML=rows.length?rows.map(row=>{
-      const parts=locationParts(row.local),kind=locationKind(row.local),warehouse=kind==='Magazyn';
-      return `<tr><td><span class="location-place"><b>${esc(parts.mpk)} · ${esc(parts.name)}</b><small>${esc(row.local)}</small></span></td><td>${esc(row.city)}</td><td><span class="location-kind ${warehouse?'warehouse':''}">${kind}</span></td><td><span class="location-active">Aktywny</span></td><td><button type="button" class="danger location-remove" data-city="${esc(row.city)}" data-local="${esc(row.local)}">Usuń</button></td></tr>`;
-    }).join(''):'<tr><td colspan="5" class="locations-empty">Brak lokali i magazynów na liście.</td></tr>'
-  }$('#manageLocations').onclick=()=>{renderLocationList();openMenuModal('#locationsModal')};$('#closeLocations').onclick=()=>$('#locationsModal').classList.remove('open');$('#locationList').onclick=async e=>{const button=e.target.closest('button[data-city][data-local]');if(!button)return;const city=button.dataset.city,local=button.dataset.local;if(!confirm(`Usunąć lokal „${local}” z miasta ${city}?`))return;const{error}=await sb.from('locations').delete().eq('city',city).eq('local',local);if(error)return alert('Nie udało się usunąć lokalu: '+error.message);await load();renderLocationList()};
-async function renderTrash(){const{data:deleted,error}=await sb.from('inspections').select('*').not('deleted_at','is',null).order('deleted_at',{ascending:false});if(error)return alert('Nie udało się pobrać kosza: '+error.message);$('#trashList').innerHTML=deleted?.length?deleted.map(row=>{const r=fromDb(row);return`<li><span><b>${esc(r.city)} — ${esc(r.local)}</b><br>${esc(r.type)} <small class="muted">(usunięto: ${fmt(iso(r.deletedAt))})</small></span><span class="trash-actions"><button type="button" class="secondary" data-restore="${esc(r.id)}" data-version="${esc(r.version)}">Przywróć</button><button type="button" class="permanent-delete" data-permanent-delete="${esc(r.id)}" data-version="${esc(r.version)}" data-city="${esc(r.city)}" data-local="${esc(r.local)}" data-type="${esc(r.type)}" data-protocol-path="${esc(r.protocolPath||'')}">Usuń na stałe</button></span></li>`}).join(''):'<li class="muted">Kosz jest pusty.</li>'}
-async function permanentlyDelete(id,version,city,local,type,protocolPath){
-    if(!confirm(`Trwale usunąć wpis „${local} — ${type}”${city?` z miasta ${city}`:''}?\n\nTej operacji nie można cofnąć. Wpis i jego protokół zostaną bezpowrotnie usunięte.`))return;
-    const{data:changed,error}=await sb.from('inspections').delete().eq('id',id).eq('version',Number(version)).not('deleted_at','is',null).select('id');
-    if(error)return alert('Nie udało się trwale usunąć wpisu: '+error.message);
-    if(!changed?.length)return alert('Wpis został zmieniony lub przywrócony przez inną osobę. Odśwież kosz i spróbuj ponownie.');
-    if(protocolPath){
-        const{error:removeError}=await sb.storage.from('protocols').remove([protocolPath]);
-        if(removeError)alert('Wpis usunięto, ale nie udało się usunąć pliku protokołu: '+removeError.message);
-    }
-    await renderTrash();
-    await load();
-}
-$('#showTrash').onclick=async()=>{closeUserMenu();await renderTrash();$('#trashModal').classList.add('menu-origin','open')};$('#closeTrash').onclick=()=>$('#trashModal').classList.remove('open');$('#trashList').onclick=async e=>{const restore=e.target.closest('button[data-restore]');if(restore){const{data:changed,error}=await sb.from('inspections').update({deleted_at:null}).eq('id',restore.dataset.restore).eq('version',Number(restore.dataset.version)).not('deleted_at','is',null).select('id');if(error)return alert(error.message);if(!changed?.length)return alert('Wpis został zmieniony przez inną osobę. Odśwież kosz i spróbuj ponownie.');await renderTrash();await load();return}const permanent=e.target.closest('button[data-permanent-delete]');if(!permanent)return;await permanentlyDelete(permanent.dataset.permanentDelete,permanent.dataset.version,permanent.dataset.city,permanent.dataset.local,permanent.dataset.type,permanent.dataset.protocolPath)};
-async function showHistory(id){const{data:events,error}=await sb.from('inspection_audit').select('action,changed_at,old_data,new_data').eq('inspection_id',id).order('changed_at',{ascending:false});if(error)return alert('Nie udało się pobrać historii: '+error.message);const labels={INSERT:'utworzono',UPDATE:'zaktualizowano',DELETE:'usunięto trwale'};$('#historyList').innerHTML=events?.length?events.map(event=>{const row=event.new_data||event.old_data||{},detail=[row.city,row.local,row.type].filter(Boolean).join(' — ');return`<li><span><b>${esc(labels[event.action]||event.action)}</b><br><small class="muted">${esc(new Date(event.changed_at).toLocaleString('pl-PL'))}${detail?` · ${esc(detail)}`:''}</small></span></li>`}).join(''):'<li class="muted">Brak zapisanej historii.</li>';$('#historyModal').classList.add('open')}$('#closeHistory').onclick=()=>$('#historyModal').classList.remove('open');
-$('#export').onclick=()=>{const h=['Miasto','Nr lokalu','Rodzaj przeglądu','Data wykonania','Ważny przez (mies.)','Data następnego przeglądu','Status','Data dodania protokołu','Uwagi'],csv=[h,...data.map(r=>[r.city,r.local,r.type,r.done,r.months,nextDate(r.done,r.months),state(r),r.protocolDate,r.notes])].map(row=>row.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\r\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='przeglady-export.csv';a.click();URL.revokeObjectURL(a.href)};
-/* Uporządkowane zarządzanie rodzajami i lokalami. */
-function ensureTypesDialog(){
-    const dialog=$('#typesModal .dialog');
-    if(dialog.dataset.enhanced==='true')return;
-    dialog.dataset.enhanced='true';
-    dialog.classList.add('types-dialog');
-    const heading=dialog.querySelector('h2');
-    const description=dialog.querySelector('p.muted');
-    const addRow=dialog.querySelector('.type-add');
-    heading.insertAdjacentHTML('beforebegin','<div class="dialog-title-row"><div></div></div>');
-    const titleRow=dialog.querySelector('.dialog-title-row');
-    titleRow.firstElementChild.append(heading,description);
-    addRow.insertAdjacentHTML('beforeend','<button type="button" id="cancelTypeEdit" class="secondary" hidden>Anuluj</button>');
-    addRow.insertAdjacentHTML('afterend','<p id="typeEditingNote" class="type-editing-note" hidden></p><div class="types-tablebox"><table class="types-table"><thead><tr><th>Rodzaj przeglądu</th><th>Liczba wpisów</th><th>Akcje</th></tr></thead><tbody id="typeListTable"></tbody></table></div>');
-    dialog.querySelector('#typeList').remove();
-}
-function resetTypeEditor(){
-    editingType=null;
-    $('#newType').value='';
-    $('#addType').textContent='Dodaj';
-    $('#cancelTypeEdit').hidden=true;
-    $('#typeEditingNote').hidden=true;
-}
-function renderManagedTypes(){
-    ensureTypesDialog();
-    const body=$('#typeListTable');
-    const names=[...inspectionTypes].sort((a,b)=>a.localeCompare(b,'pl'));
-    body.innerHTML=names.length?names.map(name=>{
-        const recordCount=data.filter(row=>norm(row.type)===norm(name)).length;
-        return `<tr><td class="type-name-cell">${esc(name)}</td><td class="type-count">${countLabel(recordCount)}</td><td><div class="type-actions"><button type="button" class="secondary" data-edit-type="${esc(name)}">Edytuj</button><button type="button" class="danger" data-delete-type="${esc(name)}">Usuń</button></div></td></tr>`;
-    }).join(''):'<tr><td colspan="3" class="locations-empty">Brak aktywnych rodzajów przeglądów.</td></tr>';
-}
-function openTypeEditor(name){
-    editingType=name;
-    $('#newType').value=name;
-    $('#addType').textContent='Zapisz zmianę';
-    $('#cancelTypeEdit').hidden=false;
-    $('#typeEditingNote').textContent=`Edytujesz: ${name}`;
-    $('#typeEditingNote').hidden=false;
-    $('#newType').focus();
-}
-async function saveInspectionType(){
-    const name=$('#newType').value.trim();
-    if(!name)return alert('Podaj nazwę rodzaju przeglądu.');
-    if(!editingType){
-        const{error}=await sb.from('inspection_types').upsert({name,active:true},{onConflict:'name'});
-        if(error)return alert(error.message);
-    }else if(name!==editingType){
-        if(inspectionTypes.some(item=>norm(item)===norm(name)))return alert('Taki rodzaj przeglądu już istnieje.');
-        const{error:typeError}=await sb.from('inspection_types').update({name}).eq('name',editingType);
-        if(typeError)return alert('Nie udało się zmienić nazwy: '+typeError.message);
-        const{error:inspectionError}=await sb.from('inspections').update({type:name}).eq('type',editingType).is('deleted_at',null);
-        if(inspectionError){
-            await sb.from('inspection_types').update({name:editingType}).eq('name',name);
-            return alert('Nie udało się zaktualizować istniejących przeglądów: '+inspectionError.message);
-        }
-    }
-    resetTypeEditor();
-    await load();
-    renderManagedTypes();
-}
-$('#manageTypes').textContent='Rodzaje przeglądów';
-$('#manageTypes').onclick=()=>{closeUserMenu();ensureTypesDialog();resetTypeEditor();renderManagedTypes();$('#typesModal').classList.add('open')};
-$('#addType').onclick=saveInspectionType;
-document.addEventListener('click',async event=>{
-    const edit=event.target.closest('[data-edit-type]');
-    if(edit){openTypeEditor(edit.dataset.editType);return}
-    const remove=event.target.closest('[data-delete-type]');
-    if(remove){
-        const name=remove.dataset.deleteType;
-        if(!confirm(`Usunąć „${name}” z listy?`))return;
-        const{error}=await sb.from('inspection_types').update({active:false}).eq('name',name);
-        if(error)return alert(error.message);
-        if(editingType===name)resetTypeEditor();
-        await load();
-        renderManagedTypes();
-        return;
-    }
-    if(event.target.closest('#cancelTypeEdit'))resetTypeEditor();
-    if(event.target.closest('#locationAdd')){
-        $('#locationsModal').classList.remove('open');
-        $('#localForm').reset();
-        openMenuModal('#localModal');
-    }
-});
-const originalRenderLocationList=renderLocationList;
-renderLocationList=function(){
-    const dialog=$('#locationsModal .dialog');
-    if(!dialog.querySelector('#locationAdd')){
-        const heading=dialog.querySelector('h2');
-        const description=dialog.querySelector('p.muted');
-        heading.insertAdjacentHTML('beforebegin','<div class="dialog-title-row"><div></div><button type="button" id="locationAdd" class="dialog-add">+ Dodaj</button></div>');
-        dialog.querySelector('.dialog-title-row>div').append(heading,description);
-    }
-    return originalRenderLocationList();
-};
-$('#manageLocations').onclick=()=>{closeUserMenu();renderLocationList();$('#locationsModal').classList.add('open')};
-const savedTheme=localStorage.getItem('theme');
-
-if(savedTheme){
-    document.querySelector(`[data-theme="${savedTheme}"]`)?.click();
-}else{
-    const defaultTheme=document.querySelector('[data-theme="default"]');
-    document.querySelectorAll('[data-theme]').forEach(option=>{
-        const selected=option===defaultTheme;
-        option.classList.toggle('active',selected);
-        option.setAttribute('aria-pressed',String(selected));
-    });
-}
-startActivityTracking();
-start();
-
-// PWA: instalacja działa przez HTTPS (np. GitHub Pages). Nie zapisujemy danych
-// przeglądów lokalnie — aplikacja zawsze pobiera je z Supabase.
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=20260828-notification-click2', { scope: './' })
-            .catch(error => console.warn('Nie udało się zarejestrować PWA:', error));
-    });
-}
-</script>
-</body>
+          <button type="button" data-theme="dark">Ciemny</button>
+        </div>
+      </section>
+    </div>
+    <datalist id="cities"></datalist><datalist id="locals"></datalist
+    ><datalist id="types"></datalist>
+    <nav class="mobile-bottom-nav" aria-label="Nawigacja główna">
+      <button type="button" data-mobile-action="home" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m3 10 9-7 9 7v10H3zM9 20v-7h6v7" /></svg
+        ><span>Start</span>
+      </button>
+      <button type="button" data-mobile-action="inspections">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="4" width="14" height="17" rx="2" />
+          <path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4" /></svg
+        ><span>Przeglądy</span>
+      </button>
+      <button type="button" data-mobile-action="add">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 4v16M4 12h16" /></svg
+        ><span>Dodaj</span>
+      </button>
+      <button type="button" data-mobile-action="calendar">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M7 3v4M17 3v4M3 10h18M7 14h2M12 14h2M7 18h2" /></svg
+        ><span>Terminy</span>
+      </button>
+      <button
+        type="button"
+        id="mobileMenuToggle"
+        data-mobile-action="menu"
+        aria-controls="userMenu"
+        aria-expanded="false"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" /></svg
+        ><span>Menu</span>
+      </button>
+    </nav>
+    <div class="modal" id="recordDetailModal">
+      <section class="dialog record-detail-dialog">
+        <button
+          type="button"
+          class="modal-close"
+          id="closeRecordDetail"
+          aria-label="Zamknij szczegóły"
+        >
+          ×
+        </button>
+        <div id="recordDetailContent"></div>
+      </section>
+    </div>
+    <script src="app.js"></script>
+    <script src="workspace.js"></script>
+  </body>
 </html>
