@@ -311,9 +311,17 @@
         <p>Logowanie jest wymagane, aby dane były wspólne i chronione.</p>
         <div class="form">
           <label class="wide"
-            >E-mail<input required type="email" name="email" /></label
+            >E-mail<input
+              required
+              type="email"
+              name="email"
+              autocomplete="username" /></label
           ><label class="wide"
-            >Hasło<input required type="password" name="password"
+            >Hasło<input
+              required
+              type="password"
+              name="password"
+              autocomplete="current-password"
           /></label>
         </div>
         <p id="loginMessage" class="muted"></p>
@@ -322,7 +330,7 @@
             Zmień motyw</button
           ><button type="button" id="register" class="secondary">
             Utwórz konto</button
-          ><button>Zaloguj</button>
+          ><button type="submit" id="loginSubmit">Zaloguj</button>
         </footer>
         <div class="login-install" id="loginInstall">
           <button type="button" id="installApp" class="secondary">
