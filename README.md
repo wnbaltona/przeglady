@@ -4,7 +4,7 @@ Aplikacja do obsługi terminów przeglądów, protokołów, historii zmian i pow
 
 ## Publikacja
 
-Opublikuj pliki `index.html`, `app.js`, `styles.css`, `layout.css`, `workspace.css`, `workspace.js`, `mobile-history.js`, `supabase-config.js`, `service-worker.js`, `manifest.webmanifest` i katalog `icons` razem na serwerze statycznym obsługującym HTTPS. W tej wersji wymagane są również pliki `layout.css`, `workspace.css` i `workspace.js`. Konfiguracja istniejącego projektu pozostaje w `supabase-config.js`.
+Opublikuj pliki `index.html`, `app.js`, `styles.css`, `layout.css`, `workspace.css`, `workspace.js`, `mobile-history.js`, `install.js`, `supabase-config.js`, `service-worker.js`, `manifest.webmanifest` i katalog `icons` razem na serwerze statycznym obsługującym HTTPS. W tej wersji wymagane są również pliki `layout.css`, `workspace.css` i `workspace.js`. Konfiguracja istniejącego projektu pozostaje w `supabase-config.js`.
 
 Klucza `service_role` nie umieszczaj w plikach udostępnianych przez serwer WWW. Do pobierania danych wymagane jest połączenie z internetem. Na iPhonie aplikację można dodać do ekranu początkowego przez Safari.
 
@@ -56,4 +56,4 @@ Do archiwum nie dodano danych demonstracyjnych ani serwera podglądu. Integracje
 
 ## Instalacja systemowa
 
-Instalację proponuje przeglądarka na podstawie manifestu, ikon oraz rejestracji service workera. Aplikacja nie przechwytuje `beforeinstallprompt` i nie wyświetla własnego okna instalacji. Czas i forma propozycji zależą od przeglądarki; strona nie może wymusić systemowego okna przy każdym wejściu. Na iPhonie można dodać stronę z Safari przez Udostępnij → Do ekranu początkowego. Publikuj stronę przez HTTPS razem z manifestem, service workerem i ikonami. Identyfikator i zakres istniejącej aplikacji PWA pozostały takie same.
+Instalację proponuje przeglądarka na podstawie manifestu, ikon oraz rejestracji service workera. Aplikacja nie blokuje systemowej propozycji instalacji i nie wyświetla własnego okna. Przycisk „Zainstaluj aplikację” w panelu logowania korzysta z systemowego promptu, gdy jest dostępny; w przeciwnym razie pokazuje instrukcję instalacji z menu przeglądarki. W trybie zainstalowanej aplikacji przycisk jest ukryty. Czas i forma propozycji zależą od przeglądarki; strona nie może wymusić systemowego okna przy każdym wejściu. Na iPhonie można dodać stronę z Safari przez Udostępnij → Do ekranu początkowego. Publikuj stronę przez HTTPS razem z manifestem, service workerem i ikonami. Identyfikator i zakres istniejącej aplikacji PWA pozostały takie same.

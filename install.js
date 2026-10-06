@@ -1,91 +1,58 @@
-/* Propozycja instalacji PWA oraz instrukcja dla przeglądarek bez prompt(). */
+/* Przycisk instalacji w logowaniu; systemowa propozycja nadal jest dostępna. */
 (() => {
-  const modal = document.getElementById("installModal");
   const button = document.getElementById("installApp");
-  const instructions = document.getElementById("installInstructions");
+  const area = document.getElementById("loginInstall");
+  const help = document.getElementById("installHelp");
   const standalone = window.matchMedia("(display-mode: standalone)");
-  const key = "przeglady:install-dismissed";
-  let deferredPrompt = null,
-    dismissed = false,
+  let pendingPrompt = null,
     installed = false;
-  try {
-    dismissed = sessionStorage.getItem(key) === "1";
-  } catch {}
-  const isInstalled = () =>
-    installed || standalone.matches || navigator.standalone === true;
   function update() {
-    button.hidden = !deferredPrompt;
-    instructions.hidden = Boolean(deferredPrompt);
+    area.hidden =
+      installed || standalone.matches || navigator.standalone === true;
+  }
+  function instructions() {
     const ios =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      /iPhone|iPad|iPod/.test(navigator.userAgent) ||
       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    if (ios) {
-      instructions.textContent =
-        "Otwórz stronę w Safari. Wybierz Udostępnij → Do ekranu początkowego, a następnie Dodaj. Jeśli pojawi się opcja „Otwórz jako aplikację”, pozostaw ją włączoną.";
-    } else if (/Android/.test(navigator.userAgent)) {
-      instructions.textContent =
-        "W menu przeglądarki wybierz Zainstaluj aplikację lub Dodaj do ekranu głównego. Jeśli używasz przeglądarki wewnątrz innej aplikacji, otwórz stronę w Chrome.";
-    } else {
-      instructions.textContent =
-        "W menu Chrome lub Edge wybierz opcję instalacji tej strony jako aplikacji. W Safari na Macu wybierz Plik → Dodaj do Docka.";
-    }
-    document.getElementById("installLater").textContent = deferredPrompt
-      ? "Później"
-      : "Rozumiem";
+    help.textContent = ios
+      ? "W Safari wybierz Udostępnij → Do ekranu początkowego → Dodaj. Jeśli widzisz opcję „Otwórz jako aplikację”, pozostaw ją włączoną."
+      : /Android/.test(navigator.userAgent)
+        ? "W menu Chrome wybierz Zainstaluj aplikację lub Dodaj do ekranu głównego. Jeśli otwierasz stronę wewnątrz innej aplikacji, otwórz ją najpierw w Chrome."
+        : "W menu Chrome lub Edge wybierz instalację tej strony jako aplikacji. W Safari na Macu wybierz Plik → Dodaj do Docka.";
+    help.hidden = false;
   }
-  function close() {
-    dismissed = true;
-    try {
-      sessionStorage.setItem(key, "1");
-    } catch {}
-    modal.classList.remove("open");
-  }
-  function show() {
-    if (dismissed || isInstalled()) return;
-    update();
-    modal.classList.add("open");
-    (deferredPrompt ? button : document.getElementById("installLater")).focus({
-      preventScroll: true,
-    });
-  }
-  document.getElementById("closeInstall").onclick = close;
-  document.getElementById("installLater").onclick = close;
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) close();
-  });
   window.addEventListener("beforeinstallprompt", (event) => {
-    event.preventDefault();
-    deferredPrompt = event;
+    // Nie blokujemy automatycznej propozycji przeglądarki.
+    pendingPrompt = event;
     update();
-    if (!dismissed && !isInstalled()) show();
   });
+  window.addEventListener("appinstalled", () => {
+    installed = true;
+    pendingPrompt = null;
+    update();
+  });
+  standalone.addEventListener("change", update);
   button.onclick = async () => {
-    const prompt = deferredPrompt;
-    if (!prompt) return;
+    const prompt = pendingPrompt;
+    if (!prompt) {
+      instructions();
+      return;
+    }
     button.disabled = true;
+    help.hidden = true;
     try {
       await prompt.prompt();
       const result = await prompt.userChoice;
-      if (result.outcome === "accepted") installed = true;
-      close();
+      if (result.outcome === "accepted") {
+        installed = true;
+        update();
+      }
     } catch {
-      // Pozostaje dostępna ręczna instalacja z menu przeglądarki.
-      deferredPrompt = null;
-      update();
+      instructions();
     } finally {
-      deferredPrompt = null;
+      pendingPrompt = null;
       button.disabled = false;
     }
   };
-  window.addEventListener("appinstalled", () => {
-    installed = true;
-    close();
-  });
-  standalone.addEventListener("change", () => {
-    if (isInstalled()) close();
-  });
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && modal.classList.contains("open")) close();
-  });
-  setTimeout(show, 900);
+  update();
 })();

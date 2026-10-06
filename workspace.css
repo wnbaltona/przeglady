@@ -1,4 +1,18 @@
 /* Panel firmowy: stała nawigacja, pełne widoki i wspólne powierzchnie. */
+.login-install {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.login-install button {
+  width: 100%;
+  min-height: 44px;
+}
+.login-install p {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
 /* Kliknięcie i dotyk bez systemowego niebieskiego podświetlenia. */
 html,
 body,
