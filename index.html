@@ -705,7 +705,45 @@
       </section>
     </div>
     <script src="app.js"></script>
+    <div
+      class="modal install-modal"
+      id="installModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="installTitle"
+    >
+      <section class="dialog install-dialog">
+        <button
+          type="button"
+          class="modal-close"
+          id="closeInstall"
+          aria-label="Zamknij propozycję instalacji"
+        >
+          ×
+        </button>
+        <img
+          class="install-logo"
+          src="icons/pwa-icon-192.png"
+          alt=""
+          width="56"
+          height="56"
+        />
+        <h2 id="installTitle">Zainstaluj aplikację Przeglądy</h2>
+        <p>
+          Dodaj aplikację do ekranu głównego, aby wygodnie otwierać rejestr i
+          sprawdzać terminy.
+        </p>
+        <p id="installInstructions" class="install-instructions"></p>
+        <div class="install-actions">
+          <button type="button" class="secondary" id="installLater">
+            Później
+          </button>
+          <button type="button" id="installApp" hidden>Zainstaluj</button>
+        </div>
+      </section>
+    </div>
     <script src="workspace.js"></script>
     <script src="mobile-history.js"></script>
+    <script src="install.js"></script>
   </body>
 </html>
