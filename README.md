@@ -4,7 +4,7 @@ Aplikacja do obsługi terminów przeglądów, protokołów, historii zmian i pow
 
 ## Publikacja
 
-Opublikuj pliki `index.html`, `app.js`, `styles.css`, `layout.css`, `workspace.css`, `workspace.js`, `supabase-config.js`, `service-worker.js`, `manifest.webmanifest` i katalog `icons` razem na serwerze statycznym obsługującym HTTPS. W tej wersji wymagane są również pliki `layout.css`, `workspace.css` i `workspace.js`. Konfiguracja istniejącego projektu pozostaje w `supabase-config.js`.
+Opublikuj pliki `index.html`, `app.js`, `styles.css`, `layout.css`, `workspace.css`, `workspace.js`, `mobile-history.js`, `supabase-config.js`, `service-worker.js`, `manifest.webmanifest` i katalog `icons` razem na serwerze statycznym obsługującym HTTPS. W tej wersji wymagane są również pliki `layout.css`, `workspace.css` i `workspace.js`. Konfiguracja istniejącego projektu pozostaje w `supabase-config.js`.
 
 Klucza `service_role` nie umieszczaj w plikach udostępnianych przez serwer WWW. Do pobierania danych wymagane jest połączenie z internetem. Na iPhonie aplikację można dodać do ekranu początkowego przez Safari.
 
@@ -32,6 +32,8 @@ Skrypty synchronizacji wymagają `SUPABASE_URL` i `SUPABASE_SERVICE_ROLE_KEY` w 
 
 ## Usprawnienia obsługi — 6 października
 
+`mobile-history.js` obsługuje przycisk Wstecz telefonu i cofanie w przeglądarce przy widoku mobilnym. Najpierw zamyka otwarte okno lub menu, następnie pozwala wrócić do poprzedniej zakładki. Zamykanie przez × także usuwa wpis okna z historii. Publikuj ten plik razem z pozostałymi skryptami; jest wczytywany po `workspace.js`. Działanie sprawdzono w lokalnym podglądzie przez cofnięcie historii dla alertów, formularza oraz przejścia między widokami.
+
 Ciemny motyw korzysta ze wspólnej granatowej palety dla panelu, nawigacji, tabel, kalendarza i okien. Poprawiono kontrast opisów, pól i statusów, wyróżnienie aktywnych filtrów oraz dzisiejszego dnia. Kontrolki dat, wybór pliku i paski przewijania także korzystają z ciemnego wyglądu. Sprawdzono lokalny podgląd pulpitu, kalendarza, lokali, szczegółów i formularza w szerokościach 390 i 1366 px oraz zachowanie motywu po przeładowaniu.
 
 - Filtry, sortowanie i rozwinięte lokale są zapamiętywane w obrębie sesji przeglądarki, oddzielnie dla każdego konta. Formularz przywraca pozycję przewijania po zapisie lub anulowaniu.
@@ -51,3 +53,4 @@ Podgląd używa danych demonstracyjnych i nie łączy się z produkcyjną bazą.
 W przeglądarce sprawdzono dane demonstracyjne przy szerokościach 320, 390, 699 i 1440 px. Zweryfikowano ekran główny, rozwijanie list, kalendarz, formularz, alerty i menu. Pomiary potwierdziły brak poziomego przepełnienia na sprawdzonych ekranach, mieszczący się kalendarz i jego przyciski oraz wyśrodkowanie okna listy lokali. Sprawdzono składnię i formatowanie oraz testy obsługi paska nawigacji i formularza lokalu z atrapą bazy.
 
 Do archiwum nie dodano danych demonstracyjnych ani serwera podglądu. Integracje produkcyjne, powiadomienia i transakcja edycji lokalu wymagają sprawdzenia w docelowym środowisku.
+

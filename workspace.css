@@ -1,4 +1,13 @@
 /* Panel firmowy: stała nawigacja, pełne widoki i wspólne powierzchnie. */
+/* Kliknięcie i dotyk bez systemowego niebieskiego podświetlenia. */
+html,
+body,
+body * {
+  -webkit-tap-highlight-color: transparent;
+}
+body :focus:not(:focus-visible) {
+  outline: none;
+}
 :root {
   --sidebar-width: 72px;
 }
