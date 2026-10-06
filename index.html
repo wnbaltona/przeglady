@@ -1,711 +1,110 @@
 <!doctype html>
 <html lang="pl">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Rejestr Przeglądów</title>
-    <meta name="theme-color" content="#16324F" />
-    <meta name="application-name" content="Rejestr Przeglądów" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <link rel="manifest" href="./manifest.webmanifest?v=20260827-logo3" />
-    <link
-      rel="icon"
-      href="./icons/pwa-icon-desktop.svg?v=20260827-desktop1"
-      type="image/svg+xml"
-    />
-    <link
-      rel="apple-touch-icon"
-      href="./icons/pwa-icon-192.png?v=20260827-logo3"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js?v=20260827-3"></script>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="layout.css" />
-    <link rel="stylesheet" href="workspace.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' blob: data:; manifest-src 'self'; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net; base-uri 'none'; form-action 'none'"
+    >
+    <meta name="description" content="Serwis Lokali — zgłaszanie i obsługa usterek.">
+    <meta name="theme-color" content="#1d2e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Serwis Lokali">
+
+    <title>Serwis Lokali · Zgłoszenia usterek</title>
+    <link rel="manifest" href="./manifest.json?v=native-install2">
+    <link rel="icon" type="image/png" href="./icon-192.png?v=7">
+    <link rel="apple-touch-icon" href="./icon-192.png?v=7">
+    <link rel="stylesheet" href="./styles.css?v=blue-theme1">
+    <link rel="stylesheet" href="./fonts/manrope.css?v=1">
+    <link rel="stylesheet" href="./ui-polish.css?v=blue-theme1">
+    <link rel="stylesheet" href="./ui-layout.css?v=blue-theme1">
+    <link rel="stylesheet" href="./ui-finish.css?v=blue-theme1">
+    <link rel="stylesheet" href="./ui-schedule.css?v=blue-theme1">
+    <link rel="stylesheet" href="./ui-responsive.css?v=blue-theme1">
+    <link rel="stylesheet" href="./ui-login.css?v=desktop-polish2">
+    <link rel="stylesheet" href="./ui-theme.css?v=install1">
   </head>
-  <body data-workspace="dashboard">
-    <aside class="workspace-sidebar" aria-label="Menu aplikacji">
-      <a
-        class="workspace-brand"
-        href="#pulpit"
-        aria-label="Rejestr przeglądów — pulpit"
-        ><span class="brand-mark"
-          ><img src="icons/pwa-icon-desktop.svg" alt="" /></span
-        ><span>Rejestr przeglądów<small>Zarządzanie obiektami</small></span></a
-      >
-      <nav id="workspaceNav" aria-label="Nawigacja główna"></nav>
-      <div class="sidebar-footer">Terminy · dokumenty · historia</div>
+
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <img src="./icon-192.png?v=7" width="32" height="32" alt="">
+        </span>
+        <div>Serwis Lokali<small>Zgłoszenia usterek</small></div>
+      </div>
+      <nav id="navigation" aria-label="Nawigacja główna"></nav>
+      <button class="sidebar-toggle" type="button" data-action="sidebar-toggle" aria-label="Zwiń menu" aria-controls="navigation" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 5l-7 7 7 7M20 5v14"/></svg><span>Zwiń menu</span></button>
     </aside>
-    <header class="top">
-      <a
-        class="mobile-app-logo"
-        href="#pulpit"
-        aria-label="Rejestr przeglądów — pulpit"
-        ><img src="icons/pwa-icon-desktop.svg" alt=""
-      /></a>
-      <div class="workspace-page-title">
-        <h1>Rejestr Przeglądów</h1>
-        <p>Wspólny rejestr, terminy i protokoły</p>
+
+    <div class="main-wrap">
+      <header class="topbar">
+        <div class="profile">
+          <div class="role-switch">
+            <label for="profile-select">Twoje konto</label>
+            <select id="profile-select" aria-label="Zalogowane konto" disabled></select>
+            <button id="account-summary" class="account-summary" type="button" data-action="open-account" hidden></button>
+          </div>
+          <button
+            id="notification-bell"
+            class="notification-bell"
+            type="button"
+            data-action="notifications"
+            aria-label="Powiadomienia"
+            aria-haspopup="dialog"
+            aria-controls="notifications-dialog"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M9 21h6M12 2V1"/>
+            </svg>
+            <span class="notification-bell-label">Powiadomienia</span>
+            <span class="notification-count" id="notification-count" hidden>0</span>
+          </button>
+          <button id="admin-account-button" class="btn secondary small" type="button" data-action="open-account">Moje konto</button>
+          <div class="profile-current">
+            <strong id="profile-name"></strong>
+            <small id="profile-role"></small>
+          </div>
+          <button class="btn secondary small logout-button" type="button" data-action="logout">
+            Wyloguj
+          </button>
+        </div>
+      </header>
+
+      <div class="sync-notice" id="sync-notice" hidden>
+        <span>Dostępne są nowsze dane z drugiej karty. Twój formularz nie został zmieniony.</span>
+        <button type="button" data-action="apply-pending">Wczytaj nowsze dane</button>
       </div>
-      <div class="actions">
-        <button id="add">+ Dodaj przegląd</button
-        ><button id="showCalendar" class="secondary" type="button">
-          Kalendarz terminów</button
-        ><button
-          id="attentionOpen"
-          class="secondary attention-open"
-          type="button"
-          aria-label="Otwórz alerty"
-          title="Alerty"
-        >
-          <svg
-            class="attention-open-icon"
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M12 22a2.6 2.6 0 0 0 2.45-1.73h-4.9A2.6 2.6 0 0 0 12 22Zm7.2-5.08-1.58-1.58V10.2A5.63 5.63 0 0 0 13.5 4.8V4a1.5 1.5 0 0 0-3 0v.8A5.63 5.63 0 0 0 6.38 10.2v5.14L4.8 16.92A1.1 1.1 0 0 0 5.58 18.8h12.84a1.1 1.1 0 0 0 .78-1.88Z"
-            /></svg
-          ><span id="attentionOpenCount" class="attention-open-count" hidden
-            >0</span
-          >
-        </button>
-        <div class="user-menu">
-          <button
-            id="menuToggle"
-            class="secondary"
-            type="button"
-            aria-expanded="false"
-            aria-controls="userMenu"
-          >
-            Menu ▾
-          </button>
-          <div id="userMenu" class="menu-panel" hidden>
-            <div class="menu-user-row">
-              <div id="user" class="menu-user">Niezalogowano</div>
-              <button
-                id="menuClose"
-                class="menu-close"
-                type="button"
-                aria-label="Zamknij menu"
-              >
-                ×
-              </button>
-            </div>
-            <div class="menu-section-label">Dane i przeglądy</div>
-            <button id="refreshData" class="secondary" type="button">
-              Odśwież dane</button
-            ><button id="manageTypes" class="secondary" type="button">
-              Dodaj / usuń rodzaj przeglądu</button
-            ><button id="addLocal" class="secondary" type="button">
-              Dodaj lokal / magazyn</button
-            ><button id="manageLocations" class="secondary" type="button">
-              Lokale i magazyny
-            </button>
-            <div class="menu-section-label">Widok i konto</div>
-            <button id="showTrash" class="secondary" type="button">Kosz</button
-            ><button id="pushToggle" class="secondary" type="button" hidden>
-              Włącz powiadomienia</button
-            ><button id="themeOpen" class="secondary" type="button">
-              Zmień motyw</button
-            ><button id="logout" class="danger" type="button" hidden>
-              Wyloguj
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-    <div id="menuBackdrop" class="menu-backdrop" hidden></div>
-    <main class="wrap">
-      <div id="notice" class="notice">Trwa łączenie ze wspólnym rejestrem…</div>
-      <section class="panel" id="registerFilters">
-        <div class="tools">
-          <button id="export" class="secondary">Eksportuj CSV</button>
-        </div>
-
-        <div class="filters">
-          <div class="search-row">
-            <input
-              id="search"
-              aria-label="Szukaj przeglądów"
-              placeholder="Szukaj miasta, lokalu, rodzaju przeglądu lub uwag..."
-              autocomplete="off"
-            />
-          </div>
-
-          <div class="filter-row">
-            <select id="city" aria-label="Filtr miasta">
-              <option value="">Wszystkie miasta</option>
-            </select>
-
-            <select id="protocol" aria-label="Filtr protokołu">
-              <option value="">Wszystkie protokoły</option>
-              <option value="DODANY">Z protokołem</option>
-              <option value="BRAK PROTOKOŁU">Bez protokołu</option>
-            </select>
-
-            <span id="filterCount" class="filter-count" hidden>
-              Aktywne filtry:
-              <b id="filterCountNumber">0</b>
-            </span>
-
-            <button
-              type="button"
-              id="clearFilters"
-              class="clear-filters"
-              hidden
-            >
-              Wyczyść filtry
-            </button>
-          </div>
-        </div>
-      </section>
-      <section class="stats" id="legacyStats">
-        <button
-          type="button"
-          class="card stat overdue"
-          data-quick-status="PO TERMINIE"
-        >
-          Po terminie<b id="overdue">0</b></button
-        ><button
-          type="button"
-          class="card stat due"
-          data-quick-status="DO WYKONANIA"
-        >
-          Do wykonania <b id="due">0</b></button
-        ><button type="button" class="card stat ok" data-quick-status="OK">
-          Aktualne<b id="ok">0</b></button
-        ><button type="button" class="card stat total" data-quick-status="">
-          Wszystkie wpisy<b id="all">0</b>
-        </button>
-      </section>
-      <section id="dashboardView" class="workspace-section">
-        <div class="workspace-heading">
-          <div>
-            <h2>Pulpit</h2>
-          </div>
-          <button class="secondary" data-workspace-view="inspections">
-            Otwórz rejestr
-          </button>
-        </div>
-        <div id="dashboardMetrics" class="dashboard-metrics"></div>
-        <section class="workspace-card">
-          <div class="section-heading">
-            <div>
-              <h3>Przeglądy wymagające uwagi</h3>
-              <p>Zacznij od najpilniejszych terminów.</p>
-            </div>
-            <button class="secondary" data-workspace-view="attention">
-              Wszystkie alerty
-            </button>
-          </div>
-          <div id="dashboardUrgent"></div>
-        </section>
-      </section>
-      <section id="registerView" class="workspace-section" hidden>
-        <div class="workspace-heading">
-          <div>
-            <span class="eyebrow">Wspólny rejestr</span>
-            <h2>Przeglądy</h2>
-            <p>Wybierz miasto i lokal, aby zobaczyć przeglądy.</p>
-          </div>
-          <span id="registerResultCount" class="result-count"></span>
-        </div>
-        <div
-          id="registerStatusFilters"
-          class="dashboard-metrics register-status-filters"
-          role="group"
-          aria-label="Filtr statusu przeglądów"
-        >
-          <button
-            type="button"
-            class="dashboard-metric metric-overdue"
-            data-workspace-status="PO TERMINIE"
-            aria-pressed="false"
-          >
-            <span>Po terminie</span><b id="registerOverdueCount">0</b>
-          </button>
-
-          <button
-            type="button"
-            class="dashboard-metric metric-due"
-            data-workspace-status="DO WYKONANIA"
-            aria-pressed="false"
-          >
-            <span>Do wykonania</span><b id="registerDueCount">0</b>
-          </button>
-          <button
-            type="button"
-            class="dashboard-metric metric-current"
-            data-workspace-status="OK"
-            aria-pressed="false"
-          >
-            <span>Aktualne</span><b id="registerCurrentCount">0</b>
-          </button>
-          <button
-            type="button"
-            class="dashboard-metric"
-            data-workspace-status=""
-            aria-pressed="true"
-          >
-            <span>Wszystkie wpisy</span><b id="registerAllCount">0</b>
-          </button>
-        </div>
-        <div id="registerTable" class="workspace-card"></div>
-        <section id="cityGroups" class="city-groups"></section>
-      </section>
-      <section id="settingsView" class="workspace-section" hidden>
-        <div class="workspace-heading">
-          <div>
-            <span class="eyebrow">Administracja</span>
-            <h2>Ustawienia</h2>
-            <p>Zarządzaj słownikami, wyglądem i kontem.</p>
-          </div>
-        </div>
-        <div class="settings-grid">
-          <section class="workspace-card">
-            <h3>Dane i słowniki</h3>
-            <button class="settings-action" data-forward="manageTypes">
-              Rodzaje przeglądów <span>›</span></button
-            ><button class="settings-action" data-forward="showTrash">
-              Kosz <span>›</span>
-            </button>
-          </section>
-          <section class="workspace-card">
-            <h3>Wygląd i konto</h3>
-            <p id="workspaceUser" class="muted"></p>
-            <button class="settings-action" data-forward="themeOpen">
-              Motyw aplikacji <span>›</span></button
-            ><button
-              id="workspacePush"
-              class="settings-action"
-              data-forward="pushToggle"
-              hidden
-            >
-              Powiadomienia <span>›</span></button
-            ><button
-              id="workspaceLogout"
-              class="settings-action danger"
-              data-forward="logout"
-              hidden
-            >
-              Wyloguj <span>›</span>
-            </button>
-          </section>
-        </div>
-      </section>
-    </main>
-    <div class="modal" id="loginModal">
-      <form class="dialog" id="loginForm">
-        <button
-          type="button"
-          id="closeLogin"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2>Dostęp do rejestru</h2>
-        <p>Logowanie jest wymagane, aby dane były wspólne i chronione.</p>
-        <div class="form">
-          <label class="wide"
-            >E-mail<input required type="email" name="email" /></label
-          ><label class="wide"
-            >Hasło<input required type="password" name="password"
-          /></label>
-        </div>
-        <p id="loginMessage" class="muted"></p>
-        <footer>
-          <button type="button" id="themeOpenLogin" class="secondary">
-            Zmień motyw</button
-          ><button type="button" id="register" class="secondary">
-            Utwórz konto</button
-          ><button>Zaloguj</button>
-        </footer>
-      </form>
+      <main class="content" id="content">
+        <div class="loading" role="status">Łączenie ze wspólną bazą danych…</div>
+      </main>
     </div>
-    <div class="modal" id="editModal">
-      <form class="dialog" id="editForm">
-        <button
-          type="button"
-          id="cancel"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2 id="formTitle">Dodaj przegląd</h2>
-        <div class="form">
-          <label>Miasto<input required name="city" list="cities" /></label
-          ><label>Nr lokalu<input required name="local" list="locals" /></label
-          ><label
-            >Rodzaj przeglądu<input required name="type" list="types" /></label
-          ><label
-            >Data wykonania<input required type="date" name="done" /></label
-          ><label
-            >Ważny przez (mies.)<input
-              required
-              min="1"
-              type="number"
-              name="months"
-              value="12" /></label
-          ><label
-            >Data dodania protokołu<input
-              type="date"
-              name="protocolDate" /></label
-          ><label class="wide"
-            >Plik protokołu<input
-              type="file"
-              name="file"
-              accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"
-            /><small id="fileInfo" class="muted"
-              >Opcjonalnie: PDF, dokument lub zdjęcie.</small
-            ><button type="button" id="removeAttachment" class="danger" hidden>
-              Usuń załącznik
-            </button></label
-          ><label class="wide"
-            >Uwagi<textarea name="notes" rows="3"></textarea>
-          </label>
-        </div>
-        <footer><button type="submit">Zapisz</button></footer>
-      </form>
-    </div>
-    <div class="modal" id="typesModal">
-      <section class="dialog types-dialog">
-        <button
-          type="button"
-          id="closeTypes"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <div class="dialog-title-row">
-          <div>
-            <h2>Rodzaje przeglądów</h2>
-            <p class="muted">
-              Usunięta nazwa znika z podpowiedzi. Istniejące przeglądy pozostają
-              bez zmian.
-            </p>
-          </div>
-        </div>
-        <div class="type-add">
-          <input id="newType" placeholder="Nowy rodzaj przeglądu" /><button
-            type="button"
-            id="addType"
-          >
-            Dodaj</button
-          ><button type="button" id="cancelTypeEdit" class="secondary" hidden>
-            Anuluj
-          </button>
-        </div>
-        <p id="typeEditingNote" class="type-editing-note" hidden></p>
-        <div class="types-tablebox">
-          <table class="types-table">
-            <thead>
-              <tr>
-                <th>Rodzaj przeglądu</th>
-                <th>Liczba wpisów</th>
-                <th>Akcje</th>
-              </tr>
-            </thead>
-            <tbody id="typeListTable"></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-    <div class="modal" id="localModal">
-      <form class="dialog" id="localForm">
-        <button
-          type="button"
-          id="cancelLocal"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2 id="localFormTitle">Dodaj lokal / magazyn</h2>
-        <p class="muted" id="localFormDescription">
-          Obiekt pojawi się na liście po wybraniu wskazanego miasta.
-        </p>
-        <div class="form">
-          <label>Miasto<input required name="city" list="cities" /></label
-          ><label
-            >MPK<input
-              required
-              name="mpk"
-              placeholder="np. B52 lub 208" /></label
-          ><label class="wide"
-            >Nazwa lokalu / magazynu<input
-              required
-              name="name"
-              placeholder="np. Multistore lub Magazyn"
-          /></label>
-        </div>
-        <footer><button type="submit">Zapisz obiekt</button></footer>
-      </form>
-    </div>
-    <div class="modal" id="locationsModal">
-      <section class="dialog locations-dialog">
-        <button
-          type="button"
-          id="closeLocations"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <div class="dialog-title-row">
-          <div>
-            <h2>Lokale i magazyny</h2>
-            <p class="muted">
-              Zarządzaj pozycjami widocznymi w podpowiedziach. Usunięcie nie
-              kasuje istniejących przeglądów.
-            </p>
-          </div>
-          <button type="button" id="locationAdd" class="dialog-add">
-            + Dodaj
-          </button>
-        </div>
-        <label class="location-search"
-          >Szukaj lokalu lub miasta<input
-            id="locationSearch"
-            type="search"
-            placeholder="MPK, nazwa lokalu lub miasto…"
-            autocomplete="off"
-        /></label>
-        <div
-          id="locationListSummary"
-          class="locations-summary"
-          aria-live="polite"
-        ></div>
-        <div class="locations-tablebox">
-          <table class="locations-table">
-            <thead>
-              <tr>
-                <th>MPK / nazwa</th>
-                <th>Miasto</th>
-                <th>Typ</th>
-                <th>Status</th>
-                <th><span class="sr-only">Akcja</span></th>
-              </tr>
-            </thead>
-            <tbody id="locationList"></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-    <div class="modal" id="trashModal">
-      <section class="dialog">
-        <button
-          type="button"
-          id="closeTrash"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2>Kosz</h2>
-        <p class="muted">
-          Wpisy w koszu nie są widoczne w rejestrze i można je przywrócić.
-        </p>
-        <ul id="trashList" class="type-list"></ul>
-      </section>
-    </div>
-    <div class="modal" id="historyModal">
-      <section class="dialog">
-        <button
-          type="button"
-          id="closeHistory"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2>Historia wpisu</h2>
-        <ul id="historyList" class="type-list"></ul>
-      </section>
-    </div>
-    <div class="modal" id="calendarModal">
-      <section class="dialog calendar-dialog">
-        <button
-          type="button"
-          id="closeCalendar"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2>Kalendarz terminów przeglądów</h2>
-        <div class="calendar-toolbar">
-          <button
-            type="button"
-            id="calendarPrevious"
-            class="secondary"
-            aria-label="Poprzedni miesiąc"
-          >
-            ‹</button
-          ><strong id="calendarTitle"></strong
-          ><button
-            type="button"
-            id="calendarNext"
-            class="secondary"
-            aria-label="Następny miesiąc"
-          >
-            ›
-          </button>
-        </div>
-        <div class="calendar-weekdays">
-          <span>Pon</span><span>Wt</span><span>Śr</span><span>Czw</span
-          ><span>Pt</span><span>Sob</span><span>Nie</span>
-        </div>
-        <div id="calendarGrid" class="calendar-grid"></div>
-        <div class="calendar-legend">
-          <span class="calendar-legend-item"
-            ><span class="calendar-dot reminder30-dot"></span
-            ><span>30 dni przed terminem</span></span
-          ><span class="calendar-legend-item"
-            ><span class="calendar-dot reminder14-dot"></span
-            ><span>14 dni przed terminem</span></span
-          ><span class="calendar-legend-item"
-            ><span class="calendar-dot expiry-dot"></span
-            ><span>Utrata ważności</span></span
-          >
-        </div>
-        <div id="calendarDetails" class="calendar-details muted">
-          Wybierz oznaczony dzień, aby zobaczyć szczegóły lub zaktualizować
-          przegląd.
-        </div>
-        <footer>
-          <button type="button" id="calendarToday" class="secondary">
-            Dzisiaj</button
-          ><button type="button" id="calendarAdd">+ Dodaj przegląd</button>
-        </footer>
-      </section>
-    </div>
-    <div class="modal attention-modal" id="attentionModal">
-      <section class="dialog attention-dialog">
-        <button
-          type="button"
-          id="closeAttention"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <div class="attention-header">
-          <div>
-            <h2>Przeglądy wymagające uwagi</h2>
-          </div>
-        </div>
-        <div class="attention-tablebox">
-          <table class="attention-table">
-            <colgroup>
-              <col />
-              <col />
-              <col />
-              <col />
-              <col />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Nr lokalu</th>
-                <th>Miasto</th>
-                <th>Rodzaj przeglądu</th>
-                <th>Termin ważności</th>
-                <th>Status terminu</th>
-              </tr>
-            </thead>
-            <tbody id="attentionTableBody"></tbody>
-          </table>
-        </div>
-        <footer>
-          <button type="button" id="attentionShowAll" class="secondary">
-            Pokaż wszystkie
-          </button>
-        </footer>
-      </section>
-    </div>
-    <div class="modal" id="themeModal">
-      <section class="dialog">
-        <button
-          type="button"
-          id="closeTheme"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2>Zmień motyw</h2>
 
-        <div class="theme-options">
-          <button type="button" data-theme="default">Granatowy</button>
+    <dialog id="push-welcome-dialog" class="push-welcome-dialog" aria-labelledby="push-welcome-title"></dialog>
+    <dialog id="account-dialog" class="account-dialog" aria-labelledby="account-title"></dialog>
+    <dialog id="detail-dialog" aria-labelledby="dialog-title"></dialog>
+    <dialog id="quick-close-dialog" class="quick-close-dialog" aria-labelledby="quick-close-title"></dialog>
+    <dialog id="notifications-dialog" class="notifications-dialog" aria-labelledby="notifications-title"></dialog>
+    <dialog id="attachment-preview-dialog" class="attachment-preview-dialog" aria-labelledby="attachment-preview-title"></dialog>
+    <div class="toast-container" id="toasts" aria-live="polite"></div>
 
-          <button type="button" data-theme="corporate">
-            Zielony szałwiowy
-          </button>
+    <noscript><div class="fatal">Włącz JavaScript, aby korzystać z aplikacji.</div></noscript>
 
-          <button type="button" data-theme="elegant">Beżowo-terakotowy</button>
-
-          <button type="button" data-theme="minimal">Minimalistyczny</button>
-
-          <button type="button" data-theme="dark">Ciemny</button>
-        </div>
-      </section>
-    </div>
-    <datalist id="cities"></datalist><datalist id="locals"></datalist
-    ><datalist id="types"></datalist>
-    <nav class="mobile-bottom-nav" aria-label="Nawigacja główna">
-      <button type="button" data-mobile-action="home" aria-current="page">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m3 10 9-7 9 7v10H3zM9 20v-7h6v7" /></svg
-        ><span>Start</span>
-      </button>
-      <button type="button" data-mobile-action="inspections">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="5" y="4" width="14" height="17" rx="2" />
-          <path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4" /></svg
-        ><span>Przeglądy</span>
-      </button>
-      <button type="button" data-mobile-action="add">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 4v16M4 12h16" /></svg
-        ><span>Dodaj</span>
-      </button>
-      <button type="button" data-mobile-action="calendar">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3" y="5" width="18" height="16" rx="2" />
-          <path d="M7 3v4M17 3v4M3 10h18M7 14h2M12 14h2M7 18h2" /></svg
-        ><span>Terminy</span>
-      </button>
-      <button
-        type="button"
-        id="mobileMenuToggle"
-        data-mobile-action="menu"
-        aria-controls="userMenu"
-        aria-expanded="false"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 6h16M4 12h16M4 18h16" /></svg
-        ><span>Menu</span>
-      </button>
-    </nav>
-    <div class="modal" id="recordDetailModal">
-      <section class="dialog record-detail-dialog">
-        <button
-          type="button"
-          class="modal-close"
-          id="closeRecordDetail"
-          aria-label="Zamknij szczegóły"
-        >
-          ×
-        </button>
-        <div id="recordDetailContent"></div>
-      </section>
-    </div>
-    <script src="app.js"></script>
-    <script src="workspace.js"></script>
-    <script src="mobile-history.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./locations.js?v=4"></script>
+    <script src="./app-config.js?v=1"></script>
+    <script src="./model.js?v=profiles2"></script>
+    <script src="./app-core.js?v=native-install2"></script>
+    <script src="./app-views.js?v=account1"></script>
+    <script src="./app-actions.js?v=preview1"></script>
+    <script src="./app-events.js?v=account1"></script>
+    <script src="./push-client.js?v=push-welcome3"></script>
+    <script src="./account.js?v=native-install2"></script>
+    <script src="./app-data.js?v=account1"></script>
+    <script src="./bootstrap.js?v=install1"></script>
   </body>
 </html>
