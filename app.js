@@ -2778,14 +2778,10 @@ start();
 
 // PWA: instalacja działa przez HTTPS (np. GitHub Pages). Nie zapisujemy danych
 // przeglądów lokalnie — aplikacja zawsze pobiera je z Supabase.
-if ("serviceWorker" in navigator && location.protocol === "https:") {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("./service-worker.js?v=20260828-notification-click2", {
-        scope: "./",
-      })
-      .catch((error) =>
-        console.warn("Nie udało się zarejestrować PWA:", error),
-      );
-  });
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  navigator.serviceWorker
+    .register("./service-worker.js?v=20260828-notification-click2", {
+      scope: "./",
+    })
+    .catch((error) => console.warn("Nie udało się zarejestrować PWA:", error));
 }

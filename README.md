@@ -4,7 +4,7 @@ Aplikacja do obsługi terminów przeglądów, protokołów, historii zmian i pow
 
 ## Publikacja
 
-Opublikuj pliki `index.html`, `app.js`, `styles.css`, `layout.css`, `workspace.css`, `workspace.js`, `mobile-history.js`, `install.js`, `supabase-config.js`, `service-worker.js`, `manifest.webmanifest` i katalog `icons` razem na serwerze statycznym obsługującym HTTPS. W tej wersji wymagane są również pliki `layout.css`, `workspace.css` i `workspace.js`. Konfiguracja istniejącego projektu pozostaje w `supabase-config.js`.
+Opublikuj pliki `index.html`, `app.js`, `styles.css`, `layout.css`, `workspace.css`, `workspace.js`, `mobile-history.js`, `supabase-config.js`, `service-worker.js`, `manifest.webmanifest` i katalog `icons` razem na serwerze statycznym obsługującym HTTPS. W tej wersji wymagane są również pliki `layout.css`, `workspace.css` i `workspace.js`. Konfiguracja istniejącego projektu pozostaje w `supabase-config.js`.
 
 Klucza `service_role` nie umieszczaj w plikach udostępnianych przez serwer WWW. Do pobierania danych wymagane jest połączenie z internetem. Na iPhonie aplikację można dodać do ekranu początkowego przez Safari.
 
@@ -54,8 +54,6 @@ W przeglądarce sprawdzono dane demonstracyjne przy szerokościach 320, 390, 699
 
 Do archiwum nie dodano danych demonstracyjnych ani serwera podglądu. Integracje produkcyjne, powiadomienia i transakcja edycji lokalu wymagają sprawdzenia w docelowym środowisku.
 
+## Instalacja systemowa
 
-
-## Propozycja instalacji
-
-Plik `install.js` pokazuje okno instalacji po wejściu na stronę, raz w sesji przeglądarki. Jeśli przeglądarka udostępni zdarzenie `beforeinstallprompt`, przycisk Zainstaluj otwiera jej dialog po kliknięciu. W pozostałych przypadkach okno zawiera instrukcję instalacji z menu; na iPhonie instrukcję Safari → Udostępnij → Do ekranu początkowego. W trybie zainstalowanej aplikacji okno się nie pojawia. Można je zamknąć przez ×, tło, Escape lub Wstecz na telefonie. Natywna instalacja zależy od przeglądarki i wymaga poprawnie opublikowanej strony HTTPS z manifestem i ikonami. Sprawdzono obsługę zdarzenia z atrapą przeglądarki oraz lokalny wygląd i zamknięcie okna; instalacji na fizycznym telefonie nie wykonywano.
+Instalację proponuje przeglądarka na podstawie manifestu, ikon oraz rejestracji service workera. Aplikacja nie przechwytuje `beforeinstallprompt` i nie wyświetla własnego okna instalacji. Czas i forma propozycji zależą od przeglądarki; strona nie może wymusić systemowego okna przy każdym wejściu. Na iPhonie można dodać stronę z Safari przez Udostępnij → Do ekranu początkowego. Publikuj stronę przez HTTPS razem z manifestem, service workerem i ikonami. Identyfikator i zakres istniejącej aplikacji PWA pozostały takie same.

@@ -2,7 +2,6 @@
 (() => {
   const media = window.matchMedia("(max-width: 800px)");
   const closeButtons = {
-    installModal: "closeInstall",
     editModal: "cancel",
     localModal: "cancelLocal",
     typesModal: "closeTypes",
