@@ -11,6 +11,7 @@
     loginModal: "closeLogin",
     attentionModal: "closeAttention",
     recordDetailModal: "closeRecordDetail",
+    accountModal: "closeAccount",
   };
   const marker = "inspectionNavigation";
   let initialized = false,
@@ -47,6 +48,16 @@
     else document.getElementById(id)?.classList.remove("open");
   }
   function sync() {
+    if (document.body.classList.contains("auth-screen")) {
+      initialized = false;
+      applying = false;
+      removingEntry = false;
+      trail.length = 0;
+      openedAt.clear();
+      last = undefined;
+      history.replaceState({ ...history.state, [marker]: null }, "");
+      return;
+    }
     if (!media.matches || applying || removingEntry) return;
     const current = snapshot();
     if (!initialized) {
@@ -81,6 +92,7 @@
     }
   }
   window.addEventListener("popstate", (event) => {
+    if (document.body.classList.contains("auth-screen")) return;
     // Niektóre przeglądarki osadzone zwracają null w popstate.
     const target = event.state?.[marker] || trail[trail.length - 2];
     if (!initialized || !target) return;

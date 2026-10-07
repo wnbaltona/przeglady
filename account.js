@@ -1,13 +1,37 @@
-'use strict';
-let passwordRecovery=new URLSearchParams(location.hash.slice(1)).get('type')==='recovery';
-function passwordFields(current=false){return `${current?'<div class="field"><label for="account-current-password">Obecne hasło</label><input id="account-current-password" name="currentPassword" type="password" autocomplete="current-password" required></div>':''}<div class="field"><label for="account-new-password">Nowe hasło</label><input id="account-new-password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required><p class="hint">Co najmniej 8 znaków.</p></div><div class="field"><label for="account-confirm-password">Powtórz nowe hasło</label><input id="account-confirm-password" name="confirmation" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></div>`;}
-function openAccount(){if(!authUser)return;const profile=signedInProfile(),dialog=$('#account-dialog');dialog.innerHTML=`<div class="dialog-head"><h2 id="account-title">Moje konto</h2><button class="close-dialog" type="button" data-action="close-account" aria-label="Zamknij panel konta">✕</button></div><div class="dialog-body"><dl class="account-data"><dt>Imię i nazwisko</dt><dd>${esc(profile?.name||'Nie przypisano profilu')}</dd><dt>E-mail</dt><dd>${esc(authUser.email)}</dd><dt>Rola</dt><dd>${esc(profile?.role||'Oczekuje na nadanie dostępu')}</dd><dt>Przypisane MPK</dt><dd>${esc(profile?.mpks?.join(', ')||'Brak')}</dd></dl><section class="account-push"><h3>Powiadomienia na urządzeniu</h3><p id="push-status" role="status">Sprawdzanie ustawień…</p><button id="push-toggle" type="button" class="btn secondary" disabled>Włącz powiadomienia</button><p class="hint">Nowe zgłoszenia, komentarze i zmiany statusu dotyczące Twojego konta. Na każdym urządzeniu włącz powiadomienia osobno.</p></section><h3>Zmień hasło</h3><form id="account-password-form">${passwordFields(true)}<button type="submit" class="btn">Zapisz nowe hasło</button><p class="account-status" role="status"></p></form><button type="button" class="btn secondary account-logout" data-action="logout">Wyloguj się</button></div>`;if(!dialog.open)dialog.showModal();window.refreshPushButton?.();}
-function openPasswordReset(){const dialog=$('#account-dialog');dialog.innerHTML=`<div class="dialog-head"><h2 id="account-title">Nie pamiętasz hasła?</h2><button class="close-dialog" type="button" data-action="close-account" aria-label="Zamknij reset hasła">✕</button></div><div class="dialog-body"><p>Podaj adres e-mail swojego konta. Wyślemy link do ustawienia nowego hasła.</p><form id="password-reset-form"><div class="field"><label for="reset-email">E-mail</label><input id="reset-email" name="email" type="email" autocomplete="email" value="${esc($('#login-email')?.value||rememberedLoginEmail())}" required></div><button class="btn" type="submit">Wyślij link</button><p class="account-status" role="status"></p></form></div>`;if(!dialog.open)dialog.showModal();}
-function showPasswordRecovery(){document.body.classList.add('auth-screen');$('#navigation').innerHTML='';$('.profile')?.classList.add('auth-hidden');$('#notification-bell').hidden=true;$('#content').innerHTML=`<section class="panel recovery-panel"><h1>Ustaw nowe hasło</h1><p>Wpisz nowe hasło do swojego konta.</p><form id="recovery-password-form">${passwordFields()}<button class="btn" type="submit">Zapisz nowe hasło</button></form><button class="btn secondary account-logout" type="button" data-action="logout">Anuluj i wyloguj</button></section>`;}
-function validatePassword(values){if(typeof values.password!=='string'||values.password.length<8||values.password.length>128)throw Error('Nowe hasło musi mieć od 8 do 128 znaków.');if(values.password!==values.confirmation)throw Error('Wpisane nowe hasła nie są identyczne.');}
-async function sendPasswordReset(form){if(!authClient)throw Error('Logowanie nie jest jeszcze gotowe.');const values=Object.fromEntries(new FormData(form));const redirect=new URL(location.href);redirect.hash='';redirect.search='';const {error}=await authClient.auth.resetPasswordForEmail(values.email.trim(),{redirectTo:redirect.href});if(error)throw Error('Nie udało się wysłać linku. '+error.message);form.querySelector('.account-status').textContent='Jeśli konto istnieje, otrzymasz wiadomość z linkiem. Sprawdź też folder spam.';}
-async function changeAccountPassword(form,recovery=false){if(!authUser||!authClient)throw Error('Zaloguj się ponownie lub otwórz nowy link do resetowania hasła.');if(recovery&&!passwordRecovery)throw Error('Otwórz link do resetowania hasła z wiadomości e-mail.');const values=Object.fromEntries(new FormData(form));validatePassword(values);
- if(!recovery){if(!values.currentPassword)throw Error('Wpisz obecne hasło.');if(values.password===values.currentPassword)throw Error('Nowe hasło musi różnić się od obecnego.');const verifier=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});try{const {data,error}=await verifier.auth.signInWithPassword({email:authUser.email,password:values.currentPassword});if(error||data.user?.id!==authUser.id)throw Error('Obecne hasło jest nieprawidłowe.');}finally{await verifier.auth.signOut({scope:'local'});}}
- const {error}=await authClient.auth.updateUser({password:values.password});if(error)throw Error('Nie udało się zmienić hasła. '+error.message);form.reset();
- if(recovery){passwordRecovery=false;await loadDemoState();showApp();if(user()){announceProfile();startLiveSync();}toast('Hasło zostało zmienione.');}else{form.querySelector('.account-status').textContent='Hasło zostało zmienione.';}
-}
+// Panel konta korzysta z tej samej sesji i wylogowania co ustawienia.
+(() => {
+  const modal = $("#accountModal");
+  const opener = $("#accountOpen");
+  function closeAccount() {
+    modal.classList.remove("open");
+    opener.setAttribute("aria-expanded", "false");
+    if (activeSession?.user) opener.focus({ preventScroll: true });
+  }
+  window.updateAccountPanel = () => {
+    $("#accountEmail").textContent = activeSession?.user?.email || "—";
+    opener.hidden = !activeSession?.user;
+    if (!activeSession?.user) {
+      modal.classList.remove("open");
+      opener.setAttribute("aria-expanded", "false");
+    }
+  };
+  opener.onclick = () => {
+    if (!activeSession?.user) return;
+    closeUserMenu();
+    window.updateAccountPanel();
+    $("#accountMessage").textContent = "";
+    modal.classList.add("open");
+    opener.setAttribute("aria-expanded", "true");
+    $("#closeAccount").focus();
+  };
+  $("#closeAccount").onclick = closeAccount;
+  $("#accountLogout").onclick = () => $("#logout").click();
+  $("#accountTheme").onclick = () => {
+    closeAccount();
+    openThemeModal();
+  };
+  modal.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeAccount();
+  });
+  window.updateAccountPanel();
+})();

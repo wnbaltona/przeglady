@@ -21,11 +21,12 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=20260827-3"></script>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="layout.css" />
-    <link rel="stylesheet" href="workspace.css" />
+    <link rel="stylesheet" href="styles.css?v=20261007-ux4" />
   </head>
-  <body data-workspace="dashboard">
+  <body class="auth-screen" data-workspace="dashboard">
+    <div id="connectionNotice" class="connection-notice" role="status" hidden>
+      Brak połączenia z internetem. Zapis zmian wymaga połączenia.
+    </div>
     <aside class="workspace-sidebar" aria-label="Menu aplikacji">
       <a
         class="workspace-brand"
@@ -71,6 +72,21 @@
           ><span id="attentionOpenCount" class="attention-open-count" hidden
             >0</span
           >
+        </button>
+        <button
+          id="accountOpen"
+          class="secondary"
+          type="button"
+          aria-label="Moje konto"
+          aria-controls="accountModal"
+          aria-expanded="false"
+          title="Moje konto"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
+          </svg>
+          <span>Moje konto</span>
         </button>
         <div class="user-menu">
           <button
@@ -297,7 +313,45 @@
         </div>
       </section>
     </main>
-    <div class="modal" id="loginModal">
+    <div class="modal" id="accountModal">
+      <section
+        class="dialog account-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="accountTitle"
+      >
+        <button
+          type="button"
+          id="closeAccount"
+          class="modal-close"
+          aria-label="Zamknij konto"
+        >
+          ×
+        </button>
+        <h2 id="accountTitle">Moje konto</h2>
+        <p class="muted">Dane zalogowanego użytkownika</p>
+        <dl class="account-details">
+          <div>
+            <dt>Adres e-mail</dt>
+            <dd id="accountEmail">—</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>Zalogowano</dd>
+          </div>
+        </dl>
+        <p id="accountMessage" role="alert"></p>
+        <div class="account-actions">
+          <button id="accountTheme" type="button" class="secondary">
+            Zmień motyw
+          </button>
+          <button id="accountLogout" type="button" class="danger">
+            Wyloguj
+          </button>
+        </div>
+      </section>
+    </div>
+    <div class="modal open" id="loginModal">
       <form class="dialog" id="loginForm">
         <button
           type="button"
@@ -317,14 +371,26 @@
               name="email"
               autocomplete="username" /></label
           ><label class="wide"
-            >Hasło<input
-              required
-              type="password"
-              name="password"
-              autocomplete="current-password"
-          /></label>
+            >Hasło<span class="password-field"
+              ><input
+                required
+                type="password"
+                name="password"
+                autocomplete="current-password"
+                aria-label="Hasło"
+              /><button
+                type="button"
+                id="passwordToggle"
+                class="secondary"
+                aria-label="Pokaż lub ukryj hasło"
+                aria-pressed="false"
+              >
+                Pokaż
+              </button></span
+            ></label
+          >
         </div>
-        <p id="loginMessage" class="muted"></p>
+        <p id="loginMessage" class="muted" role="status" aria-live="polite"></p>
         <footer>
           <button type="button" id="themeOpenLogin" class="secondary">
             Zmień motyw</button
@@ -342,15 +408,21 @@
     </div>
     <div class="modal" id="editModal">
       <form class="dialog" id="editForm">
-        <button
-          type="button"
-          id="cancel"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2 id="formTitle">Dodaj przegląd</h2>
+        <div class="form-heading">
+          <button
+            type="button"
+            id="cancel"
+            class="modal-close"
+            aria-label="Zamknij okno"
+          >
+            ×
+          </button>
+          <h2 id="formTitle">Dodaj przegląd</h2>
+        </div>
+        <p class="form-hint">
+          Uzupełnij lokal, rodzaj i datę wykonania. Protokół i uwagi są
+          opcjonalne.
+        </p>
         <div class="form">
           <label>Miasto<input required name="city" list="cities" /></label
           ><label>Nr lokalu<input required name="local" list="locals" /></label
@@ -362,6 +434,9 @@
             >Ważny przez (mies.)<input
               required
               min="1"
+              max="120"
+              step="1"
+              inputmode="numeric"
               type="number"
               name="months"
               value="12" /></label
@@ -373,9 +448,9 @@
             >Plik protokołu<input
               type="file"
               name="file"
-              accept=".pdf,.doc,.docx,.xls,.xlsx,image/*"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp"
             /><small id="fileInfo" class="muted"
-              >Opcjonalnie: PDF, dokument lub zdjęcie.</small
+              >Opcjonalnie: PDF, dokument lub zdjęcie. Maksymalnie 10 MB.</small
             ><button type="button" id="removeAttachment" class="danger" hidden>
               Usuń załącznik
             </button></label
@@ -383,7 +458,8 @@
             >Uwagi<textarea name="notes" rows="3"></textarea>
           </label>
         </div>
-        <footer><button type="submit">Zapisz</button></footer>
+        <p id="nextDatePreview" class="next-date-preview" role="status"></p>
+        <footer><button type="submit">Zapisz przegląd</button></footer>
       </form>
     </div>
     <div class="modal" id="typesModal">
@@ -432,15 +508,17 @@
     </div>
     <div class="modal" id="localModal">
       <form class="dialog" id="localForm">
-        <button
-          type="button"
-          id="cancelLocal"
-          class="modal-close"
-          aria-label="Zamknij okno"
-        >
-          ×
-        </button>
-        <h2 id="localFormTitle">Dodaj lokal / magazyn</h2>
+        <div class="form-heading">
+          <button
+            type="button"
+            id="cancelLocal"
+            class="modal-close"
+            aria-label="Zamknij okno"
+          >
+            ×
+          </button>
+          <h2 id="localFormTitle">Dodaj lokal / magazyn</h2>
+        </div>
         <p class="muted" id="localFormDescription">
           Obiekt pojawi się na liście po wybraniu wskazanego miasta.
         </p>
@@ -719,8 +797,12 @@
         <div id="recordDetailContent"></div>
       </section>
     </div>
-    <script src="app.js"></script>
+    <script src="inspection-utils.js"></script>
+    <script src="calendar.js"></script>
+    <script src="app.js?v=20261007-ux4"></script>
     <script src="workspace.js"></script>
+    <script src="account.js"></script>
+    <script src="ux.js?v=20261007-2"></script>
     <script src="mobile-history.js"></script>
     <script src="install.js"></script>
   </body>

@@ -1,6 +1,7 @@
 const $ = (s) => document.querySelector(s),
   config = window.APP_CONFIG || {},
   ready = Boolean(config.supabaseUrl && config.supabaseAnonKey);
+// Konfiguracja i sesja
 const safeStorage = (() => {
   try {
     localStorage.setItem("__test", "1");
@@ -34,6 +35,8 @@ let activeSession = null,
   inactivityTimer = null,
   inactivityLogoutInProgress = false,
   lastActivityWrite = 0;
+let sessionVersion = 0;
+let logoutPending = false;
 let data = [],
   inspectionTypes = [],
   locations = [],
@@ -57,6 +60,7 @@ const MAX_PROTOCOL_SIZE = 10 * 1024 * 1024,
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   ]);
+// Słownik domyślnych rodzajów
 const fallbackTypes = [
   "Elektryczny (roczny)",
   "Elektryczny (5-cio letni)",
@@ -221,6 +225,7 @@ function restoreFormScroll() {
     }
   });
 }
+// Mapowanie rekordów Supabase
 const fromDb = (r) => ({
   id: r.id,
   city: r.city,
@@ -266,83 +271,7 @@ function setAttentionFilter(active) {
     history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   } catch {}
 }
-function nextDate(d, m) {
-  if (!d || !m) return "";
-  const [year, month, day] = String(d).split("-").map(Number),
-    months = Number(m);
-  if (
-    !Number.isInteger(year) ||
-    !Number.isInteger(month) ||
-    !Number.isInteger(day) ||
-    !Number.isInteger(months) ||
-    months < 1
-  )
-    return "";
-  const target = month - 1 + months,
-    targetYear = year + Math.floor(target / 12),
-    targetMonth = ((target % 12) + 12) % 12,
-    lastDay = new Date(Date.UTC(targetYear, targetMonth + 1, 0)).getUTCDate(),
-    targetDay = Math.min(day, lastDay);
-  return `${targetYear}-${String(targetMonth + 1).padStart(2, "0")}-${String(targetDay).padStart(2, "0")}`;
-}
-function daysUntilExpiry(r) {
-  const expiry = nextDate(r.done, r.months);
-  if (!expiry) return null;
-  const today = new Date();
-  const todayAtNoon = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-    12,
-  );
-  return Math.round((new Date(expiry + "T12:00:00") - todayAtNoon) / 86400000);
-}
-function daysWord(value) {
-  return Math.abs(Number(value)) === 1 ? "dzień" : "dni";
-}
-function state(r) {
-  const days = daysUntilExpiry(r);
-  if (days === null) return "";
-
-  if (days < 0) return "PO TERMINIE";
-  if (days <= 30) return "DO WYKONANIA";
-  return "OK";
-}
-
-function statusClass(r) {
-  const days = daysUntilExpiry(r);
-  if (days === null) return "";
-
-  if (days < 0) return "POBLACK";
-  if (days <= 14) return "DO14";
-  if (days <= 30) return "DO30";
-  return "OK";
-}
-
-function requiresAttention(r) {
-  const days = daysUntilExpiry(r);
-  return days !== null && days <= 14;
-}
-
-function statusLabel(r) {
-  const days = daysUntilExpiry(r);
-  if (days === null) return "—";
-
-  if (days < 0) return `Po terminie (${Math.abs(days)} ${daysWord(days)})`;
-  if (days === 0) return "Do wykonania (dzisiaj)";
-  if (days <= 30) return `Do wykonania (za ${days} ${daysWord(days)})`;
-  return "OK";
-}
-function protocol(r) {
-  return r.protocolFileName || r.protocolDate ? "DODANY" : "BRAK PROTOKOŁU";
-}
-function countLabel(n) {
-  return n === 1
-    ? "1 przegląd"
-    : (n % 100 < 12 || n % 100 > 14) && n % 10 >= 2 && n % 10 <= 4
-      ? `${n} przeglądy`
-      : `${n} przeglądów`;
-}
+// Sortowanie rejestru
 function sortValue(r, key) {
   switch (key) {
     case "local":
@@ -517,6 +446,7 @@ function refreshLocals() {
     .map((x) => `<option value="${esc(x)}">`)
     .join("");
 }
+// Wiersze i karty przeglądów
 function rows(records) {
   return records
     .map((r) => {
@@ -698,6 +628,7 @@ function renderLocalInspections(local, city) {
         </div>
     `;
 }
+// Filtrowanie i grupowanie rejestru
 function render() {
   rememberView();
   refreshLists();
@@ -802,10 +733,9 @@ function render() {
     */
 
   if (!cities.length) {
-    $("#cityGroups").innerHTML =
-      '<div class="notice">' +
-      "Brak przeglądów spełniających wybrane kryteria." +
-      "</div>";
+    $("#cityGroups").innerHTML = activeFilters
+      ? '<div class="workspace-empty"><strong>Brak wyników</strong><p>Zmień wyszukiwanie lub wyczyść filtry, aby zobaczyć pozostałe przeglądy.</p><button type="button" class="secondary" data-empty-clear>Wyczyść filtry</button></div>'
+      : '<div class="workspace-empty"><strong>Rejestr jest pusty</strong><p>Dodaj pierwszy przegląd, aby rozpocząć śledzenie terminów.</p><button type="button" data-empty-add>Dodaj przegląd</button></div>';
     window.renderWorkspace?.(shown);
     return;
   }
@@ -1059,6 +989,7 @@ function katowiceTerminal(local) {
     return "Terminal B";
   return "Pozostałe";
 }
+// Alerty
 function attentionRows() {
   return data.filter(requiresAttention).sort((a, b) => {
     const dateA = nextDate(a.done, a.months) || "9999-12-31",
@@ -1178,6 +1109,8 @@ $("#attentionShowAll").addEventListener("click", () => {
   render();
 });
 async function load() {
+  if (!activeSession?.user) return;
+  const loadingSession = sessionVersion;
   const [
     { data: rs, error },
     { data: ts, error: te },
@@ -1197,6 +1130,7 @@ async function load() {
       .eq("key", "initial_seed_done")
       .maybeSingle(),
   ]);
+  if (loadingSession !== sessionVersion || !activeSession?.user) return;
   if (error) return showError(error.message);
   if (te || le || se)
     return showError(
@@ -1229,6 +1163,7 @@ async function load() {
   render();
   $("#notice").hidden = true;
 }
+// Powiadomienia push
 function pushSupported() {
   return (
     location.protocol === "https:" &&
@@ -1418,6 +1353,7 @@ $("#pushToggle").onclick = async () => {
   if (subscription) await disablePushNotifications();
   else await enablePushNotifications();
 };
+// Limit bezczynności
 function activityStorageKey(session = activeSession) {
   return session?.user?.id
     ? `${ACTIVITY_STORAGE_PREFIX}${session.user.id}`
@@ -1510,24 +1446,47 @@ function startActivityTracking() {
 }
 async function applySession(s) {
   const previousUserId = activeSession?.user?.id || "";
+  if (previousUserId !== (s?.user?.id || "")) sessionVersion++;
   activeSession = s || null;
+  document.body.classList.toggle("auth-screen", !s?.user);
   $("#user").textContent = s?.user?.email || "Niezalogowano";
   $("#logout").hidden = !s?.user;
   $("#loginModal").classList.toggle("open", !s?.user);
   if (s?.user) {
+    $("#loginMessage").textContent = "";
+    $("#loginForm").elements.password.value = "";
     if (previousUserId !== s.user.id || !readLastActivity(s)) saveActivity(s);
     else scheduleInactivityCheck();
     await load();
+    if (!activeSession?.user || activeSession.user.id !== s.user.id) return;
+    if (previousUserId !== s.user.id)
+      window.openWorkspace?.("dashboard", false);
     if (window.activeAttention && !window.attentionModalShown) {
       window.attentionModalShown = true;
       openAttentionTable();
     }
     void syncExistingPushSubscription().finally(() => updatePushButton());
   } else {
+    closeUserMenu();
+    document.querySelectorAll(".modal.open").forEach((modal) => {
+      if (modal.id !== "loginModal") modal.classList.remove("open");
+    });
+    $("#loginModal").classList.remove("menu-origin");
+    $("#loginForm").reset();
+    $("#loginForm").elements.password.type = "password";
+    $("#passwordToggle").textContent = "Pokaż";
+    $("#passwordToggle").setAttribute("aria-pressed", "false");
+    data = [];
+    locations = [];
+    inspectionTypes = [];
+    editing = null;
+    returnToCalendar = false;
+    render();
     clearTimeout(inactivityTimer);
     inactivityTimer = null;
     void updatePushButton();
   }
+  window.updateAccountPanel?.();
 }
 async function start() {
   if (!ready) {
@@ -1535,6 +1494,8 @@ async function start() {
       "Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js.",
     );
     $("#add").disabled = true;
+    $("#loginMessage").textContent =
+      "Aplikacja wymaga konfiguracji Supabase w pliku supabase-config.js.";
     return;
   }
   const {
@@ -1566,12 +1527,25 @@ async function start() {
 }
 $("#loginForm").onsubmit = async (e) => {
   e.preventDefault();
-  const f = new FormData(e.target),
-    { error } = await sb.auth.signInWithPassword({
+  if (e.target.getAttribute("aria-busy") === "true") return;
+  const f = new FormData(e.target);
+  $("#loginMessage").textContent = "";
+  setFormBusy(e.target, true, "Logowanie…");
+  try {
+    if (!sb) throw new Error("Aplikacja wymaga konfiguracji połączenia.");
+    const { error } = await sb.auth.signInWithPassword({
       email: f.get("email"),
       password: f.get("password"),
     });
-  $("#loginMessage").textContent = error ? error.message : "";
+    if (error) throw error;
+  } catch (error) {
+    $("#loginMessage").textContent =
+      error.message === "Invalid login credentials"
+        ? "Nieprawidłowy e-mail lub hasło. Sprawdź wpisane dane."
+        : "Nie udało się zalogować. Sprawdź połączenie i spróbuj ponownie.";
+  } finally {
+    setFormBusy(e.target, false);
+  }
 };
 $("#register").onclick = async () => {
   if (!config.allowRegistration)
@@ -1587,10 +1561,36 @@ $("#register").onclick = async () => {
     : "Sprawdź skrzynkę e-mail i potwierdź konto.";
 };
 $("#logout").onclick = async () => {
-  $("#loginModal").classList.add("menu-origin");
-  closeUserMenu();
-  clearActivity();
-  await sb.auth.signOut({ scope: "local" });
+  if (logoutPending || !activeSession?.user) return;
+  logoutPending = true;
+  const session = activeSession;
+  const buttons = ["#logout", "#workspaceLogout", "#accountLogout"]
+    .map($)
+    .filter(Boolean);
+  buttons.forEach((button) => {
+    button.disabled = true;
+  });
+  $("#accountMessage").textContent = "";
+  try {
+    const { error } = await sb.auth.signOut({ scope: "local" });
+    if (error) throw error;
+    clearActivity(session);
+    await applySession(null);
+    $("#loginMessage").textContent =
+      "Wylogowano. Zaloguj się ponownie, aby otworzyć rejestr.";
+    const heading = $("#loginForm h2");
+    heading.setAttribute("tabindex", "-1");
+    heading.focus({ preventScroll: true });
+  } catch (error) {
+    const message = "Nie udało się wylogować. Spróbuj ponownie.";
+    $("#accountMessage").textContent = message;
+    showToast(message);
+  } finally {
+    logoutPending = false;
+    buttons.forEach((button) => {
+      button.disabled = false;
+    });
+  }
 };
 $("#add").onclick = () => openForm();
 $("#cancel").onclick = () => {
@@ -1603,178 +1603,6 @@ $("#cancel").onclick = () => {
     $("#calendarModal").classList.add("open");
   }
 };
-function calendarDateKey(year, month, day) {
-  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-function dateShift(date, days) {
-  const value = new Date(date + "T12:00:00");
-  value.setDate(value.getDate() + days);
-  return calendarDateKey(
-    value.getFullYear(),
-    value.getMonth(),
-    value.getDate(),
-  );
-}
-function calendarEventClass(event) {
-  return event.kind === "reminder30"
-    ? "reminder30-dot"
-    : event.kind === "reminder14"
-      ? "reminder14-dot"
-      : "expiry-dot";
-}
-function calendarCountLabel(count) {
-  return countLabel(count);
-}
-function calendarInspectionCount(events) {
-  return new Set(events.map((event) => String(event.record.id))).size;
-}
-function calendarEventSort(a, b) {
-  return (
-    String(a.date).localeCompare(String(b.date)) ||
-    norm(a.record.city).localeCompare(norm(b.record.city), "pl") ||
-    norm(a.record.local).localeCompare(norm(b.record.local), "pl") ||
-    norm(a.record.type).localeCompare(norm(b.record.type), "pl")
-  );
-}
-function calendarEventCard(event, showDate = false) {
-  const eventClass =
-    event.kind === "reminder30"
-      ? "reminder30"
-      : event.kind === "reminder14"
-        ? "reminder14"
-        : "expiry";
-  const eventText =
-    event.kind === "reminder30"
-      ? "Do wykonania (za 30 dni)"
-      : event.kind === "reminder14"
-        ? "Do wykonania (za 14 dni)"
-        : "Termin ważności";
-  const expiry = nextDate(event.record.done, event.record.months);
-  return `
-        <article class="calendar-event-card ${eventClass}">
-            <div class="calendar-event-kind">
-                <span class="calendar-dot ${calendarEventClass(event)}"></span>
-                ${showDate ? `${fmt(event.date)} · ` : ""}${eventText}
-            </div>
-            <div class="calendar-event-place">${esc(event.record.city)} — ${esc(event.record.local)}</div>
-            <div class="calendar-event-type">${esc(event.record.type)}</div>
-            <div class="calendar-event-expiry">Ważność do: <strong>${fmt(expiry)}</strong></div>
-            <button type="button" class="secondary" data-calendar-edit="${esc(event.record.id)}">Edytuj przegląd</button>
-        </article>
-    `;
-}
-function renderCalendarDetails(date, events) {
-  const details = $("#calendarDetails");
-  if (!events?.length) {
-    details.classList.add("muted");
-    details.textContent = "Brak terminów w tym dniu.";
-    return;
-  }
-  details.classList.remove("muted");
-  const orderedEvents = [...events]
-    .map((event) => ({ ...event, date: event.date || date }))
-    .sort(calendarEventSort);
-  details.innerHTML = `
-        <div class="calendar-details-heading">
-            <strong>${fmt(date)}</strong>
-            <span class="calendar-details-count">${calendarCountLabel(calendarInspectionCount(events))}</span>
-        </div>
-        <div class="calendar-event-list">
-            ${orderedEvents.map((event) => calendarEventCard(event)).join("")}
-        </div>
-    `;
-}
-function renderCalendarOverview(events, year, month) {
-  const details = $("#calendarDetails"),
-    prefix = `${year}-${String(month + 1).padStart(2, "0")}-`;
-  const monthEvents = Object.entries(events)
-    .filter(([date]) => date.startsWith(prefix))
-    .flatMap(([date, items]) => items.map((event) => ({ ...event, date })))
-    .sort(calendarEventSort);
-  if (!monthEvents.length) {
-    details.classList.add("muted");
-    details.textContent = "W tym miesiącu nie ma oznaczonych terminów.";
-    return;
-  }
-  details.classList.remove("muted");
-  details.innerHTML = `
-        <div class="calendar-details-heading">
-            <strong>Terminy w tym miesiącu</strong>
-            <span class="calendar-details-count">${calendarCountLabel(calendarInspectionCount(monthEvents))}</span>
-        </div>
-        <div class="calendar-event-list">${monthEvents.map((event) => calendarEventCard(event, true)).join("")}</div>
-    `;
-}
-function renderCalendar() {
-  const year = calendarMonth.getFullYear(),
-    month = calendarMonth.getMonth();
-  $("#calendarTitle").textContent = new Date(year, month, 1).toLocaleDateString(
-    "pl-PL",
-    { month: "long", year: "numeric" },
-  );
-  const events = data.reduce((map, record) => {
-    const expiry = nextDate(record.done, record.months);
-    if (!expiry) return map;
-    const reminder30 = dateShift(expiry, -30),
-      reminder14 = dateShift(expiry, -14);
-    (map[reminder30] ??= []).push({ record, kind: "reminder30" });
-    (map[reminder14] ??= []).push({ record, kind: "reminder14" });
-    (map[expiry] ??= []).push({ record, kind: "expiry" });
-    return map;
-  }, {});
-  const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7,
-    days = new Date(year, month + 1, 0).getDate();
-  const weekCount = Math.ceil((firstWeekday + days) / 7);
-  $("#calendarGrid").style.setProperty("--calendar-weeks", weekCount);
-  const today = new Date(),
-    todayKey = calendarDateKey(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
-  let html = "";
-  for (let index = 0; index < firstWeekday; index++)
-    html += '<span class="calendar-day empty" aria-hidden="true"></span>';
-  for (let day = 1; day <= days; day++) {
-    const key = calendarDateKey(year, month, day),
-      dayEvents = events[key] || [],
-      dots = dayEvents
-        .slice(0, 5)
-        .map(
-          (event) =>
-            `<span class="calendar-dot ${calendarEventClass(event)}" aria-hidden="true"></span>`,
-        )
-        .join("");
-    const dayLabel = new Date(year, month, day).toLocaleDateString("pl-PL", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
-      eventLabel = dayEvents.length
-        ? `, ${calendarCountLabel(dayEvents.length)}`
-        : ", brak terminów";
-    const mobileDots = [...new Set(dayEvents.map(calendarEventClass))]
-      .map(
-        (eventClass) =>
-          `<span class="calendar-dot ${eventClass}" aria-hidden="true"></span>`,
-      )
-      .join("");
-    html += `<button type="button" class="calendar-day ${dayEvents.length ? "has-events" : ""} ${key === todayKey ? "today" : ""} ${key === calendarSelectedDate ? "selected" : ""}" data-calendar-date="${key}" aria-label="${esc(dayLabel + eventLabel)}" aria-current="${key === todayKey ? "date" : "false"}" aria-pressed="${key === calendarSelectedDate}"><span class="calendar-date">${day}</span>${dayEvents.length ? `<span class="calendar-events calendar-desktop-events">${dots}</span><span class="calendar-events calendar-mobile-events">${mobileDots}</span>` : ""}</button>`;
-  }
-  for (let index = firstWeekday + days; index < weekCount * 7; index++)
-    html += '<span class="calendar-day empty" aria-hidden="true"></span>';
-  $("#calendarGrid").innerHTML = html;
-  $("#calendarGrid").onclick = (e) => {
-    const day = e.target.closest("[data-calendar-date]");
-    if (!day) return;
-    calendarSelectedDate = day.dataset.calendarDate;
-    renderCalendar();
-  };
-  if (calendarSelectedDate)
-    renderCalendarDetails(calendarSelectedDate, events[calendarSelectedDate]);
-  else renderCalendarOverview(events, year, month);
-}
 $("#showCalendar").onclick = () => {
   calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   calendarSelectedDate = "";
@@ -1914,6 +1742,7 @@ document.querySelectorAll("[data-theme]").forEach((btn) => {
     closeThemeModal();
   };
 });
+// Formularz przeglądu
 function openForm(r = null, fromCalendar = false, defaults = {}) {
   rememberView();
   formScroll = {
@@ -1940,7 +1769,7 @@ function openForm(r = null, fromCalendar = false, defaults = {}) {
   $("#formTitle").textContent = edit ? "Edytuj przegląd" : "Dodaj przegląd";
   $("#fileInfo").textContent = r?.protocolFileName
     ? `Obecny plik: ${r.protocolFileName}. Wybranie nowego zastąpi obecny.`
-    : "Opcjonalnie: PDF, dokument lub zdjęcie.";
+    : "Opcjonalnie: PDF, dokument lub zdjęcie. Maksymalnie 10 MB.";
   $("#removeAttachment").hidden = !r?.protocolPath;
   $("#editModal").classList.add("open");
 }
@@ -2003,7 +1832,8 @@ $("#removeAttachment").onclick = async () => {
       throw new Error(
         `Załącznik odłączono od wpisu, ale nie udało się usunąć pliku: ${removeError.message}`,
       );
-    $("#fileInfo").textContent = "Opcjonalnie: PDF, dokument lub zdjęcie.";
+    $("#fileInfo").textContent =
+      "Opcjonalnie: PDF, dokument lub zdjęcie. Maksymalnie 10 MB.";
     button.hidden = true;
     await load();
     alert("Załącznik został usunięty.");
@@ -2015,7 +1845,8 @@ $("#removeAttachment").onclick = async () => {
 };
 $("#editForm").onsubmit = async (e) => {
   e.preventDefault();
-  const submit = e.submitter;
+  if (e.target.getAttribute("aria-busy") === "true") return;
+  setFormFeedback(e.target);
   let uploadedPath = null;
   let inspectionSaved = false;
 
@@ -2042,7 +1873,7 @@ $("#editForm").onsubmit = async (e) => {
     )
       throw new Error("Taki przegląd dla tego lokalu już istnieje.");
 
-    if (submit) submit.disabled = true;
+    setFormBusy(e.target, true);
 
     // Najpierw zapisujemy słowniki. Dzięki temu błąd pomocniczego zapisu
     // nie wystąpi już po utworzeniu wpisu wskazującego na protokół.
@@ -2139,9 +1970,14 @@ $("#editForm").onsubmit = async (e) => {
     // Nowy plik usuwamy tylko wtedy, gdy wpis nie został zapisany w bazie.
     if (uploadedPath && !inspectionSaved)
       await sb.storage.from("protocols").remove([uploadedPath]);
-    alert("Błąd podczas zapisywania: " + err.message);
+    setFormFeedback(
+      e.target,
+      err instanceof TypeError
+        ? "Nie udało się zapisać przeglądu. Sprawdź połączenie i spróbuj ponownie."
+        : "Nie udało się zapisać przeglądu. " + err.message,
+    );
   } finally {
-    if (submit) submit.disabled = false;
+    setFormBusy(e.target, false);
   }
 };
 async function editRow(id) {
@@ -2299,13 +2135,15 @@ $("#addLocal").onclick = () => openLocationForm();
 $("#cancelLocal").onclick = closeLocationForm;
 $("#localForm").onsubmit = async (e) => {
   e.preventDefault();
+  if (e.target.getAttribute("aria-busy") === "true") return;
+  setFormFeedback(e.target);
   const f = new FormData(e.target),
     city = String(f.get("city")).trim(),
     mpk = String(f.get("mpk")).trim(),
     name = String(f.get("name")).trim(),
     local = `${mpk} (${name})`;
   if (!city || !mpk || !name)
-    return alert("Uzupełnij miasto, MPK i nazwę obiektu.");
+    return setFormFeedback(e.target, "Uzupełnij miasto, MPK i nazwę obiektu.");
   const original = editingLocation;
   if (original && city === original.city && local === original.local)
     return closeLocationForm();
@@ -2313,13 +2151,12 @@ $("#localForm").onsubmit = async (e) => {
     original &&
     locations.some((row) => row.city === city && row.local === local)
   ) {
-    return alert("Obiekt o takiej nazwie już istnieje w tym mieście.");
+    return setFormFeedback(
+      e.target,
+      "Obiekt o takiej nazwie już istnieje w tym mieście.",
+    );
   }
-  const submit = e.target.querySelector(
-    'button[type="submit"], footer button:not([type])',
-  );
-  submit.disabled = true;
-  $("#cancelLocal").disabled = true;
+  setFormBusy(e.target, true);
   try {
     const { error } = original
       ? await sb.rpc("rename_location", {
@@ -2341,13 +2178,14 @@ $("#localForm").onsubmit = async (e) => {
     }
     await load();
     closeLocationForm();
+    showToast(original ? "Zapisano zmiany lokalu" : "Dodano lokal");
   } catch (error) {
-    alert("Nie udało się zapisać lokalu: " + error.message);
+    setFormFeedback(e.target, "Nie udało się zapisać lokalu. " + error.message);
   } finally {
-    submit.disabled = false;
-    $("#cancelLocal").disabled = false;
+    setFormBusy(e.target, false);
   }
 };
+// Lista lokali
 function locationKind(local) {
   return /magazyn/i.test(String(local || "")) ? "Magazyn" : "Lokal";
 }
@@ -2685,7 +2523,10 @@ if (savedTheme) {
   });
 }
 // Zamykanie przez tło korzysta z tej samej ścieżki co przyciski okien.
-$("#closeLogin").onclick = () => $("#loginModal").classList.remove("open");
+$("#closeLogin").onclick = () => {
+  if (!document.body.classList.contains("auth-screen"))
+    $("#loginModal").classList.remove("open");
+};
 const modalCloseButtons = {
   loginModal: "closeLogin",
   editModal: "cancel",
@@ -2697,6 +2538,7 @@ const modalCloseButtons = {
   calendarModal: "closeCalendar",
   attentionModal: "closeAttention",
   themeModal: "closeTheme",
+  accountModal: "closeAccount",
 };
 document.querySelectorAll(".modal").forEach((modal) => {
   let startedOnBackdrop = false;
