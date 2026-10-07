@@ -10,7 +10,7 @@ Aplikacja do obsługi terminów przeglądów, protokołów i powiadomień. Dane 
 - `calendar.js` — siatka miesiąca, alerty i szczegóły terminów.
 - `app.js` — stan aplikacji, Supabase, rejestr i operacje użytkownika.
 - `workspace.js` — nawigacja, pulpit i szczegóły przeglądu.
-- `account.js` — panel konta w nagłówku.
+- `header-session.js` — przycisk wylogowania w nagłówku.
 - `ux.js` — fokus w oknach, informacje przy formularzach i stan połączenia.
 - `mobile-history.js` — zamykanie okien i cofanie na telefonie.
 - `install.js` — przycisk instalacji i instrukcje dla przeglądarek.

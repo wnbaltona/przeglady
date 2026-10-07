@@ -45,7 +45,6 @@ function setFormBusy(form, busy, text = "Zapisywanie…") {
     trashModal: "closeTrash",
     historyModal: "closeHistory",
     themeModal: "closeTheme",
-    accountModal: "closeAccount",
     attentionModal: "closeAttention",
     recordDetailModal: "closeRecordDetail",
   };
@@ -119,7 +118,7 @@ function setFormBusy(form, busy, text = "Zapisywanie…") {
       const target =
         returnTo?.isConnected && visible(returnTo)
           ? returnTo
-          : document.querySelector("#accountOpen:not([hidden])");
+          : document.querySelector("#headerLogout:not([hidden])");
       target?.focus({ preventScroll: true });
     }
     topModal = next;

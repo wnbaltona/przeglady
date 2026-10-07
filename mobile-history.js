@@ -11,7 +11,6 @@
     loginModal: "closeLogin",
     attentionModal: "closeAttention",
     recordDetailModal: "closeRecordDetail",
-    accountModal: "closeAccount",
   };
   const marker = "inspectionNavigation";
   let initialized = false,

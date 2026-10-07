@@ -1486,7 +1486,7 @@ async function applySession(s) {
     inactivityTimer = null;
     void updatePushButton();
   }
-  window.updateAccountPanel?.();
+  window.updateHeaderSession?.();
 }
 async function start() {
   if (!ready) {
@@ -1564,13 +1564,12 @@ $("#logout").onclick = async () => {
   if (logoutPending || !activeSession?.user) return;
   logoutPending = true;
   const session = activeSession;
-  const buttons = ["#logout", "#workspaceLogout", "#accountLogout"]
+  const buttons = ["#logout", "#workspaceLogout", "#headerLogout"]
     .map($)
     .filter(Boolean);
   buttons.forEach((button) => {
     button.disabled = true;
   });
-  $("#accountMessage").textContent = "";
   try {
     const { error } = await sb.auth.signOut({ scope: "local" });
     if (error) throw error;
@@ -1583,7 +1582,6 @@ $("#logout").onclick = async () => {
     heading.focus({ preventScroll: true });
   } catch (error) {
     const message = "Nie udało się wylogować. Spróbuj ponownie.";
-    $("#accountMessage").textContent = message;
     showToast(message);
   } finally {
     logoutPending = false;
@@ -2538,7 +2536,6 @@ const modalCloseButtons = {
   calendarModal: "closeCalendar",
   attentionModal: "closeAttention",
   themeModal: "closeTheme",
-  accountModal: "closeAccount",
 };
 document.querySelectorAll(".modal").forEach((modal) => {
   let startedOnBackdrop = false;

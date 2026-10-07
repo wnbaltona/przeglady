@@ -29,10 +29,11 @@ async function run() {
         this.elements.password.value = "";
       },
     });
-  const openModal = { id: "accountModal", classList: classList("open") };
+  const openModal = { id: "editModal", classList: classList("open") };
   let signedOut = false,
     rejectLogout = false,
-    clearCount = 0;
+    clearCount = 0,
+    toastMessage = "";
   const context = vm.createContext({
     $: node,
     document: {
@@ -56,7 +57,9 @@ async function run() {
     clearActivity() {
       clearCount++;
     },
-    showToast() {},
+    showToast(message) {
+      toastMessage = message;
+    },
     sb: {
       auth: {
         async signOut() {
@@ -87,8 +90,8 @@ async function run() {
   assert.equal(context.activeSession.user.id, "test");
   assert.equal(context.data.length, 1);
   assert.equal(clearCount, 0);
-  assert.equal(node("#accountLogout").disabled, false);
-  assert.match(node("#accountMessage").textContent, /Nie udało/);
+  assert.equal(node("#headerLogout").disabled, false);
+  assert.match(toastMessage, /Nie udało/);
 
   rejectLogout = false;
   await Promise.all([node("#logout").onclick(), node("#logout").onclick()]);

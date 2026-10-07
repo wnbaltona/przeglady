@@ -7248,8 +7248,8 @@ body.theme-dark .location-active {
   border-color: #438961;
 }
 
-/* Konto w nagłówku i osobny ekran logowania. */
-.top .actions > #accountOpen {
+/* Wylogowanie w nagłówku i osobny ekran logowania. */
+.top .actions > #headerLogout {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -7257,7 +7257,7 @@ body.theme-dark .location-active {
   min-height: 40px;
   flex-shrink: 0;
 }
-#accountOpen svg {
+#headerLogout svg {
   width: 20px;
   height: 20px;
   fill: none;
@@ -7265,58 +7265,6 @@ body.theme-dark .location-active {
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-.modal .account-dialog {
-  width: min(440px, calc(100vw - 24px));
-  height: auto;
-  max-height: calc(100dvh - 32px);
-  padding: 28px;
-  overflow-y: auto;
-}
-.account-dialog h2 {
-  margin: 0;
-  padding-right: 32px;
-}
-.account-dialog > p {
-  margin: 8px 0 20px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.account-details {
-  margin: 0 0 20px;
-  display: grid;
-  gap: 14px;
-}
-.account-details > div {
-  padding: 12px;
-  background: var(--surface-soft);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.account-details dt {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-bottom: 5px;
-}
-.account-details dd {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-.account-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-.account-actions button {
-  min-height: 42px;
-}
-#accountMessage:empty {
-  display: none;
-}
-#accountMessage {
-  color: var(--red);
 }
 body.auth-screen {
   background: #fff;
@@ -7356,27 +7304,22 @@ body.auth-screen #closeLogin {
 }
 @media (max-width: 800px) {
   body .top {
-    grid-template-columns: 32px minmax(0, 1fr) 40px 40px;
+    grid-template-columns: 32px minmax(0, 1fr) 40px 72px;
     grid-template-areas: "logo title alerts account" "search search search search";
     gap: 10px;
   }
-  .top .actions > #accountOpen {
+  .top .actions > #headerLogout {
     grid-area: account;
-    width: 40px;
+    width: 72px;
+    font-size: 11px;
     height: 40px;
     padding: 0;
     border: 1px solid rgb(255 255 255 / 18%);
     background: rgb(255 255 255 / 10%);
     color: #fff;
   }
-  #accountOpen span {
+  #headerLogout svg {
     display: none;
-  }
-  .modal .account-dialog {
-    padding: 24px 20px;
-  }
-  .account-dialog h2 {
-    font-size: 20px;
   }
 }
 
