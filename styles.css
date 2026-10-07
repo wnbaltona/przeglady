@@ -7610,3 +7610,25 @@ body.theme-dark .badge.BRAK {
     font-size: 10px;
   }
 }
+
+/* Kropka i opis w legendzie mają osobne miejsce także po zawinięciu wiersza. */
+.calendar-dialog .calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.calendar-dialog .calendar-legend-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  white-space: nowrap;
+}
+.calendar-dialog .calendar-legend-item .calendar-dot {
+  display: block;
+  position: static;
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+}
