@@ -5678,14 +5678,12 @@ body:has(.modal.open) {
   overflow: hidden;
 }
 @media (min-width: 801px) {
-  #recordDetailModal,
-  #editModal {
+  #recordDetailModal {
     padding: 0;
     align-items: stretch;
     justify-content: flex-end;
   }
-  #recordDetailModal > .dialog,
-  #editModal > .dialog {
+  #recordDetailModal > .dialog {
     width: min(520px, 90vw);
     max-width: 520px;
     margin: 0;
@@ -5696,8 +5694,7 @@ body:has(.modal.open) {
     overflow-y: auto;
     box-shadow: -12px 0 40px #17253618;
   }
-  #recordDetailModal .modal-close,
-  #editModal .modal-close {
+  #recordDetailModal .modal-close {
     top: 16px;
     right: 16px;
   }
@@ -7663,5 +7660,70 @@ body .form-heading .modal-close {
   }
   body .form-heading .modal-close {
     top: 8px;
+  }
+}
+
+/* Formularz przeglądu pozostaje wyśrodkowany także na krótkich ekranach. */
+#editModal {
+  padding: 24px;
+  align-items: center;
+  justify-items: center;
+}
+#editModal > .dialog {
+  width: min(680px, 100%);
+  max-width: 680px;
+  height: auto;
+  max-height: calc(100dvh - 48px);
+  margin: 0;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 24px 72px #0003;
+  overscroll-behavior: contain;
+}
+#editForm .form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 18px;
+}
+#editForm .form label:nth-child(3),
+#editForm .form label:nth-child(6) {
+  grid-column: 1 / -1;
+}
+#editForm .form input,
+#editForm .form textarea {
+  width: 100%;
+  min-width: 0;
+}
+#editForm footer {
+  bottom: -20px;
+  margin-bottom: -20px;
+  padding: 14px 0 20px;
+}
+@media (max-width: 800px) {
+  #editModal {
+    padding: max(12px, env(safe-area-inset-top)) 12px
+      max(12px, env(safe-area-inset-bottom));
+  }
+  #editModal > .dialog {
+    padding: 16px;
+    max-height: calc(
+      100dvh - max(12px, env(safe-area-inset-top)) -
+        max(12px, env(safe-area-inset-bottom))
+    );
+    border-radius: 16px;
+  }
+  #editForm .form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  #editForm .form label {
+    grid-column: 1;
+  }
+  #editForm footer {
+    bottom: -16px;
+    margin-bottom: -16px;
+    padding-bottom: 16px;
+  }
+  #editForm footer button {
+    width: 100%;
   }
 }
