@@ -919,7 +919,7 @@ function render() {
                                     data-local="${esc(local)}"
                                 >
 
-                                    <div class="local-add-row"><button type="button" class="secondary" data-add-inspection data-city="${esc(cityName)}" data-local="${esc(local)}">+ Dodaj przegląd</button></div>
+                                    <div class="local-add-row"><span class="local-section-title">Przeglądy lokalu</span><button type="button" class="secondary" data-add-inspection data-city="${esc(cityName)}" data-local="${esc(local)}">+ Dodaj przegląd</button></div>
                                     ${
                                       localRows.length
                                         ? `

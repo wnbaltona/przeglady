@@ -6390,11 +6390,25 @@ body:has(.modal.open) {
 }
 .local-add-row {
   display: flex;
-  justify-content: flex-end;
-  margin: 0 0 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 0 0 12px;
+}
+.local-section-title {
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--text-muted);
 }
 .local-add-row button {
-  min-height: 40px;
+  margin-left: auto;
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 11px;
+  line-height: 1.25;
 }
 .location-actions {
   flex-wrap: wrap;
@@ -7631,4 +7645,90 @@ body.theme-dark .badge.BRAK {
   width: 8px;
   height: 8px;
   margin: 0;
+}
+
+/* Rozwinięty lokal nie rozszerza siatki poza dostępną szerokość. */
+#cityGroups,
+#cityGroups .city-group,
+#cityGroups .local-list,
+#cityGroups .local-wrapper,
+#cityGroups .local-inspections,
+#cityGroups .desktop-inspection-table {
+  min-width: 0;
+  max-width: 100%;
+}
+#cityGroups .local-inspections {
+  margin-left: 0;
+}
+@media (min-width: 801px) {
+  #cityGroups .local-inspections {
+    padding: 10px;
+    overflow-x: visible;
+  }
+  #cityGroups .inspections-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+  #cityGroups .inspections-table .col-type {
+    width: 18%;
+  }
+  #cityGroups .inspections-table .col-done {
+    width: 12%;
+  }
+  #cityGroups .inspections-table .col-next {
+    width: 12%;
+  }
+  #cityGroups .inspections-table .col-status {
+    width: 18%;
+  }
+  #cityGroups .inspections-table .col-protocol {
+    width: 12%;
+  }
+  #cityGroups .inspections-table .col-notes {
+    width: 10%;
+  }
+  #cityGroups .inspections-table .col-actions {
+    width: 18%;
+  }
+  #cityGroups .inspections-table :is(th, td) {
+    min-width: 0;
+    padding: 10px 8px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #cityGroups .inspections-table .badge {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: normal;
+  }
+  #cityGroups .inspections-table .row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+  #cityGroups .inspections-table .row-actions button {
+    padding: 8px;
+    max-width: 100%;
+  }
+  #cityGroups .inspections-table .open-file {
+    display: block;
+    max-width: 100%;
+    margin: 5px auto 0;
+  }
+}
+
+@media (min-width: 801px) {
+  #cityGroups .inspections-table th {
+    overflow-wrap: normal;
+  }
+  #cityGroups .inspections-table .sort-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3px;
+    max-width: 100%;
+  }
+  #cityGroups .inspections-table .sort-arrow {
+    flex: 0 0 12px;
+  }
 }
