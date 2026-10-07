@@ -6922,8 +6922,8 @@ body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric {
   border: 1px solid var(--line);
   border-left: 6px solid var(--metric-accent);
   border-radius: 16px;
-  padding: 20px 23px;
-  gap: 10px;
+  padding: 14px 18px;
+  gap: 8px;
 }
 body :is(#dashboardMetrics, #registerStatusFilters) .metric-overdue {
   --metric-accent: #ef4444;
@@ -6935,30 +6935,30 @@ body :is(#dashboardMetrics, #registerStatusFilters) .metric-current {
   --metric-accent: #10b981;
 }
 body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric span {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.4;
 }
 body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric b {
-  font-size: 32px;
+  font-size: 28px;
   line-height: 1.2;
 }
 @media (max-width: 800px) {
   body :is(#dashboardMetrics, #registerStatusFilters) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    gap: 8px;
   }
   body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric {
-    padding: 12px 14px;
+    padding: 10px 12px;
     border-left-width: 5px;
     border-radius: 12px;
-    grid-template-rows: 20px 30px;
-    gap: 6px;
+    grid-template-rows: 18px 27px;
+    gap: 4px;
   }
   body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric span {
     font-size: 12px;
   }
   body :is(#dashboardMetrics, #registerStatusFilters) .dashboard-metric b {
-    font-size: 26px;
+    font-size: 24px;
   }
 }
 
