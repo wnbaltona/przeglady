@@ -212,7 +212,7 @@
   });
   function recordRow(record) {
     const expiry = nextDate(record.done, record.months);
-    return `<tr data-record-detail="${esc(record.id)}" tabindex="0" aria-label="Szczegóły: ${esc(record.local)} — ${esc(record.type)}"><td data-label="Lokal"><b>${esc(record.local)}</b><small>${esc(record.city)}</small></td><td data-label="Rodzaj">${esc(record.type)}</td><td data-label="Wykonano">${fmt(record.done)}</td><td data-label="Następny termin">${fmt(expiry)}</td><td data-label="Status"><span class="badge ${statusClass(record)}">${statusLabel(record)}</span></td><td data-label="Protokół"><span class="protocol-label">${protocol(record) === "DODANY" ? "Dodany" : "Brak"}</span></td><td class="record-open"><span aria-hidden="true">›</span></td></tr>`;
+    return `<tr data-record-detail="${esc(record.id)}" tabindex="0" aria-label="Szczegóły: ${esc(record.local)} — ${esc(record.type)}"><td data-label="Lokal"><b>${esc(record.local)}</b><small>${esc(record.city)}</small></td><td data-label="Rodzaj">${esc(record.type)}</td><td data-label="Wykonano">${fmt(record.done)}</td><td data-label="Następny termin">${fmt(expiry)}</td><td data-label="Status"><span class="badge ${statusClass(record)}">${statusLabel(record)}</span></td><td data-label="Protokół"><span class="badge ${protocol(record) === "DODANY" ? "OK" : "BRAK"}">${protocol(record) === "DODANY" ? "Dodany" : "Brak"}</span></td><td class="record-open"><span aria-hidden="true">›</span></td></tr>`;
   }
   function recordTable(records) {
     const headers = [
