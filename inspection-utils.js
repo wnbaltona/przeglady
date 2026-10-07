@@ -67,7 +67,7 @@ function statusLabel(record) {
   return "OK";
 }
 function protocol(record) {
-  return record.protocolFileName || record.protocolDate
+  return record.protocolPath || record.protocolFileName || record.protocolDate
     ? "DODANY"
     : "BRAK PROTOKOŁU";
 }

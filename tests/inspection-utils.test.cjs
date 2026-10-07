@@ -41,6 +41,11 @@ assert.equal(
   "Po terminie (1 dzień)",
 );
 assert.equal(context.protocol({ protocolDate: "2026-10-07" }), "DODANY");
+assert.equal(
+  context.protocol({ protocolPath: "inspections/test.pdf" }),
+  "DODANY",
+);
+assert.equal(context.protocol({ protocolFileName: "test.pdf" }), "DODANY");
 assert.equal(context.protocol({}), "BRAK PROTOKOŁU");
 assert.equal(context.countLabel(1), "1 przegląd");
 assert.equal(context.countLabel(12), "12 przeglądów");

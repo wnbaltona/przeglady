@@ -456,7 +456,7 @@ function rows(records) {
     <span class="badge ${statusClass(r)}">
         ${statusLabel(r)}
     </span>
-</td><td class="protocol-cell"><span class="badge ${p === "DODANY" ? "OK" : "BRAK"}">${p === "DODANY" ? "DODANY" : "BRAK"}</span>${r.protocolPath ? ` <button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>` : ""}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
+</td><td class="protocol-cell">${r.protocolPath ? `<button type="button" class="open-file" data-action="open" data-id="${esc(r.id)}">Otwórz</button>` : `<span class="badge ${p === "DODANY" ? "OK" : "BRAK"}">${p === "DODANY" ? "DODANY" : "BRAK"}</span>`}</td><td>${esc(r.notes)}</td><td><div class="row-actions">
     <button type="button" class="secondary action-edit" data-action="edit" data-id="${esc(r.id)}" title="Edytuj" aria-label="Edytuj">
         <span>Edytuj</span>
     </button>
